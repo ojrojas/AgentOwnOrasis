@@ -13,6 +13,27 @@
   "activationEvents": [],
   "main": "./oroasis/out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Oroasis Settings",
+      "type": "object",
+      "properties": {
+        "oroasisSettings.ollamaBaseUrl":{
+          "type":"string",
+          "default": "http://127.0.0.1:11434",
+          "description": "Write the 'Ollama' base url"
+        },
+        "oroasisSettings.ollamaListModels":{
+          "type":"array",
+          "default":["llama3.2"],
+          "description": "List of models from Ollama"
+        },
+        "oroasisSettings.templatePromptGenerate":{
+          "type":"string",
+          "default": "", 
+          "description": "Template prompt use to generate "
+        }
+      }
+    },
     "commands": [
       {
         "command": "agentownorasis.helloWorld",
