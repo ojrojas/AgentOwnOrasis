@@ -13,7 +13,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/oroasis/out/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
 		}

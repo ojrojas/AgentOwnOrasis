@@ -8,6 +8,10 @@ export class OllamaApiService {
         const settings = vscode.workspace.getConfiguration("oroasisSettings");
         this.templateGenerate = settings.get('templatePromptGenerate');
         this.ollama = new Ollama({ host: settings.get('ollamaBaseUrl') });
+        const models = this.listModels();
+        models.then(response => {
+            if(response.models.length){}
+        })
     }
 
     listModels = () => {

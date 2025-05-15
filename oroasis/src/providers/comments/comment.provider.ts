@@ -1,8 +1,8 @@
 import { Comment, CommentAuthorInformation, CommentMode, CommentReaction, MarkdownString } from 'vscode'
 import { CommnetType } from './comment.types';
 export class CommentComponent implements Comment {
-    id: number;
-    type: CommnetType;
+    id = 0;
+    type: CommnetType = 'Markdown';
     marked: string | MarkdownString;
     constructor(
         public body: string | MarkdownString,
@@ -11,7 +11,7 @@ export class CommentComponent implements Comment {
         public contextValue?: string | undefined,
         public reactions?: CommentReaction[] | undefined,
         public timestamp?: Date | undefined) {
-           ++ this.id;
-          this.marked = this.body; 
+        ++this.id;
+        this.marked = this.body;
     }
 }
