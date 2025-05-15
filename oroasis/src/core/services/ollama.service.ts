@@ -1,29 +1,44 @@
-import { GenerateRequest, Ollama } from 'ollama';
-import * as vscode from 'vscode';
+import { ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, Message, Ollama } from 'ollama';
+import { workspace } from 'vscode';
 
 export class OllamaApiService {
     readonly ollama: Ollama;
     templateGenerate: string | undefined;
+    messages: Message[] = [];
     constructor() {
-        const settings = vscode.workspace.getConfiguration("oroasisSettings");
+        const settings = workspace.getConfiguration("oroasisSettings");
         this.templateGenerate = settings.get('templatePromptGenerate');
         this.ollama = new Ollama({ host: settings.get('ollamaBaseUrl') });
-        const models = this.listModels();
-        models.then(response => {
-            if(response.models.length){}
-        })
+        const response = this.listModels();
+        response.then(list => {
+            if (list.models.length > 0) {
+                settings.update("ollamaListModels", list.models);
+            }
+        });
     }
 
     listModels = () => {
         return this.ollama.list();
     };
 
-    generate = (request: GenerateRequest) => {
+    generate = (request: GenerateRequest): Promise<GenerateResponse> => {
         return this.ollama.generate({
             model: request.model,
             prompt: request.prompt,
             template: this.templateGenerate
         });
+    };
+
+    chat = (request: ChatRequest): Promise<ChatResponse> => {
+        this.addMessages(request.messages!);
+        return this.ollama.chat({
+            model: request.model,
+            messages: this.messages
+        });
+    };
+
+    public addMessages = (messages: Message[]): void => {
+        this.messages.push(messages[0]);
     };
 
 }

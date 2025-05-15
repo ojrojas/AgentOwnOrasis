@@ -28,20 +28,29 @@
           "description": "List of models from Ollama"
         },
         "oroasisSettings.templatePromptGenerate":{
-          "type":"string",
-          "default": "", 
-          "description": "Template prompt use to generate "
+          "type": "string",
+          "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices", 
+          "editPresentation": "multilineText",
+          "description": "Template prompt use to generate"
         }
       }
     },
     "commands": [
       {
         "command": "oroasis.helloWorld",
-        "title": "Hello World"
+        "title": "Oroasis: Hello World"
       },
       {
         "command": "oroasis.openChatAgent", 
-        "title": "Oroasis Open Chat Agent"
+        "title": "Oroasis: Open Chat Agent"
+      },
+      {
+        "command": "oroasis.createComment",
+        "title": "Oroasis: Create Comment"
+      },
+      {
+        "command": "oroasis.askAgent",
+        "title": "Oroasis: Ask to Agent"
       }
     ]
   },
