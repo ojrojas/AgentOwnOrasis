@@ -1,0 +1,19 @@
+{
+  "name": "oroasis",
+  "version": "1.0.0",
+  "description": "Extension agent manage",
+  "publisher": "orojasga",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Extension",
+    "agent",
+    "IA"
+  ],
+  "author": "Oscar Julian Rojas",
+  "license": "GNU LGPLv3",
+  "dependencies": {
+    "ollama": "^0.5.15"
+  }
+}

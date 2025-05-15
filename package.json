@@ -1,0 +1,49 @@
+{
+  "name": "agentownorasis",
+  "displayName": "AgentOwnOrasis",
+  "description": "Personal agent IA",
+  "version": "0.0.1",
+  "publisher": "orojasga",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./oroasis/out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentownorasis.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "oroasis.openChatAgent", 
+        "title": "Oroasis Open Chat Agent"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "start:webview": "cd webview-chat && npm run start",
+    "build:webview": "cd webview-chat && npm run build",
+    "compile": "tsc -b ./",
+    "watch": "tsc -b -watch ./",
+    "lint": "eslint src",
+    "pretest": "npm run compile && npm run lint",
+    "test": "vscode-test",
+    "postinstall": "cd oroasis && npm install && cd ../webview-chat && npm install && cd .."
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  }
+}
