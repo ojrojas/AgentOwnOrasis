@@ -8,8 +8,10 @@ export class WebviewProvider implements WebviewViewProvider {
     view?: WebviewView | WebviewPanel;
     disposables: Disposable;
 
-    resolveWebviewView(webviewView: WebviewView, context: WebviewViewResolveContext, token: CancellationToken): Thenable<void> | void {
+    resolveWebviewView(
+        webviewView: WebviewView, 
+        context: WebviewViewResolveContext, 
+        token: CancellationToken): Thenable<void> | void {
         throw new Error('Method not implemented.');
     }
-
 }
