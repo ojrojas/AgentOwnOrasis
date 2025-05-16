@@ -10,14 +10,14 @@ export class OllamaApiService {
         this.templateGenerate = settings.get('templatePromptGenerate');
         this.ollama = new Ollama({ host: settings.get('ollamaBaseUrl') });
         const hasModels = settings.get('ollamaListModels') as Array<ListResponse>;
-        // if (hasModels.length === 0) {
-        //     const response = this.listModels();
-        //     response.then(list => {
-        //         if (list.models.length > 0) {
-        //             settings.update("ollamaListModels",list.models, true);
-        //         }
-        //     });
-        // }
+        if (hasModels.length === 0) {
+            const response = this.listModels();
+            response.then(list => {
+                if (list.models.length > 0) {
+                    settings.update("ollamaListModels",list.models, true);
+                }
+            });
+        }
     }
 
     listModels = () => {

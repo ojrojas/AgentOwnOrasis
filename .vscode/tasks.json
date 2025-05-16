@@ -8,6 +8,9 @@
 			"script": "watch",
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,
+			"dependsOn":[
+				"compile:oroasis"
+			],
 			"presentation": {
 				"reveal": "never"
 			},
@@ -17,12 +20,20 @@
 			}
 		},
 		{
+			"label": "compile:oroasis",
 			"type": "npm",
-			"script": "compile",
 			"group": "build",
-			"problemMatcher": [],
-			"label": "npm: compile",
-			"detail": "tsc -p ./"
+			"script": "compile:oroasis",
+			"isBackground": true,
+			"presentation": {
+				"group": "watch",
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			}
 		}
 	]
 }

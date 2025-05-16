@@ -4,6 +4,9 @@
   "description": "Extension agent manage",
   "publisher": "orojasga",
   "scripts": {
+    "compile": "tsc -p ./",
+    "build": "tsc -b ./",
+    "watch": "tsc -watch -p ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -15,5 +18,8 @@
   "license": "GNU LGPLv3",
   "dependencies": {
     "ollama": "^0.5.15"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }

@@ -5,12 +5,12 @@ export const createComment = (commentReply: CommentReply) => {
     const thread = commentReply.thread;
     const comment = new CommentComponent(
         thread,
+        'Comment',
         new MarkdownString(commentReply.text),
         CommentMode.Preview,
         {
-            name: 'Oroasis Agent',
-            iconPath: Uri.file('../assets/oroasisBotLight.ico')
+            name: 'User',
         },
-        thread.comments.length > 1 ? 'canBeDeleteComment' : undefined
+        thread.comments.length ? 'canBeDeleteComment' : undefined
     );
 };

@@ -10,64 +10,53 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./oroasis/out/extension.js",
   "contributes": {
-    "configuration": {
-      "title": "Oroasis Settings",
-      "type": "object",
-      "properties": {
-        "oroasisSettings.ollamaBaseUrl":{
-          "type":"string",
-          "default": "http://127.0.0.1:11434",
-          "description": "Write the 'Ollama' base url"
-        },
-        "oroasisSettings.ollamaListModels":{
-          "type":"array",
-          "description": "List of models from Ollama"
-        },
-        "oroasisSettings.templatePromptGenerate":{
-          "type": "string",
-          "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices", 
-          "editPresentation": "multilineText",
-          "description": "Template prompt use to generate"
-        }
-      }
-    },
-    "menus": {
-		 	"comments/comment/title": [
-		 		{
-		 			"command": "oroasis.deleteComment",
-          "group": "commentDelete",
-		 			"when": "commentController == oroasisCommentController && canBeDeleteComment"
-		 		},
-        {
-          "command": "oroasis.editComment",
-          "group": "commentEditable",
-          "when": "comment == oroasisCommentController"
-        }
-		 	]
-		 },
     "commands": [
       {
         "command": "oroasis.helloWorld",
         "title": "Oroasis: Hello World"
       },
       {
-        "command": "oroasis.openChatAgent", 
-        "title": "Oroasis: Open Chat Agent"
-      },
-      {
         "command": "oroasis.createComment",
-        "title": "Oroasis: Create Comment"
+        "title": "Oroasis: Create Comment",
+        "enablement": "!commentIsEmpty"
+      },
+       {
+        "command": "oroasis.replyComment",
+        "title": "Oroasis: Reply Comment",
+        "enablement": "!commentIsEmpty"
       },
       {
         "command": "oroasis.editComment",
-        "title": "Oroasis: Edit Comment"
+        "title": "Oroasis: Edit Comment",
+        "icon":"$(edit)"       
+      },
+      {
+        "command": "oroasis.saveComment",
+        "title": "Oroasis Save Comment"
+        
+      },
+      {
+        "command": "oroasis.cancelSaveComment",
+        "title": "Oroasis: Cancel Save Comment"
       },
       {
         "command": "oroasis.deleteComment",
-        "title": "Oroasis: Delete Comment"
+        "title": "Oroasis: Delete Comment",
+        "icon" :"$(trash)"
+      },
+      {
+        "command": "oroasis.deleteAllComments",
+        "title": "Oroasis Delete All Comments",
+        "icon":"$(trash)"
+      },
+      {
+        "command": "oroasis.openChatAgent",
+        "title": "Oroasis: Open Chat Agent"
       },
       {
         "command": "oroasis.askAgent",
@@ -77,14 +66,92 @@
         "command": "oroasis.editAgent",
         "title": "Oroasis: Edit agent"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Oroasis Settings",
+      "type": "object",
+      "properties": {
+        "oroasisSettings.ollamaBaseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434",
+          "description": "Write the 'Ollama' base url"
+        },
+        "oroasisSettings.ollamaListModels": {
+          "type": "array",
+          "description": "List of models from Ollama"
+        },
+        "oroasisSettings.templatePromptGenerate": {
+          "type": "string",
+          "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices",
+          "editPresentation": "multilineText",
+          "description": "Template prompt use to generate"
+        }
+      }
+    },
+    "menus": {
+      "comments/comment/title": [
+        {
+          "command": "oroasis.editComment",
+          "group": "group@1",
+          "when": "commentController == oroasisCommentController"
+        },
+        {
+          "command": "oroasis.deleteComment",
+          "group": "group@2",
+          "when": "commentController == oroasisCommentController && comment == canBeDeleteComment"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "oroasis.createComment",
+          "when": "false"
+        },
+        {
+          "command": "oroasis.replyComment",
+          "when": "false"
+        }
+      ],
+      "comments/commentThread/context": [
+        {
+          "command": "oroasis.createComment",
+          "group": "inline@5",
+          "when": "commentController == oroasisCommentController && commentThreadIsEmpty"
+        },
+        {
+          "command": "oroasis.replyComment",
+          "group": "inline@4",
+          "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
+        }
+      ],
+      "comments/comment/context": [
+        {
+          "command": "oroasis.saveComment",
+          "group": "inline@2",
+          "when": "commentController == oroasisCommentController"
+        },
+        {
+          "command": "oroasis.cancelSaveComment",
+          "group": "inline@1",
+          "when": "commentController == oroasisCommentController"
+        }
+      ],
+      "comments/commentThread/title": [
+        {
+          "command": "oroasis.deleteAllComments",
+          "group": "navigation",
+          "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
+        }
+      ] 
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "compile:oroasis": "cd oroasis && npm run compile",
+    "watch:oroasis": "cd oroasis && npm run watch",
     "start:webview": "cd webview-chat && npm run start",
     "build:webview": "cd webview-chat && npm run build",
     "compile": "tsc -b ./",
-    "watch": "tsc -watch -p ./",
+    "watch": "tsc -b --watch ./",
     "lint": "eslint src",
     "pretest": "npm run compile && npm run lint",
     "test": "vscode-test",
