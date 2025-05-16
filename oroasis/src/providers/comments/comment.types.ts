@@ -1,1 +1,1 @@
-export type CommnetType = "Note" | "Markdown";
+export type CommnetType = "Note" | "Markdown" | undefined;

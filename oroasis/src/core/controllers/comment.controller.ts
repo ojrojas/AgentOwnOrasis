@@ -10,9 +10,7 @@ export const createCommentController = (): CommentController =>{
     commentController.commentingRangeProvider = {
         provideCommentingRanges: (document: TextDocument, cancellationToken: CancellationToken ) =>{
             const count = document.lineCount;
-            const characters = document.getText();
-            const range = new Range(0,0, count -1, characters.length -1);
-            return [range];
+            return [new Range(0,0, count -1, 0)];
         }
     };
 

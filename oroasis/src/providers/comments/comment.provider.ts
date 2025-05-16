@@ -1,17 +1,22 @@
-import { Comment, CommentAuthorInformation, CommentMode, CommentReaction, MarkdownString } from 'vscode'
+import { Comment, CommentAuthorInformation, CommentMode, CommentThread, MarkdownString } from 'vscode';
 import { CommnetType } from './comment.types';
 export class CommentComponent implements Comment {
     id = 0;
-    type: CommnetType = 'Markdown';
+    type: CommnetType;
     marked: string | MarkdownString;
+    thread: CommentThread;
+    timestamp = new Date();
     constructor(
+        public threadParent: CommentThread,
         public body: string | MarkdownString,
         public mode: CommentMode,
         public author: CommentAuthorInformation,
-        public contextValue?: string | undefined,
-        public reactions?: CommentReaction[] | undefined,
-        public timestamp?: Date | undefined) {
+        public contextValue?: string | undefined
+    ) {
         ++this.id;
         this.marked = this.body;
+        this.thread = threadParent;
+        this.thread.comments.concat(this);
+        console.log("pass here");
     }
 }

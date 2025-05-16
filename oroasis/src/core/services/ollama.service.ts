@@ -1,4 +1,4 @@
-import { ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, Message, Ollama } from 'ollama';
+import { ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message, Ollama } from 'ollama';
 import { workspace } from 'vscode';
 
 export class OllamaApiService {
@@ -9,12 +9,15 @@ export class OllamaApiService {
         const settings = workspace.getConfiguration("oroasisSettings");
         this.templateGenerate = settings.get('templatePromptGenerate');
         this.ollama = new Ollama({ host: settings.get('ollamaBaseUrl') });
-        const response = this.listModels();
-        response.then(list => {
-            if (list.models.length > 0) {
-                settings.update("ollamaListModels", list.models);
-            }
-        });
+        const hasModels = settings.get('ollamaListModels') as Array<ListResponse>;
+        // if (hasModels.length === 0) {
+        //     const response = this.listModels();
+        //     response.then(list => {
+        //         if (list.models.length > 0) {
+        //             settings.update("ollamaListModels",list.models, true);
+        //         }
+        //     });
+        // }
     }
 
     listModels = () => {
