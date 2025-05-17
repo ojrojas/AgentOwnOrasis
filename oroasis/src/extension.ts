@@ -2,14 +2,18 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { OllamaApiService } from './core/services/ollama.service';
-import { askAgentCommand, createCommand, editAgentCommand, helloWorldCommand, openPanelCommand } from './core/commands/commands.registers';
+import { createCommand, helloWorldCommand } from './core/commands/commands.registers';
 import { createCommentController } from './core/controllers/comment.controller';
 import { CommentComponent } from './providers/comments/comment.provider';
 import { cancelSaveCommentCommand, createCommentCommand, deleteAllCommentsCommand, deleteCommentCommand, editCommentCommand, replyCommentCommand, saveComentCommand } from './core/commands/commands.comment';
+import { askAgentCommand, editAgentCommand, updateModelsCommand } from './core/commands/commands.agent';
+import { openPanelCommand } from './core/commands/commands.webview';
+import { IOllamaApiService } from './core/services/ollama.interface.service';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
-const ollamaService = new OllamaApiService();
+const ollamaService: IOllamaApiService = new OllamaApiService();
+ollamaService.udpdateModels();
 
 function addSubscriber(item: any) {
 	disposables.push(item);
@@ -23,8 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// controllers
 	addSubscriber(createCommentController());
 
-	// commands
-	addSubscriber(createCommand('oroasis.helloWorld', (outputChannel) => helloWorldCommand(outputChannel)));
+	// commands sample
+	addSubscriber(createCommand('oroasis.helloWorld', () => helloWorldCommand(outputChannel)));
 	// commands comments
 	addSubscriber(createCommand('oroasis.createComment', (commentReply: vscode.CommentReply) => createCommentCommand(commentReply)));
 	addSubscriber(createCommand('oroasis.editComment', (comment: CommentComponent) => editCommentCommand(comment)));
@@ -35,9 +39,10 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.deleteAllComments', (thread: vscode.CommentThread) => deleteAllCommentsCommand(thread)));
 
 	// commands agent
-	addSubscriber(createCommand('oroasis.openChatAgent', (outputChannel) => openPanelCommand(outputChannel)));
-	addSubscriber(createCommand('oroasis.askAgent', (outputChannel) => askAgentCommand(outputChannel)));
-	addSubscriber(createCommand('oroasis.editAgent', (outputChannel) => editAgentCommand(outputChannel)));
+	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(outputChannel)));
+	addSubscriber(createCommand('oroasis.askAgent', (commentReply:vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
+	addSubscriber(createCommand('oroasis.editAgent', () => editAgentCommand(outputChannel)));
+	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel)));
 
 	disposables.forEach(dis => {
 		context.subscriptions.push(dis);

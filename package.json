@@ -17,6 +17,10 @@
   "contributes": {
     "commands": [
       {
+        "command": "Oroasis.updateModels",
+        "title": "Oroasis: Update Models"
+      },
+      {
         "command": "oroasis.helloWorld",
         "title": "Oroasis: Hello World"
       },
@@ -25,7 +29,7 @@
         "title": "Oroasis: Create Comment",
         "enablement": "!commentIsEmpty"
       },
-       {
+      {
         "command": "oroasis.replyComment",
         "title": "Oroasis: Reply Comment",
         "enablement": "!commentIsEmpty"
@@ -33,12 +37,11 @@
       {
         "command": "oroasis.editComment",
         "title": "Oroasis: Edit Comment",
-        "icon":"$(edit)"       
+        "icon": "$(edit)"
       },
       {
         "command": "oroasis.saveComment",
         "title": "Oroasis Save Comment"
-        
       },
       {
         "command": "oroasis.cancelSaveComment",
@@ -47,12 +50,12 @@
       {
         "command": "oroasis.deleteComment",
         "title": "Oroasis: Delete Comment",
-        "icon" :"$(trash)"
+        "icon": "$(trash)"
       },
       {
         "command": "oroasis.deleteAllComments",
         "title": "Oroasis Delete All Comments",
-        "icon":"$(trash)"
+        "icon": "$(trash)"
       },
       {
         "command": "oroasis.openChatAgent",
@@ -80,9 +83,19 @@
           "type": "array",
           "description": "List of models from Ollama"
         },
+        "oroasisSettings.modelDefault": {
+          "type": "string",
+          "default": "codellama",
+          "description": "Model asigned by request to ollama"
+        },
+         "oroasisSettings.roleAgentDefault": {
+          "type": "string",
+          "default": "assistant",
+          "description": "The role of the message, either system, user, assistant, or tool"
+        },
         "oroasisSettings.templatePromptGenerate": {
           "type": "string",
-          "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices",
+          "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices, you are help me to resolve this question",
           "editPresentation": "multilineText",
           "description": "Template prompt use to generate"
         }
@@ -141,7 +154,7 @@
           "group": "navigation",
           "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
         }
-      ] 
+      ]
     }
   },
   "scripts": {
