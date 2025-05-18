@@ -85,7 +85,7 @@
         },
         "oroasisSettings.modelDefault": {
           "type": "string",
-          "default": "codellama",
+          "default": "qwen2.5-coder:3b",
           "description": "Model asigned by request to ollama"
         },
          "oroasisSettings.roleAgentDefault": {
@@ -127,13 +127,18 @@
       "comments/commentThread/context": [
         {
           "command": "oroasis.createComment",
-          "group": "inline@5",
+          "group": "inline@1",
           "when": "commentController == oroasisCommentController && commentThreadIsEmpty"
         },
         {
           "command": "oroasis.replyComment",
-          "group": "inline@4",
+          "group": "inline@2",
           "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
+        },
+        {
+          "command": "oroasis.askAgent",
+          "group": "inline@3",
+          "when": "commentController == oroasisCommentController"
         }
       ],
       "comments/comment/context": [

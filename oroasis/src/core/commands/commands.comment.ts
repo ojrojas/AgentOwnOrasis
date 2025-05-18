@@ -4,11 +4,21 @@ import { CommentComponent } from "../../providers/comments/comment.provider";
 
 // Comments 
 export const createCommentCommand = (commentReply: CommentReply) => {
-    createComment(commentReply);
+    createComment(
+        commentReply.text,
+        'User',
+        commentReply,
+        'Comment'
+    );
 };
 
 export const replyCommentCommand = (commentReply: CommentReply) => {
-    createComment(commentReply);
+    createComment(
+        commentReply.text,
+        'User',
+        commentReply,
+        'Comment'
+    );
 };
 
 export const editCommentCommand = (comment: CommentComponent) => {

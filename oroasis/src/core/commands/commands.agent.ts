@@ -10,7 +10,6 @@ export const updateModelsCommand = (outputChannel: OutputChannel) => {
     ollama.udpdateModels();
 };
 
-
 export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
     window.withProgress({
         location: ProgressLocation.SourceControl,
@@ -25,8 +24,7 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             return;
         }
 
-        createComment(commentReply.text, 'user', commentReply, 'RequestChat');
-
+        createComment(commentReply.text, 'User', commentReply, 'RequestChat');
 
         const roleAgent = settings.get('templatePromptGenerate');
         const response = await ollamaService.chat({
@@ -39,13 +37,11 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             ]
         });
         
-        createComment(response.message.content, 'assistant', commentReply, 'ResponseChat');
+        createComment(response.message.content, 'Assistant', commentReply, 'ResponseChat');
     });
 };
 
 export const editAgentCommand = (outputChannel: OutputChannel) => { };
-
-
 
 // Auxiliar functions
 export const createMessage = (role: string, roleAgent: string, content: string) => {

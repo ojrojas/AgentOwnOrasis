@@ -1,8 +1,8 @@
 import { CommentMode, CommentReply, MarkdownString, Uri } from 'vscode';
 import { CommentComponent } from './comment.provider';
-import { CommnetType } from './comment.types';
+import { ActorType, CommnetType } from './comment.types';
 
-export const createComment = (data: string,actor: string, commentReply: CommentReply, commentType: CommnetType) => {
+export const createComment = (data: string,actor: ActorType, commentReply: CommentReply, commentType: CommnetType) => {
     const thread = commentReply.thread;
     const comment = new CommentComponent(
         thread,
@@ -10,7 +10,8 @@ export const createComment = (data: string,actor: string, commentReply: CommentR
         new MarkdownString(data),
         CommentMode.Preview,
         {
-            name: actor,
+            name: actor as string,
+            iconPath: Uri.parse("../../assets/icons/oroasisBotDark.ico")
         },
         thread.comments.length ? 'canBeDeleteComment' : undefined
     );
