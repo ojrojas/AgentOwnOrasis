@@ -1,15 +1,16 @@
 import { CommentMode, CommentReply, MarkdownString, Uri } from 'vscode';
 import { CommentComponent } from './comment.provider';
+import { CommnetType } from './comment.types';
 
-export const createComment = (commentReply: CommentReply) => {
+export const createComment = (data: string,actor: string, commentReply: CommentReply, commentType: CommnetType) => {
     const thread = commentReply.thread;
     const comment = new CommentComponent(
         thread,
-        'Comment',
-        new MarkdownString(commentReply.text),
+        commentType,
+        new MarkdownString(data),
         CommentMode.Preview,
         {
-            name: 'User',
+            name: actor,
         },
         thread.comments.length ? 'canBeDeleteComment' : undefined
     );

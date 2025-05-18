@@ -1,1 +1,1 @@
-export type CommnetType = "Comment" | "Markdown" | undefined;
+export type CommnetType = "Comment" | "Markdown" | "ResponseChat" | "RequestChat" | undefined;

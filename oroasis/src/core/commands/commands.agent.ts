@@ -1,6 +1,8 @@
-import { CommentReply, OutputChannel, ProgressLocation, window, workspace } from "vscode";
+import { CommentMode, CommentReply, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
 import { OllamaApiService } from "../services/ollama.service";
 import { IOllamaApiService } from "../services/ollama.interface.service";
+import { CommentComponent } from "../../providers/comments/comment.provider";
+import { createComment } from "../../providers/comments/create.comment";
 
 // Agent IA
 export const updateModelsCommand = (outputChannel: OutputChannel) => {
@@ -23,10 +25,21 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             return;
         }
 
+        createComment(commentReply.text, 'user', commentReply, 'RequestChat');
+
+
         const roleAgent = settings.get('templatePromptGenerate');
-
-
-
+        const response = await ollamaService.chat({
+            model: model as string,
+            messages: [
+                {
+                    role: 'user',
+                    content: commentReply.text,
+                }
+            ]
+        });
+        
+        createComment(response.message.content, 'assistant', commentReply, 'ResponseChat');
     });
 };
 
