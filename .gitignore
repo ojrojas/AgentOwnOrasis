@@ -3,4 +3,4 @@ dist
 node_modules
 .vscode-test/
 *.vsix
-oroasis/tsconfig.tsbuildinfo
+*/tsconfig.tsbuildinfo

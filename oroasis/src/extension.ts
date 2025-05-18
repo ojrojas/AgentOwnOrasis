@@ -41,8 +41,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// commands agent
 	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(outputChannel)));
 	addSubscriber(createCommand('oroasis.askAgent', (commentReply:vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
-	addSubscriber(createCommand('oroasis.editAgent', () => editAgentCommand(outputChannel)));
-	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel)));
+	addSubscriber(createCommand('oroasis.editAgent', (commentReply:vscode.CommentReply) => editAgentCommand(commentReply, ollamaService, outputChannel)));
+	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel, ollamaService)));
 
 	disposables.forEach(dis => {
 		context.subscriptions.push(dis);
