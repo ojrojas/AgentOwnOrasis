@@ -88,6 +88,11 @@
           "default": "qwen2.5-coder:3b",
           "description": "Model asigned by request to ollama"
         },
+        "oroasisSettings.modelCompletionDefault": {
+          "type": "string",
+          "default": "qwen2.5-coder:1.5b",
+          "description": "Model asigned by request to ollama"
+        },
          "oroasisSettings.roleAgentDefault": {
           "type": "string",
           "default": "assistant",
@@ -96,6 +101,12 @@
         "oroasisSettings.templatePromptGenerate": {
           "type": "string",
           "default": "You are my personal 'Agent IA', a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices, you are help me to resolve this question",
+          "editPresentation": "multilineText",
+          "description": "Template prompt use to generate"
+        },
+         "oroasisSettings.templatePromptAutoComplete": {
+          "type": "string",
+          "default": "You are my personal AI that helps me autocomplete programming code, you must determine the language and give me autocomplete of properties, functions, classes, namespaces, conditionals, logical operators, and be very literal, always end your suggestions on a complete sentence:",
           "editPresentation": "multilineText",
           "description": "Template prompt use to generate"
         }

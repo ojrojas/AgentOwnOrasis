@@ -1,4 +1,4 @@
-import { CancellationToken, Disposable, WebviewPanel, WebviewView, WebviewViewProvider, WebviewViewResolveContext } from 'vscode'
+import { CancellationToken, Disposable, WebviewPanel, WebviewView, WebviewViewProvider, WebviewViewResolveContext } from 'vscode';
 
 
 export class WebviewProvider implements WebviewViewProvider {

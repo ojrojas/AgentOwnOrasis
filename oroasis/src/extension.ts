@@ -9,6 +9,7 @@ import { cancelSaveCommentCommand, createCommentCommand, deleteAllCommentsComman
 import { askAgentCommand, editAgentCommand, updateModelsCommand } from './core/commands/commands.agent';
 import { openPanelCommand } from './core/commands/commands.webview';
 import { IOllamaApiService } from './core/services/ollama.interface.service';
+import { CompletionProvider } from './providers/completions/completion.provider';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
@@ -23,6 +24,11 @@ function addSubscriber(item: any) {
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
+	const completionsProvider = new CompletionProvider(ollamaService); 
+
+	// providers
+	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({pattern:"**"},completionsProvider));
+
 
 	// controllers
 	addSubscriber(createCommentController());

@@ -1,6 +1,7 @@
 import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
 import { IOllamaApiService } from "../services/ollama.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
+import { Message } from "ollama";
 
 // Agent IA
 export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {
@@ -23,16 +24,25 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             return;
         }
         outputChannel.appendLine("create comment to request");
-        createComment(commentReply.text, 'User', commentReply, 'RequestChat');
-
         const roleAgent = settings.get('templatePromptGenerate');
+        
+        const messages: Message[] = [];
+
+        if (commentReply.thread.comments.length === 0) {
+            messages.push({
+                role: 'system',
+                content: roleAgent as string
+            });
+        }
+        
+        createComment(commentReply.text, 'User', commentReply, 'RequestChat');
         outputChannel.appendLine("send comment request");
 
-        const messages = commentReply.thread.comments.map(comment => {
-            return {
+        commentReply.thread.comments.map(comment => {
+            messages.push({
                 role: comment.author.name,
                 content: (comment.body as MarkdownString).value
-            };
+            });
         });
 
         const response = await ollamaService.chat({
@@ -40,7 +50,7 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             messages: messages,
             options: {
                 temperature: 0,
-                presence_penalty: 1.5,
+                presence_penalty: 1,
                 top_p: .6
             }
         });
@@ -69,11 +79,20 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
         const roleAgent = settings.get('templatePromptGenerate');
         outputChannel.appendLine("send edited comment request");
 
-        const messages = commentReply.thread.comments.map(comment => {
-            return {
+       const messages: Message[] = [];
+
+        if (commentReply.thread.comments.length === 0) {
+            messages.push({
+                role: 'system',
+                content: roleAgent as string
+            });
+        }
+
+        commentReply.thread.comments.map(comment => {
+            messages.push({
                 role: comment.author.name,
                 content: (comment.body as MarkdownString).value
-            };
+            });
         });
 
         const response = await ollamaService.chat({
@@ -86,7 +105,7 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
             ],
             options: {
                 temperature: 0,
-                presence_penalty: 1.5,
+                presence_penalty: 1,
                 top_p: .6
             }
         });
