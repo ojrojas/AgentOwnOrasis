@@ -1,4 +1,4 @@
-import { CommentReply, OutputChannel, ProgressLocation, window, workspace } from "vscode";
+import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
 import { IOllamaApiService } from "../services/ollama.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
 
@@ -7,12 +7,11 @@ export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService:
     outputChannel.appendLine("Updating models from ollama");
     ollamaService.udpdateModels();
     outputChannel.appendLine("Models updated");
-
 };
 
 export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
     window.withProgress({
-        location: ProgressLocation.SourceControl,
+        location: ProgressLocation.Window,
         title: "Agent Response",
         cancellable: true
     }, async () => {
@@ -29,14 +28,16 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
         const roleAgent = settings.get('templatePromptGenerate');
         outputChannel.appendLine("send comment request");
 
+        const messages = commentReply.thread.comments.map(comment => {
+            return {
+                role: comment.author.name,
+                content: (comment.body as MarkdownString).value
+            };
+        });
+
         const response = await ollamaService.chat({
             model: model as string,
-            messages: [
-                {
-                    role: 'user',
-                    content: commentReply.text,
-                }
-            ],
+            messages: messages,
             options: {
                 temperature: 0,
                 presence_penalty: 1.5,
@@ -51,7 +52,7 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
 
 export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
     window.withProgress({
-        location: ProgressLocation.SourceControl,
+        location: ProgressLocation.Window,
         title: "Agent Response",
         cancellable: true
     }, async () => {
@@ -67,6 +68,13 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
 
         const roleAgent = settings.get('templatePromptGenerate');
         outputChannel.appendLine("send edited comment request");
+
+        const messages = commentReply.thread.comments.map(comment => {
+            return {
+                role: comment.author.name,
+                content: (comment.body as MarkdownString).value
+            };
+        });
 
         const response = await ollamaService.chat({
             model: model as string,
@@ -89,5 +97,7 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
 };
 
 // Auxiliar functions
-export const createMessage = (role: string, roleAgent: string, content: string) => {
+export const getTextCurrentDocument = async (commentThread: CommentThread) => {
+    const document = await workspace.openTextDocument(commentThread.uri);
+    return document.getText(commentThread.range);
 };

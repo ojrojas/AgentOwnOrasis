@@ -5,7 +5,6 @@ import { IOllamaApiService } from './ollama.interface.service';
 export class OllamaApiService implements IOllamaApiService {
     readonly ollama: Ollama;
     templateGenerate: string | undefined;
-    messages: Message[] = [];
     settings: WorkspaceConfiguration;
     constructor() {
         this.settings = workspace.getConfiguration("oroasisSettings");
@@ -21,20 +20,23 @@ export class OllamaApiService implements IOllamaApiService {
         return this.ollama.generate({
             model: request.model,
             prompt: request.prompt,
-            template: this.templateGenerate
+            template: this.templateGenerate,
+            options: request.options,
+            context: request.context,
+            format: request.format,
+            system: request.system
         });
     };
 
     chat = (request: ChatRequest): Promise<ChatResponse> => {
-        this.addMessages(request.messages!);
         return this.ollama.chat({
             model: request.model,
-            messages: this.messages
+            messages: request.messages,
+            options: request.options,
+            format: request.format,
+            keep_alive: request.keep_alive,
+            tools: request.tools
         });
-    };
-
-    private addMessages = (messages: Message[]): void => {
-        this.messages.push(messages[0]);
     };
 
     public udpdateModels = (): void => {

@@ -9,7 +9,7 @@
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,
 			"dependsOn":[
-				"compile:oroasis"
+				"compile"
 			],
 			"presentation": {
 				"reveal": "never"
@@ -20,10 +20,10 @@
 			}
 		},
 		{
-			"label": "compile:oroasis",
+			"label": "compile",
 			"type": "npm",
 			"group": "build",
-			"script": "compile:oroasis",
+			"script": "compile",
 			"isBackground": true,
 			"presentation": {
 				"group": "watch",

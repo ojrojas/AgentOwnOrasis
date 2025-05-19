@@ -139,6 +139,11 @@
           "command": "oroasis.askAgent",
           "group": "inline@3",
           "when": "commentController == oroasisCommentController"
+        },
+        {
+          "command": "oroasis.editAgent",
+          "group": "inline@4",
+          "when": "commentController == oroasisCommentController"
         }
       ],
       "comments/comment/context": [
@@ -164,8 +169,6 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile:oroasis": "cd oroasis && npm run compile",
-    "watch:oroasis": "cd oroasis && npm run watch",
     "start:webview": "cd webview-chat && npm run start",
     "build:webview": "cd webview-chat && npm run build",
     "compile": "tsc -b ./",
