@@ -20,8 +20,8 @@ export class CompletionProvider implements InlineCompletionItemProvider {
     }
     provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionItem[] | InlineCompletionList> {
         const settings = workspace.getConfiguration('oroasisSettings');
-        const roleAgent = settings.get('templatePromptAutoComplete');
-        const model = settings.get('modelCompletionDefault');
+        const roleAgent = settings.get<string>('templatePromptAutoComplete');
+        const model = settings.get<string>('modelCompletionDefault');
 
         if (document.uri.scheme === "vscode-scm") {
             return null;
@@ -51,19 +51,20 @@ export class CompletionProvider implements InlineCompletionItemProvider {
         let request = roleAgent as string;
         request = request.concat("\n", lineBefore).trim();
 
+
         try {
             const response = this.ollamaService.generate({
                 model: model as string,
                 prompt: request,
-                // options: {
-                //     temperature: 0.0,
-                //    presence_penalty: 1,
-                //    top_p: 0.6
-                // }
+                options: {
+                    temperature: 0.0,
+                   presence_penalty: 1,
+                   top_p: 0.6
+                }
             });
-    
+
             console.log("response", response);
-    
+
             response.then(res => {
                 console.log("response generate: ", res);
                 result.items.push({
@@ -74,44 +75,12 @@ export class CompletionProvider implements InlineCompletionItemProvider {
             response.catch((error) => {
                 console.error(error);
             });
-            
+
         } catch (error) {
-            console.log("error", error);    
+            console.log("error", error);
         }
-
-
-
-
-        // const selectedCompletionInfo = context.selectedCompletionInfo;
-
-        // if (selectedCompletionInfo) {
-        //     const { text, range } = selectedCompletionInfo;
-        //     const typedText = document.getText(range);
-
-        //     const typedLength = range.end.character - range.start.character;
-
-        //     if (typedLength < 4) {
-        //         return null;
-        //     }
-
-        //     if (!text.startsWith(typedText)) {
-        //         return null;
-        //     }
-        // }
-
-        // let injectDetails: string | undefined = undefined;
-
     }
-    // provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionItem[] | InlineCompletionList> {
-    //     const settings = workspace.getConfiguration('oroasisSettings');
-    //     const roleAgent = settings.get('templatePromptAutoComplete');
-    //     const model = settings.get('modelDefault');
-
-    //     const editor = window.activeTextEditor!;
-    // 
-    //     return result;
-    // }
-
+    
     // handleDidShowCompletionItem(_completionItem: InlineCompletionItem): void {
     // 		console.log('handleDidShowCompletionItem');
     // 	};

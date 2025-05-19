@@ -7,5 +7,11 @@
 		"out": true // set this to false to include "out" folder in search results
 	},
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off"
+	"typescript.tsc.autoDetect": "off",
+	"yaml.schemas": {
+		"/home/orojasga/.vscode/extensions/continue.continue-1.0.8-linux-x64/config-yaml-schema.json": [
+			".continue/**/*.yaml",
+			"file:///home/orojasga/.continue/config.yaml"
+		]
+	}
 }
