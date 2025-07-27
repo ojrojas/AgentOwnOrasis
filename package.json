@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "publisher": "orojasga",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.102.2"
   },
   "categories": [
     "Other"
@@ -63,11 +63,14 @@
       },
       {
         "command": "oroasis.askAgent",
-        "title": "Oroasis: Ask to Agent"
+        "title": "Oroasis: Ask to Agent",
+        "enablement": "!commentIsEmpty"
       },
       {
         "command": "oroasis.editAgent",
-        "title": "Oroasis: Edit agent"
+        "title": "Oroasis: Edit agent",
+        "enablement": "!commentIsEmpty"
+
       }
     ],
     "configuration": {
@@ -192,7 +195,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.100.0",
+    "@types/vscode": "^1.102.2",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
