@@ -140,35 +140,35 @@
       ],
       "comments/commentThread/context": [
         {
-          "command": "oroasis.createComment",
-          "group": "inline@1",
+          "command": "oroasis.askAgent",
+          "group": "inline",
           "when": "commentController == oroasisCommentController && commentThreadIsEmpty"
         },
         {
-          "command": "oroasis.replyComment",
-          "group": "inline@2",
+          "command": "oroasis.editAgent",
+          "group": "inline",
           "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
         },
         {
-          "command": "oroasis.askAgent",
-          "group": "inline@3",
-          "when": "commentController == oroasisCommentController"
+          "command": "oroasis.replyComment",
+          "group": "inline",
+          "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
         },
         {
-          "command": "oroasis.editAgent",
-          "group": "inline@4",
+          "command": "oroasis.cancelSaveComment",
+          "group": "inline",
           "when": "commentController == oroasisCommentController"
         }
       ],
       "comments/comment/context": [
         {
-          "command": "oroasis.saveComment",
-          "group": "inline@2",
-          "when": "commentController == oroasisCommentController"
+          "command": "oroasis.editAgent",
+          "group": "inline@1",
+          "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
         },
         {
           "command": "oroasis.cancelSaveComment",
-          "group": "inline@1",
+          "group": "inline@2",
           "when": "commentController == oroasisCommentController"
         }
       ],
@@ -183,7 +183,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "start:webview": "cd webview-chat && npm run start",
+    "start:webview": "cd webview-chat && npm run dev",
     "build:webview": "cd webview-chat && npm run build",
     "compile": "tsc -b ./",
     "watch": "tsc -b --watch ./",
@@ -195,7 +195,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.102.2",
+    "@types/vscode": "^1.102.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",

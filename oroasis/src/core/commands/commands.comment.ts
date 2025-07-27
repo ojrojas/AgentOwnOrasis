@@ -7,7 +7,7 @@ export const createCommentCommand = (commentReply: CommentReply) => {
     createComment(
         commentReply.text,
         'User',
-        commentReply,
+        commentReply.thread,
         'Comment'
     );
 };
@@ -16,7 +16,7 @@ export const replyCommentCommand = (commentReply: CommentReply) => {
     createComment(
         commentReply.text,
         'User',
-        commentReply,
+        commentReply.thread,
         'Comment'
     );
 };

@@ -1,9 +1,9 @@
-import { CommentMode, CommentReply, MarkdownString, Uri } from 'vscode';
+import { CommentMode, CommentReply, CommentThread, MarkdownString, Uri } from 'vscode';
 import { CommentComponent } from './comment.provider';
 import { ActorType, CommnetType } from './comment.types';
 
-export const createComment = (data: string,actor: ActorType, commentReply: CommentReply, commentType: CommnetType) => {
-    const thread = commentReply.thread;
+export const createComment = (data: string, actor: ActorType, commentThread: CommentThread, commentType: CommnetType) => {
+    const thread = commentThread;
     const comment = new CommentComponent(
         thread,
         commentType,

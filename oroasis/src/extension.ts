@@ -10,6 +10,8 @@ import { askAgentCommand, editAgentCommand, updateModelsCommand } from './core/c
 import { openPanelCommand } from './core/commands/commands.webview';
 import { IOllamaApiService } from './core/services/ollama.interface.service';
 import { CompletionProvider } from './providers/completions/completion.provider';
+import { WebviewProvider } from './providers/webview/webview.provider';
+import { registerWebView } from './core/webview/webview.register';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
@@ -25,11 +27,11 @@ function addSubscriber(item: any) {
 export function activate(context: vscode.ExtensionContext) {
 	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
 	const completionsProvider = new CompletionProvider(ollamaService); 
+	const sideBarWebView = new WebviewProvider(context, outputChannel);
 
 	// providers
 	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({pattern:"**"},completionsProvider));
-
-
+	addSubscriber(registerWebView(sideBarWebView));
 	// controllers
 	addSubscriber(createCommentController());
 
@@ -45,9 +47,9 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.deleteAllComments', (thread: vscode.CommentThread) => deleteAllCommentsCommand(thread)));
 
 	// commands agent
-	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(outputChannel)));
+	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel)));
 	addSubscriber(createCommand('oroasis.askAgent', (commentReply:vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
-	addSubscriber(createCommand('oroasis.editAgent', (commentReply:vscode.CommentReply) => editAgentCommand(commentReply, ollamaService, outputChannel)));
+	addSubscriber(createCommand('oroasis.editAgent', (comment: CommentComponent) => editAgentCommand(comment, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel, ollamaService)));
 
 	disposables.forEach(dis => {

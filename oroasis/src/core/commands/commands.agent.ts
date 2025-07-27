@@ -2,6 +2,8 @@ import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLoc
 import { IOllamaApiService } from "../services/ollama.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
 import { Message } from "ollama";
+import { CommentComponent } from "../../providers/comments/comment.provider";
+import { editCommentCommand } from "./commands.comment";
 
 // Agent IA
 export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {
@@ -25,7 +27,7 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
         }
         outputChannel.appendLine("create comment to request");
         const roleAgent = settings.get('templatePromptGenerate');
-        
+
         const messages: Message[] = [];
 
         if (commentReply.thread.comments.length === 0) {
@@ -34,8 +36,11 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
                 content: roleAgent as string
             });
         }
-        
-        createComment(commentReply.text, 'User', commentReply, 'RequestChat');
+
+        const textHighlighted = await getTextCurrentDocument(commentReply.thread);
+        commentReply.text += textHighlighted;
+
+        createComment(commentReply.text, 'User', commentReply.thread, 'RequestChat');
         outputChannel.appendLine("send comment request");
 
         commentReply.thread.comments.map(comment => {
@@ -56,11 +61,11 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
         });
 
         outputChannel.appendLine("Comment response finish");
-        createComment(response.message.content, 'Assistant', commentReply, 'ResponseChat');
+        createComment(response.message.content, 'Assistant', commentReply.thread, 'ResponseChat');
     });
 };
 
-export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
+export const editAgentCommand = (commentReply: CommentComponent, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
     window.withProgress({
         location: ProgressLocation.Window,
         title: "Agent Response",
@@ -74,12 +79,12 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
             return;
         }
         outputChannel.appendLine("Edit to request comment");
-        createComment(commentReply.text, 'User', commentReply, 'RequestChat');
+        editCommentCommand(commentReply);
 
         const roleAgent = settings.get('templatePromptGenerate');
         outputChannel.appendLine("send edited comment request");
 
-       const messages: Message[] = [];
+        const messages: Message[] = [];
 
         if (commentReply.thread.comments.length === 0) {
             messages.push({
@@ -95,12 +100,16 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
             });
         });
 
+        messages.forEach(message => outputChannel.appendLine(message.content));
+        const m = (commentReply.body as MarkdownString);
+        console.log("esto es m: ", m.value);
+
         const response = await ollamaService.chat({
             model: model as string,
             messages: [
                 {
                     role: 'user',
-                    content: commentReply.text,
+                    content: (commentReply.body as MarkdownString).value,
                 }
             ],
             options: {
@@ -111,12 +120,13 @@ export const editAgentCommand = (commentReply: CommentReply, ollamaService: IOll
         });
 
         outputChannel.appendLine("Comment response finish");
-        createComment(response.message.content, 'Assistant', commentReply, 'ResponseChat');
+        createComment(response.message.content, 'Assistant', commentReply.thread, 'ResponseChat');
     });
 };
 
 // Auxiliar functions
 export const getTextCurrentDocument = async (commentThread: CommentThread) => {
     const document = await workspace.openTextDocument(commentThread.uri);
-    return document.getText(commentThread.range);
+    let spaceWhite: string = ": ";
+    return spaceWhite += document.getText(commentThread.range).trim();
 };
