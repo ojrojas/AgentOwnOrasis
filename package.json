@@ -201,7 +201,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "start:webview": "cd webview-chat && npm run dev",
+    "start:webview": "cd webview-chat && npm run start",
     "build:webview": "cd webview-chat && npm run build",
     "compile": "tsc -b ./",
     "watch": "tsc -b --watch ./",
