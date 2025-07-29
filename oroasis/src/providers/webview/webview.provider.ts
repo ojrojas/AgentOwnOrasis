@@ -68,9 +68,9 @@ export class WebviewProvider implements WebviewViewProvider {
         };
 
         webviewView.webview.html =
-            this.context.extensionMode === ExtensionMode.Development
+           ( this.context.extensionMode === ExtensionMode.Development
                 ? await this.getHRMHtmlForWebview(webviewView.webview)
-                : this.getHtmlForWebview(webviewView.webview);
+                : this.getHtmlForWebview(webviewView.webview)).trim();
 
         this.setWebviewMessageListener(webviewView.webview);
 
@@ -157,50 +157,36 @@ export class WebviewProvider implements WebviewViewProvider {
         // The JS files from the Angular webview-agents output
         const scriptUri = `http://${localServerUrl}/src/main.tsx`;
         const viteClient = `http://${localServerUrl}/@vite/client`;
-        const reactClient = `http://${localServerUrl}/@react-refresh`;
+        const reactRefresh = `http://${localServerUrl}/@react-refresh`;
 
         const html = await this.readDataResponse(response);
-        const stylesIcons = `https://fonts.googleapis.com/icon?family=Material+Icons`;
         const nonce = getNonce();
 
-        // let sanity = html.trim();
-
-        // sanity = sanity.replace('<script src="main.js" type="module">', `<script src="main.js" nonce=${nonce} type="module">`);
-        // sanity = sanity.replace('<script type="module" src="/@vite/client"></script>', `<script type="module" nonce=${nonce} src="/@vite/client"></script>`);
-        // sanity = sanity.replace('<script src="polyfills.js" type="module"></script>', `<script src="polyfills.js" nonce=${nonce} type="module"></script>`);
-
-        // return sanity;
-
         const csp = [
-            "default-src 'none'",
-            `font-src ${webview.cspSource}`,
-            `style-src ${webview.cspSource} 'unsafe-inline' https://* http://${localServerUrl} http://0.0.0.0:${localPort}`,
-            `img-src ${webview.cspSource} https: data:`,
-            `script-src 'unsafe-eval' https://* http://${localServerUrl} http://0.0.0.0:${localPort} 'nonce-${nonce}'`,
-            `connect-src https://* ws://${localServerUrl} ws://0.0.0.0:${localPort} http://127.0.0.1:11434 http://${localServerUrl} http://0.0.0.0:${localPort}`,
-        ];
+			`font-src csp-source data:`,
+			`style-src csp-source 'unsafe-inline' https://* http://${localServerUrl} http://0.0.0.0:${localPort}`,
+			`img-src csp-source https: data:`,
+			`connect-src https://* ws://${localServerUrl} ws://0.0.0.0:${localPort} http://${localServerUrl} http://0.0.0.0:${localPort}`,
+		];
 
         // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
         return /*html*/ `
       <!DOCTYPE html>
       <html lang="en">
         <head>
-          <script type="module" nonce="${nonce}" src=${viteClient}></script>
-          <script type="module" nonce="${nonce}" src=${viteClient}></script>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="${csp.join("; ")}">
-          <link href="${stylesUri}" rel="stylesheet">
-          <link href="${stylesAppUri}" rel="stylesheet">
-          <link href="${stylesIcons}" rel="stylesheet">
-          <title>Orasis</title>
+        <script type="module" nonce="${nonce}" src=${reactRefresh}></script>
+        <script type="module" nonce="${nonce}" src=${viteClient}></script>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Security-Policy" content="${csp.join("; ")}">
+        <title>Orasis</title>
         </head>
         <body>
-          <div id="root"></div>
-        <script>
-          const vscode = acquireVsCodeApi();
+        <div id="root"></div>
+        <script type="module" nonce="${nonce}">
+            const vscode = acquireVsCodeApi();
         </script>
-          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+          <script type="module" src="${scriptUri}" nonce="${nonce}></script>
         </body>
       </html>
     `;

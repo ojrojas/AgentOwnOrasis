@@ -70,7 +70,6 @@
         "command": "oroasis.editAgent",
         "title": "Oroasis: Edit agent",
         "enablement": "!commentIsEmpty"
-
       }
     ],
     "configuration": {
@@ -96,7 +95,7 @@
           "default": "qwen2.5-coder:1.5b",
           "description": "Model asigned by request to ollama"
         },
-         "oroasisSettings.roleAgentDefault": {
+        "oroasisSettings.roleAgentDefault": {
           "type": "string",
           "default": "assistant",
           "description": "The role of the message, either system, user, assistant, or tool"
@@ -107,7 +106,7 @@
           "editPresentation": "multilineText",
           "description": "Template prompt use to generate"
         },
-         "oroasisSettings.templatePromptAutoComplete": {
+        "oroasisSettings.templatePromptAutoComplete": {
           "type": "string",
           "default": "You are autocomplete programming code, always end your suggestions on a complete sentence:",
           "editPresentation": "multilineText",
@@ -177,6 +176,25 @@
           "command": "oroasis.deleteAllComments",
           "group": "navigation",
           "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "orasis-ai",
+          "title": "Orasis IA",
+          "icon": "./resources/chatbot_icon.png"
+        }
+      ]
+    },
+    "views": {
+      "orasis-ai": [
+        {
+          "id": "oroasis.primary-sidebar-provider",
+          "name": "Agent OR IA",
+          "icon": "./resources/chatbot.png",
+          "type": "webview"
         }
       ]
     }

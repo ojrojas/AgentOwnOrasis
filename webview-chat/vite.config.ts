@@ -13,4 +13,18 @@ export default defineConfig({
     outDir: '../media',
     emptyOutDir: true,
   },
+   server: {
+    port: 5173,
+    strictPort: true,
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': '*',
+    },
+  },
 })

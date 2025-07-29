@@ -6,3 +6,6 @@ node_modules
 */tsconfig.tsbuildinfo
 package-lock.json
 oroasis/package-lock.json
+media
+DS_Store
+oroasis/tsconfig.tsbuildinfo
