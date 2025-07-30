@@ -26,11 +26,11 @@ function addSubscriber(item: any) {
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
-	const completionsProvider = new CompletionProvider(ollamaService); 
-	const sideBarWebView = new WebviewProvider(context, outputChannel);
+	const completionsProvider = new CompletionProvider(ollamaService);
+	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService);
 
 	// providers
-	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({pattern:"**"},completionsProvider));
+	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, completionsProvider));
 	addSubscriber(registerWebView(sideBarWebView));
 	// controllers
 	addSubscriber(createCommentController());
@@ -47,8 +47,8 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.deleteAllComments', (thread: vscode.CommentThread) => deleteAllCommentsCommand(thread)));
 
 	// commands agent
-	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel)));
-	addSubscriber(createCommand('oroasis.askAgent', (commentReply:vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
+	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel, ollamaService)));
+	addSubscriber(createCommand('oroasis.askAgent', (commentReply: vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.editAgent', (comment: CommentComponent) => editAgentCommand(comment, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel, ollamaService)));
 

@@ -1,1 +1,33 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((typography: Roboto,
+      density: -5));
+}
+
+
+body {
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+}
+
+
+body.vscode-dark {
+  --panel-color: var(--vscode-panel-background);
+}
+
+body.vscode-light {
+  --panel-color: var(--vscode-editor-background);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

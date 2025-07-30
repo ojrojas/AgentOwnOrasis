@@ -16,6 +16,7 @@ import { findLast } from '../../shared/collections/array';
 import { getNonce } from '../../shared/generics/nonce';
 import { getUri } from '../../shared/generics/uri';
 import { get, IncomingMessage } from 'node:http';
+import { IOllamaApiService } from '../../core/services/ollama.interface.service';
 
 export class WebviewProvider implements WebviewViewProvider {
     static readonly PrimarySidebar: string = "oroasis.primary-sidebar-provider";
@@ -27,7 +28,8 @@ export class WebviewProvider implements WebviewViewProvider {
 
     constructor(
         readonly context: ExtensionContext,
-        private readonly outputChannel: OutputChannel
+        private readonly outputChannel: OutputChannel,
+        private readonly ollamaService: IOllamaApiService
     ) {
         WebviewProvider.activeInstances.add(this);
     }
@@ -68,7 +70,7 @@ export class WebviewProvider implements WebviewViewProvider {
         };
 
         webviewView.webview.html =
-           ( this.context.extensionMode === ExtensionMode.Development
+            (this.context.extensionMode === ExtensionMode.Development
                 ? await this.getHRMHtmlForWebview(webviewView.webview)
                 : this.getHtmlForWebview(webviewView.webview)).trim();
 
@@ -96,6 +98,30 @@ export class WebviewProvider implements WebviewViewProvider {
                 this.disposables,
             );
         }
+
+        webviewView.webview.onDidReceiveMessage(async (message) => {
+            const { type, requestId, payload } = message;
+
+            if (type === 'emitStatusAppChat:request') {
+                const appData = { id: '200OK', name: 'OrasisApp' }; // Simula lógica
+                webviewView.webview.postMessage({
+                    type: 'emitStatusAppChat:response',
+                    requestId,
+                    payload: appData,
+                });
+            }
+
+            if (type === 'getModels:request') {
+                const models = await this.ollamaService.listModels();
+               
+                webviewView.webview.postMessage({
+                    type: 'getModels:response',
+                    requestId,
+                    payload: models,
+                });
+            }
+
+        });
 
         // Listen for when the view is disposed
         // This happens when the user closes the view or when the view is closed programmatically
@@ -131,7 +157,7 @@ export class WebviewProvider implements WebviewViewProvider {
     */
     private async getHRMHtmlForWebview(webview: Webview) {
 
-       const localPort = 4200;
+        const localPort = 4200;
         const localServerUrl = `localhost:${localPort}`;
         let content: string = "";
         // Check if local dev server is running.
