@@ -1,0 +1,13 @@
+<div class="message-list-container" #messageContainer>
+  <div class="messages">
+    <app-message *ngFor="let message of messages; trackBy: trackByMessageId" [message]="message">
+    </app-message>
+
+    <div *ngIf="isTyping" class="typing-indicator">
+      <div class="typing-content">
+        <span class="typing-text">El asistente está escribiendo</span>
+        <span class="loading-dots"></span>
+      </div>
+    </div>
+  </div>
+</div>

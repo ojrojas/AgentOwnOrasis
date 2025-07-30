@@ -1,0 +1,9 @@
+<div class="chat-container">
+  <app-chat-header></app-chat-header>
+
+  <app-message-list [messages]="messages" [isTyping]="isTyping">
+  </app-message-list>
+
+  <app-message-input [isLoading]="isTyping" (messageSent)="onMessageSent($event)">
+  </app-message-input>
+</div>

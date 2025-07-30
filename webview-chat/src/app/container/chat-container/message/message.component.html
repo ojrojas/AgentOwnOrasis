@@ -1,0 +1,6 @@
+<div class="message-container" [class.user-message]="message.type === 'user'"
+  [class.bot-message]="message.type === 'bot'">
+  <div class="message-content">
+    <div [innerHTML]="processedContent"></div>
+  </div>
+</div>

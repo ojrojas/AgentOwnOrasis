@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+// import { RouterOutlet } from '@angular/router';
 import { VscodeService } from './core/services/vscode-service';
 import { IListModelsResponse } from './core/types/models.types';
+import { ChatContainerComponent } from "./container/chat-container/chat-container.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [ChatContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
