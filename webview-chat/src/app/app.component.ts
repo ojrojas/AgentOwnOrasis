@@ -23,7 +23,6 @@ export class AppComponent implements OnInit {
     const reesponse = await this.vscodeService.request("emitStatusAppChat", "ready on app chat on extension");
     this.responseStatus.set(reesponse);
     const response2 = await this.vscodeService.request("getModels", "getModels");
-    debugger;
     this.responseModels.set(response2);
   };
 }

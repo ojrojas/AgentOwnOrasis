@@ -1,10 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import * as Prism from 'prismjs';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
+import hljs from 'highlight.js/lib/core';
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/typescript';
+import json from 'highlight.js/lib/languages/json';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+// Registra solo los lenguajes necesarios
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('json', json);
 
 export interface Message {
   id: string;
@@ -22,32 +28,36 @@ export interface Message {
 })
 export class MessageComponent implements OnInit {
   @Input() message!: Message;
-  processedContent: string = '';
+  processedContent: SafeHtml = '';
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.processedContent = this.processMessageContent(this.message.content);
   }
 
-  private processMessageContent(content: string): string {
-    // Detectar y procesar bloques de código
+  private processMessageContent(content: string): SafeHtml {
     const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g;
-    let processedContent = content;
 
-    processedContent = processedContent.replace(codeBlockRegex, (match, language, code) => {
-      const highlightedCode = language && Prism.languages[language]
-        ? Prism.highlight(code.trim(), Prism.languages[language], language)
-        : code.trim();
+    let processedContent = content.replace(codeBlockRegex, (match, language, code) => {
+      let highlighted = code.trim();
 
-      return `<pre class="code-block"><code class="language-${language || 'text'}">${highlightedCode}</code></pre>`;
+      if (language && hljs.getLanguage(language)) {
+        highlighted = hljs.highlight(code.trim(), { language }).value;
+      } else {
+        highlighted = hljs.highlightAuto(code.trim()).value;
+      }
+
+      return `<pre class="hljs"><code class="language-${language}">${highlighted}</code></pre>`;
     });
 
-    // Procesar código inline
-    processedContent = processedContent.replace(/`([^`]+)`/g, '<code style="background-color: #404040; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>');
+    // Código inline
+    processedContent = processedContent.replace(/`([^`]+)`/g, `<code class="inline-code">$1</code>`);
 
-    // Procesar texto en negrita
+    // Negrita
     processedContent = processedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-    // Convertir saltos de línea a párrafos
+    // Párrafos
     const paragraphs = processedContent.split('\n\n');
     if (paragraphs.length > 1) {
       processedContent = paragraphs.map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
@@ -55,6 +65,6 @@ export class MessageComponent implements OnInit {
       processedContent = processedContent.replace(/\n/g, '<br>');
     }
 
-    return processedContent;
+    return this.sanitizer.sanitize(SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(processedContent)) || '';
   }
 }

@@ -1,9 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 
-@import 'prismjs/themes/prism-tomorrow.css';
-@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
-
 html {
   color-scheme: light dark;
   @include mat.theme((typography: Roboto,

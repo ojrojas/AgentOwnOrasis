@@ -15,6 +15,25 @@
   ],
   "main": "./oroasis/out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "orasis-aii",
+          "title": "Orasis IA",
+          "icon": "resources/oroasisBotDark.png"
+        }
+      ]
+    },
+    "views": {
+      "orasis-aii": [
+        {
+          "id": "oroasis.primary-sidebar-provider",
+          "name": "Agent OR IA",
+          "icon": "resources/oroasisBotDark.png",
+          "type": "webview"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "oroasis.updateModels",
@@ -176,25 +195,6 @@
           "command": "oroasis.deleteAllComments",
           "group": "navigation",
           "when": "commentController == oroasisCommentController && !commentThreadIsEmpty"
-        }
-      ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "orasis-ai",
-          "title": "Orasis IA",
-          "icon": "./resources/chatbot_icon.png"
-        }
-      ]
-    },
-    "views": {
-      "orasis-ai": [
-        {
-          "id": "oroasis.primary-sidebar-provider",
-          "name": "Agent OR IA",
-          "icon": "./resources/chatbot.png",
-          "type": "webview"
         }
       ]
     }

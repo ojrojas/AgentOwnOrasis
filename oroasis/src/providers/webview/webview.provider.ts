@@ -60,6 +60,22 @@ export class WebviewProvider implements WebviewViewProvider {
         return Array.from(WebviewProvider.activeInstances).find((instance) => instance.view && "onDidChangeVisibility" in instance.view);
     }
 
+    public static getActiveInstance(): WebviewProvider | undefined {
+		return Array.from(this.activeInstances).find((instance) => {
+			if (
+				instance.getWebview() &&
+				instance.getWebview()?.viewType === "claude-dev.TabPanelProvider" &&
+				"active" in instance.getWebview()!
+			) {
+				return (instance.getWebview() as WebviewPanel)?.active === true;
+			}
+			return false;
+		});
+	}
+    getWebview() {
+        return this.view;
+    }
+
 
     async resolveWebviewView(
         webviewView: WebviewView | WebviewPanel) {
@@ -186,6 +202,7 @@ export class WebviewProvider implements WebviewViewProvider {
         const response = await this.fetch(`http://${localServerUrl}`);
         const html = await this.readDataResponse(response);
         const stylesIcons = `https://fonts.googleapis.com/icon?family=Material+Icons`;
+        const fontsRoboto = `https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap`;
         const nonce = getNonce();
 
         // let sanity = html.trim();
@@ -215,7 +232,8 @@ export class WebviewProvider implements WebviewViewProvider {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy" content="${csp.join("; ")}">
           <link href="${stylesUri}" rel="stylesheet">
-          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <link href="${stylesIcons}" rel="stylesheet">
+           <link href="${fontsRoboto}" rel="stylesheet">
           <title>Orasis</title>
         </head>
         <body>
