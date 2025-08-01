@@ -2,6 +2,19 @@
    height: 100vh;
    display: flex;
    flex-direction: column;
-   background-color: #1a1a1a;
-   color: #ffffff;
+ }
+
+
+ .chat-container-header {
+   flex: 1;
+ }
+
+ .chat-container-message-list {
+   flex: 16;
+   overflow-y: scroll;
+ }
+
+ .chat-container-message-input {
+   flex: 1;
+   display: block;
  }

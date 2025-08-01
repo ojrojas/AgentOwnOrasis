@@ -1,6 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 
+:root {
+  --background-color: var(--vscode-editor-background);
+  --text-color: var(--vscode-editor-foreground);
+  --code-bg-color: var(--vscode-editorWidget-background);
+  --border-color: var(--vscode-editorWidget-border);
+}
+
+pre.hljs {
+  background-color: var(--code-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1em;
+  font-family: 'Fira Code', monospace;
+}
+
+
 html {
   color-scheme: light dark;
   @include mat.theme((typography: Roboto,
