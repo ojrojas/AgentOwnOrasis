@@ -1,4 +1,4 @@
-<div class="message-input-container">
+<mat-card class="message-input-container">
   <div class="input-wrapper">
     <mat-form-field appearance="outline" class="message-field">
       <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
@@ -6,13 +6,13 @@
       </textarea>
     </mat-form-field>
 
-    <button mat-fab color="primary" class="send-button" [disabled]="!messageText.trim() || isLoading"
+    <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading"
       (click)="sendMessage()">
       @if (!isLoading) {
         <mat-icon>send</mat-icon>
       }
       @if (isLoading) {
-        <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+        <ng-icon class="loading-icon">matHourglassEmptyOutline</ng-icon>
       }
     </button>
   </div>
@@ -23,4 +23,4 @@
       <span class="loading-dots"></span>
     </div>
   }
-</div>
+</mat-card>
