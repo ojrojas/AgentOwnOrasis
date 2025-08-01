@@ -3,18 +3,24 @@
     <mat-form-field appearance="outline" class="message-field">
       <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
         (keydown.enter)="onEnterPressed($event)" rows="1" #messageTextarea>
-          </textarea>
+      </textarea>
     </mat-form-field>
 
     <button mat-fab color="primary" class="send-button" [disabled]="!messageText.trim() || isLoading"
       (click)="sendMessage()">
-      <mat-icon *ngIf="!isLoading">send</mat-icon>
-      <mat-icon *ngIf="isLoading" class="loading-icon">hourglass_empty</mat-icon>
+      @if (!isLoading) {
+        <mat-icon>send</mat-icon>
+      }
+      @if (isLoading) {
+        <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+      }
     </button>
   </div>
 
-  <div class="input-status" *ngIf="isLoading">
-    <span class="status-text typing-animation">Esperando respuesta del bot</span>
-    <span class="loading-dots"></span>
-  </div>
+  @if (isLoading) {
+    <div class="input-status">
+      <span class="status-text typing-animation">Esperando respuesta del bot</span>
+      <span class="loading-dots"></span>
+    </div>
+  }
 </div>

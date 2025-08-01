@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SecurityContext } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -22,7 +22,7 @@ export interface Message {
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [MatCardModule],
   templateUrl: `message.component.html`,
   styleUrl: `message.component.scss`
 })

@@ -1,13 +1,17 @@
 <div class="message-list-container" #messageContainer>
   <div class="messages">
-    <app-message *ngFor="let message of messages; trackBy: trackByMessageId" [message]="message">
-    </app-message>
+    @for (message of messages; track trackByMessageId($index, message)) {
+      <app-message [message]="message">
+      </app-message>
+    }
 
-    <div *ngIf="isTyping" class="typing-indicator">
-      <div class="typing-content">
-        <span class="typing-text">Orasis is thinking</span>
-        <span class="loading-dots"></span>
+    @if (isTyping) {
+      <div class="typing-indicator">
+        <div class="typing-content">
+          <span class="typing-text">Orasis is thinking</span>
+          <span class="loading-dots"></span>
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>

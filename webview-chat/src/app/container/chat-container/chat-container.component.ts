@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ChatHeaderComponent } from './chat-header/chat-header.component';
 import { MessageInputComponent } from './message-input/message-input.component';
 import { MessageListComponent } from './message-list/message-list.component';
@@ -9,11 +9,10 @@ import { Message } from './message/message.component';
   selector: 'app-chat-container',
   standalone: true,
   imports: [
-    CommonModule,
     ChatHeaderComponent,
     MessageListComponent,
     MessageInputComponent
-  ],
+],
   templateUrl: 'chat-container.component.html',
   styleUrl: 'chat-container.component.scss'
 })
