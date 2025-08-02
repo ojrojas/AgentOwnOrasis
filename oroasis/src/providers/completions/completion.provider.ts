@@ -68,7 +68,7 @@ export class CompletionProvider implements InlineCompletionItemProvider {
             response.then(res => {
                 console.log("response generate: ", res);
                 result.items.push({
-                    insertText: new SnippetString(res.response),
+                    insertText: new SnippetString("res"),
                     range: new Range(position.line, 0, position.line, 0)
                 });
             });

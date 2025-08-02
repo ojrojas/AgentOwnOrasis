@@ -1,4 +1,4 @@
-import { ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message, Ollama } from 'ollama';
+import { AbortableAsyncIterator, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message, Ollama } from 'ollama';
 import { workspace, WorkspaceConfiguration } from 'vscode';
 import { IOllamaApiService } from './ollama.interface.service';
 
@@ -16,7 +16,7 @@ export class OllamaApiService implements IOllamaApiService {
         return this.ollama.list();
     };
 
-    generate = (request: GenerateRequest): Promise<GenerateResponse> => {
+    generate = (request: GenerateRequest): Promise<AbortableAsyncIterator<GenerateResponse>> => {
         return this.ollama.generate({
             model: request.model,
             prompt: request.prompt,
@@ -24,18 +24,20 @@ export class OllamaApiService implements IOllamaApiService {
             options: request.options,
             context: request.context,
             format: request.format,
-            system: request.system
+            system: request.system, 
+            stream: true
         });
     };
 
-    chat = (request: ChatRequest): Promise<ChatResponse> => {
+    chat = (request: ChatRequest): Promise<AbortableAsyncIterator<ChatResponse>> => {
         return this.ollama.chat({
             model: request.model,
             messages: request.messages,
             options: request.options,
             format: request.format,
             keep_alive: request.keep_alive,
-            tools: request.tools
+            tools: request.tools,
+            stream: true
         });
     };
 

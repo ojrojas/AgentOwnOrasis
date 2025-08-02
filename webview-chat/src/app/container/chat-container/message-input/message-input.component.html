@@ -9,17 +9,17 @@
     <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading"
       (click)="sendMessage()">
       @if (!isLoading) {
-        <mat-icon>send</mat-icon>
+        <ng-icon name="matSendOutline"/>
       }
       @if (isLoading) {
-        <ng-icon class="loading-icon">matHourglassEmptyOutline</ng-icon>
+        <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
       }
     </button>
   </div>
 
   @if (isLoading) {
     <div class="input-status">
-      <span class="status-text typing-animation">Esperando respuesta del bot</span>
+      <span class="status-text typing-animation">Waiting for response</span>
       <span class="loading-dots"></span>
     </div>
   }

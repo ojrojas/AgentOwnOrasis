@@ -1,8 +1,8 @@
-import { ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message } from "ollama";
+import { AbortableAsyncIterator, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse } from "ollama";
 
 export interface IOllamaApiService {
     listModels: () => Promise<ListResponse>;
-    generate: (request: GenerateRequest) => Promise<GenerateResponse>;
-    chat: (request: ChatRequest) => Promise<ChatResponse>;
+    generate: (request: GenerateRequest) => Promise<AbortableAsyncIterator<GenerateResponse>>;
+    chat: (request: ChatRequest) => Promise<AbortableAsyncIterator<ChatResponse>>;
     udpdateModels: () => void;
 }

@@ -44,6 +44,10 @@ body {
   --border-color: var(--vscode-editorWidget-border);
 }
 
+code{
+  background-color: transparent;
+}
+
 pre.hljs {
   background-color: var(--code-bg-color);
   color: var(--text-color);
@@ -51,8 +55,27 @@ pre.hljs {
   border-radius: 6px;
   padding: 1em;
   font-family: 'Fira Code', monospace;
+  overflow-x: auto;
 }
 
+pre.hljs::-webkit-scrollbar {
+  height: 6px; /* horizontal scrollbar */
+  width: 6px;  /* vertical scrollbar */
+}
+
+pre.hljs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+pre.hljs::-webkit-scrollbar-thumb {
+  background-color: var(--vscode-scrollbarSlider-background, #888);
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+pre.hljs::-webkit-scrollbar-thumb:hover {
+  background-color: var(--vscode-scrollbarSlider-hoverBackground, #666);
+}
 
 html {
   color-scheme: light dark;

@@ -34,7 +34,7 @@ export class MessageInputComponent {
 
   get placeholder(): string {
     return this.isLoading
-      ? 'Esperando respuesta...'
+      ? 'Waiting for response...'
       : '@ to mention, ⌘L to add a selection. Enter instructions...';
   }
 

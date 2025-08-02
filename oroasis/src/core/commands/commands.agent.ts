@@ -54,14 +54,26 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             model: model as string,
             messages: messages,
             options: {
-                temperature: 0,
+                temperature: 0.3,
                 presence_penalty: 1,
                 top_p: .6
             }
         });
 
+       try {
+            let  accumulated = '';
+            createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
+            for await (const chunk of response) {
+                const token = chunk.message.content || '';
+                accumulated += token;
+                createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+
         outputChannel.appendLine("Comment response finish");
-        createComment(response.message.content, 'Assistant', commentReply.thread, 'ResponseChat');
     });
 };
 
@@ -119,8 +131,19 @@ export const editAgentCommand = (commentReply: CommentComponent, ollamaService: 
             }
         });
 
+        try {
+            let  accumulated = '';
+            createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
+            for await (const chunk of response) {
+                const token = chunk.message.content || '';
+                accumulated += token;
+                createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
         outputChannel.appendLine("Comment response finish");
-        createComment(response.message.content, 'Assistant', commentReply.thread, 'ResponseChat');
     });
 };
 

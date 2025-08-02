@@ -1,6 +1,6 @@
 .message-input-container {
   background-color: #2d2d2d;
-  border-top: 2px solid #404040;
+  border-top: 1px solid  #0084ff;
   padding: 16px;
 }
 
@@ -11,6 +11,7 @@
 
 .message-field {
   flex: 1;
+  color: var(--vscode-editor-foreground);
 }
 
 .message-field :deep(.mat-mdc-form-field-outline) {
@@ -35,11 +36,12 @@
 
 .send-button {
   background-color: #0084ff;
+  color: var(--vscode-editor-foreground) !important;
 }
 
 .send-button:disabled {
   background-color: #555;
-  color: #888;
+  color: var(--vscode-editor-foreground) !important;
 }
 
 .loading-icon {
@@ -73,4 +75,8 @@ textarea {
   resize: none;
   max-height: 120px;
   min-height: 24px;
+  color: var(--vscode-editor-foreground) !important;
+}
+textarea::placeholder{
+  color:  var(--vscode-editor-foreground);
 }
