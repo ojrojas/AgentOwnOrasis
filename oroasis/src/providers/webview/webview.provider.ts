@@ -16,7 +16,7 @@ import { findLast } from '../../shared/collections/array';
 import { getNonce } from '../../shared/generics/nonce';
 import { getUri } from '../../shared/generics/uri';
 import { get, IncomingMessage } from 'node:http';
-import { IOllamaApiService } from '../../core/services/ollama.interface.service';
+import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
 
 export class WebviewProvider implements WebviewViewProvider {
     static readonly PrimarySidebar: string = "oroasis.primary-sidebar-provider";

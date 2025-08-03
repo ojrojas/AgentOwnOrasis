@@ -8,7 +8,7 @@ import { CommentComponent } from './providers/comments/comment.provider';
 import { cancelSaveCommentCommand, createCommentCommand, deleteAllCommentsCommand, deleteCommentCommand, editCommentCommand, replyCommentCommand, saveComentCommand } from './core/commands/commands.comment';
 import { askAgentCommand, editAgentCommand, updateModelsCommand } from './core/commands/commands.agent';
 import { openPanelCommand } from './core/commands/commands.webview';
-import { IOllamaApiService } from './core/services/ollama.interface.service';
+import { IOllamaApiService } from './core/interfaces/ollama.interface.service';
 import { CompletionProvider } from './providers/completions/completion.provider';
 import { WebviewProvider } from './providers/webview/webview.provider';
 import { registerWebView } from './core/webview/webview.register';

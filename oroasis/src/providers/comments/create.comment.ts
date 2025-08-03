@@ -8,7 +8,7 @@ export const createComment = (data: string, actor: ActorType, commentThread: Com
         const commentToUpdate = commentThread.comments[lastIndex];
         commentToUpdate.mode = CommentMode.Preview;
         commentToUpdate.body = new MarkdownString(data);
-        commentThread.comments = [...commentThread.comments, commentToUpdate];
+        commentThread.comments =  [...commentThread.comments.slice(0, -1), commentToUpdate];
     } else {
         const comment = new CommentComponent(
             commentThread,

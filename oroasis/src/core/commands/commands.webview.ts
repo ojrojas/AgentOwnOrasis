@@ -1,7 +1,7 @@
 import { commands, ExtensionContext, OutputChannel, Uri, ViewColumn, window } from 'vscode';
 import { WebviewProvider } from '../../providers/webview/webview.provider';
 import path from 'path';
-import { IOllamaApiService } from '../services/ollama.interface.service';
+import { IOllamaApiService } from '../interfaces/ollama.interface.service';
 
 // Webviews
 export const openPanelCommand = async (context: ExtensionContext, outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {

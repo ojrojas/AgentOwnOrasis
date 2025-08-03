@@ -1,6 +1,6 @@
 import { AbortableAsyncIterator, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message, Ollama } from 'ollama';
 import { workspace, WorkspaceConfiguration } from 'vscode';
-import { IOllamaApiService } from './ollama.interface.service';
+import { IOllamaApiService } from '../interfaces/ollama.interface.service';
 
 export class OllamaApiService implements IOllamaApiService {
     readonly ollama: Ollama;

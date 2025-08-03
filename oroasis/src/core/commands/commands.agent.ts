@@ -1,5 +1,5 @@
 import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
-import { IOllamaApiService } from "../services/ollama.interface.service";
+import { IOllamaApiService } from "../interfaces/ollama.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
 import { Message } from "ollama";
 import { CommentComponent } from "../../providers/comments/comment.provider";
@@ -60,10 +60,13 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             }
         });
 
-       try {
-            let  accumulated = '';
+        try {
+            let accumulated = '';
             createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
             for await (const chunk of response) {
+                if (chunk.done) {
+                    break;
+                }
                 const token = chunk.message.content || '';
                 accumulated += token;
                 createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
@@ -132,9 +135,12 @@ export const editAgentCommand = (commentReply: CommentComponent, ollamaService: 
         });
 
         try {
-            let  accumulated = '';
+            let accumulated = '';
             createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
             for await (const chunk of response) {
+                if (chunk.done) {
+                    break;
+                }
                 const token = chunk.message.content || '';
                 accumulated += token;
                 createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);

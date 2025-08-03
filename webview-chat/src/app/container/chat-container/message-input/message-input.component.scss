@@ -2,6 +2,7 @@
   background-color: #2d2d2d;
   border-top: 1px solid  #0084ff;
   padding: 16px;
+  min-width: 248px;
 }
 
 .input-wrapper {
@@ -14,29 +15,32 @@
   color: var(--vscode-editor-foreground);
 }
 
-.message-field :deep(.mat-mdc-form-field-outline) {
-  color: #555 !important;
+.select-models-field{
+  min-width: 100px !important;
+  background-color: #2d2d2d;
+  color: var(--vscode-editor-foreground);
+  border-radius: 5px;
 }
 
-.message-field :deep(.mat-mdc-form-field-outline-thick) {
-  color: #0084ff !important;
-}
-
-.message-field :deep(.mdc-text-field--outlined .mdc-text-field__input) {
-  color: #ffffff !important;
-}
-
-.message-field :deep(.mat-mdc-form-field-label) {
-  color: #888 !important;
-}
-
-.message-field :deep(.mdc-text-field--focused .mat-mdc-form-field-label) {
-  color: #0084ff !important;
+mat-card-actions{
+  height: 30px !important;
+  min-height: 30px;
+  justify-content: space-between;
 }
 
 .send-button {
   background-color: #0084ff;
   color: var(--vscode-editor-foreground) !important;
+  width: 30px !important;
+  height: 28px !important;
+
+}
+
+.active-microphone{
+  background-color: #0084ff;
+  color: var(--vscode-editor-foreground) !important;
+  width: 30px !important;
+  height: 28px !important;
 }
 
 .send-button:disabled {

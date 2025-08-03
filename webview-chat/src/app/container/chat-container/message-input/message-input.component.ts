@@ -5,10 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { matSendOutline, matHourglassEmptyOutline } from '@ng-icons/material-icons/outline';
+import { matSendOutline, matHourglassEmptyOutline, matMicNoneOutline, matMicOutline } from '@ng-icons/material-icons/outline';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCard } from "@angular/material/card";
-
+import { MatCardModule } from "@angular/material/card";
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-message-input',
@@ -20,17 +20,29 @@ import { MatCard } from "@angular/material/card";
     MatButtonModule,
     NgIcon,
     MatIconModule,
-    MatCard
-],
+    MatCardModule,
+    MatSelectModule
+  ],
   templateUrl: `message-input.component.html`,
   styleUrl: `message-input.component.scss`,
   viewProviders: [provideIcons({ matSendOutline, matHourglassEmptyOutline })]
 })
 export class MessageInputComponent {
+activeMicrophone() {
+throw new Error('Method not implemented.');
+}
   @Input() isLoading: boolean = false;
+
   @Output() messageSent = new EventEmitter<string>();
 
   messageText: string = '';
+
+  foods = [
+    { value: 'steak-0', viewValue: 'Steak' },
+    { value: 'pizza-1', viewValue: 'Pizza' },
+    { value: 'tacos-2', viewValue: 'Tacos' },
+  ];
+
 
   get placeholder(): string {
     return this.isLoading
