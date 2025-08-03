@@ -1,4 +1,4 @@
-import { effect } from '@angular/core';
+import { effect, isDevMode } from '@angular/core';
 import { getState, signalStoreFeature, withHooks } from '@ngrx/signals';
 
 export function withLogger(name: string) {
@@ -7,7 +7,9 @@ export function withLogger(name: string) {
       onInit(store) {
         effect(() => {
           const state = getState(store);
-          console.log(`${name} state changed`, state);
+          if (isDevMode()) {
+            console.log(`${name} state changed`, state);
+          }
         });
       },
     })

@@ -1,6 +1,7 @@
 import { Component, Input, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 
-import { MessageComponent, Message } from '../message/message.component';
+import { MessageComponent } from '../message/message.component';
+import { IMessage } from '../../../core/types/message.type';
 
 @Component({
   selector: 'app-message-list',
@@ -10,7 +11,7 @@ import { MessageComponent, Message } from '../message/message.component';
   styleUrl: `message-list.component.scss`
 })
 export class MessageListComponent implements AfterViewChecked {
-  @Input() messages: Message[] = [];
+  @Input() messages: IMessage[] = [];
   @Input() isTyping: boolean = false;
   @ViewChild('messageContainer') private messageContainer!: ElementRef;
 
@@ -25,7 +26,7 @@ export class MessageListComponent implements AfterViewChecked {
     }
   }
 
-  trackByMessageId(index: number, message: Message): string {
+  trackByMessageId(index: number, message: IMessage): string {
     return message.id;
   }
 }

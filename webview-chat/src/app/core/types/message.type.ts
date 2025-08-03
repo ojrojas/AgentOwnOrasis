@@ -1,8 +1,10 @@
 export interface IMessage {
+  id: string;
   role: string;
   content: string;
   images?: Uint8Array[] | string[];
   tool_calls?: IToolCall[];
+   timestamp: Date;
 }
 
 export interface IToolCall {

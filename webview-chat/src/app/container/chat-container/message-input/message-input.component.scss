@@ -1,6 +1,6 @@
 .message-input-container {
   background-color: #2d2d2d;
-  border-top: 1px solid  #0084ff;
+  border-top: 1px solid #0084ff;
   padding: 16px;
   min-width: 248px;
 }
@@ -15,14 +15,14 @@
   color: var(--vscode-editor-foreground);
 }
 
-.select-models-field{
+.select-models-field {
   min-width: 100px !important;
   background-color: #2d2d2d;
   color: var(--vscode-editor-foreground);
   border-radius: 5px;
 }
 
-mat-card-actions{
+mat-card-actions {
   height: 30px !important;
   min-height: 30px;
   justify-content: space-between;
@@ -36,20 +36,25 @@ mat-card-actions{
 
 }
 
-.active-microphone{
-  background-color: #0084ff;
-  color: var(--vscode-editor-foreground) !important;
-  width: 30px !important;
-  height: 28px !important;
-}
-
 .send-button:disabled {
   background-color: #555;
   color: var(--vscode-editor-foreground) !important;
 }
 
+.active-microphone {
+  background-color: #555;
+  color: var(--vscode-editor-foreground) !important;
+  width: 30px !important;
+  height: 28px !important;
+}
+
+.is-active {
+  background-color: #0084ff;
+}
+
 .loading-icon {
   animation: spin 1s linear infinite;
+  color: var(--vscode-editor-foreground) !important;
 }
 
 @keyframes spin {
@@ -63,10 +68,8 @@ mat-card-actions{
 }
 
 .input-status {
-  margin-top: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
   color: #888;
   font-size: 14px;
 }
@@ -81,6 +84,7 @@ textarea {
   min-height: 24px;
   color: var(--vscode-editor-foreground) !important;
 }
-textarea::placeholder{
-  color:  var(--vscode-editor-foreground);
+
+textarea::placeholder {
+  color: var(--vscode-editor-foreground);
 }

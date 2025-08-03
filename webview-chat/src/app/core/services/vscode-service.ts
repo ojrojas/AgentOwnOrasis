@@ -23,7 +23,7 @@ export class VscodeService {
     }
   };
 
-  public request(type: string, payload?: any): Promise<any> {
+  public request<T>(type: string, payload?: T): Promise<T> {
     const requestId = uuidv4();
     const messageType = `${type}:request`;
 

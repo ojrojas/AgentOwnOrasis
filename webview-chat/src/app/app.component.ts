@@ -12,17 +12,17 @@ import { ChatContainerComponent } from "./container/chat-container/chat-containe
 })
 export class AppComponent implements OnInit {
   title = 'webview-chat';
-  vscodeService = inject(VscodeService);
-  responseStatus = signal({ id: '', name: '' });
-  responseModels = signal<IListModelsResponse | undefined>(undefined);
+  // vscodeService = inject(VscodeService);
+  // responseStatus = signal({ id: '', name: '' });
+  // responseModels = signal<IListModelsResponse | undefined>(undefined);
 
   ngOnInit(): void {
     this.status();
   }
   status = async () => {
-    const reesponse = await this.vscodeService.request("emitStatusAppChat", "ready on app chat on extension");
-    this.responseStatus.set(reesponse);
-    const response2 = await this.vscodeService.request("getModels", "getModels");
-    this.responseModels.set(response2);
+    // const reesponse = await this.vscodeService.request("emitStatusAppChat", "ready on app chat on extension");
+    // this.responseStatus.set(reesponse);
+    // const response2 = await this.vscodeService.request("getModels", "getModels");
+    // this.responseModels.set(response2);
   };
 }

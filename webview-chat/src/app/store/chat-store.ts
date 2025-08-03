@@ -29,10 +29,15 @@ export const ChatStore = signalStore(
     hasResponse: computed(() => state.isLoading)
   })),
   withMethods((store, vscodeService = inject(VscodeService)) => ({
-    async sendChat(message: IMessage){
+    async sendChat(message: IMessage) {
       patchState(store, setPending());
       const response = await vscodeService.request('sendChat', message);
       patchState(store, setFulfilled());
+    },
+    async loadModels() {
+      patchState(store, setPending());
+      const response = await vscodeService.request<IListModelsResponse>("getModels");
+      patchState(store, { models: response }, setFulfilled());
     }
   })),
   withHooks(() => ({}))

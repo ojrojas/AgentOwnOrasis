@@ -6,18 +6,12 @@ import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
 import json from 'highlight.js/lib/languages/json';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { IMessage } from '../../../core/types/message.type';
 
 // Registra solo los lenguajes necesarios
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('json', json);
-
-export interface Message {
-  id: string;
-  content: string;
-  type: 'user' | 'bot';
-  timestamp: Date;
-}
 
 @Component({
   selector: 'app-message',
@@ -27,7 +21,7 @@ export interface Message {
   styleUrl: `message.component.scss`
 })
 export class MessageComponent implements OnInit {
-  @Input() message!: Message;
+  @Input() message!: IMessage;
   processedContent: SafeHtml = '';
 
   constructor(private sanitizer: DomSanitizer) {}

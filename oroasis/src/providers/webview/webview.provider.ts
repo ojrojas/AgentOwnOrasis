@@ -61,17 +61,17 @@ export class WebviewProvider implements WebviewViewProvider {
     }
 
     public static getActiveInstance(): WebviewProvider | undefined {
-		return Array.from(this.activeInstances).find((instance) => {
-			if (
-				instance.getWebview() &&
-				instance.getWebview()?.viewType === "claude-dev.TabPanelProvider" &&
-				"active" in instance.getWebview()!
-			) {
-				return (instance.getWebview() as WebviewPanel)?.active === true;
-			}
-			return false;
-		});
-	}
+        return Array.from(this.activeInstances).find((instance) => {
+            if (
+                instance.getWebview() &&
+                instance.getWebview()?.viewType === "claude-dev.TabPanelProvider" &&
+                "active" in instance.getWebview()!
+            ) {
+                return (instance.getWebview() as WebviewPanel)?.active === true;
+            }
+            return false;
+        });
+    }
     getWebview() {
         return this.view;
     }
@@ -118,25 +118,42 @@ export class WebviewProvider implements WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async (message) => {
             const { type, requestId, payload } = message;
 
-            if (type === 'emitStatusAppChat:request') {
-                const appData = { id: '200OK', name: 'OrasisApp' }; // Simula lógica
-                webviewView.webview.postMessage({
-                    type: 'emitStatusAppChat:response',
-                    requestId,
-                    payload: appData,
-                });
-            }
 
-            if (type === 'getModels:request') {
-                const models = await this.ollamaService.listModels();
-               
-                webviewView.webview.postMessage({
-                    type: 'getModels:response',
-                    requestId,
-                    payload: models,
-                });
-            }
+            switch (type) {
+                case 'emitStatusAppChat:request':
+                    const appData = { id: '200OK', name: 'OrasisApp' }; // Simula lógica
+                    webviewView.webview.postMessage({
+                        type: 'emitStatusAppChat:response',
+                        requestId,
+                        payload: appData,
+                    });
+                    break;
+                case 'getModels:request':
+                    const models = await this.ollamaService.listModels();
 
+                    webviewView.webview.postMessage({
+                        type: 'getModels:response',
+                        requestId,
+                        payload: models,
+                    });
+                    break;
+
+                case 'sendChat:request':
+                    const response = await this.ollamaService.chat({
+                        model: payload.model,
+                        messages:[]
+                    });
+
+                    webviewView.webview.postMessage({
+                        type: 'getModels:response',
+                        requestId,
+                        payload: response,
+                    });
+                    break;
+
+                default:
+                    break;
+            }
         });
 
         // Listen for when the view is disposed
