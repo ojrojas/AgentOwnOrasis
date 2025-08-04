@@ -211,6 +211,7 @@
     "postinstall": "cd oroasis && npm install && cd ../webview-chat && npm install && cd .."
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.102.0",
@@ -220,5 +221,9 @@
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.25.1",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "uuid": "^11.1.0"
   }
 }
