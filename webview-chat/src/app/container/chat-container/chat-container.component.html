@@ -1,7 +1,7 @@
 <div class="chat-container">
   <app-chat-header class="chat-container-header"></app-chat-header>
 
-  <app-message-list class="chat-container-message-list" [messages]="messages" [isTyping]="isTyping">
+  <app-message-list class="chat-container-message-list" [messages]="chatStore.messages()" [isTyping]="isTyping">
   </app-message-list>
 
   <app-message-input class="chat-container-message-input" [isLoading]="isTyping" (messageSent)="onMessageSent($event)">

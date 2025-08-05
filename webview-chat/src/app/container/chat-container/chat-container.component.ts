@@ -20,7 +20,6 @@ import { IMessage } from '../../core/types/message.type';
 export class ChatContainerComponent implements OnInit {
   readonly chatStore = inject(ChatStore);
 
-  messages = [];
 
   async ngOnInit(): Promise<void> {
     await this.chatStore.loadModels();
@@ -28,28 +27,24 @@ export class ChatContainerComponent implements OnInit {
 
   isTyping: boolean = false;
 
-  onMessageSent(message: string): void {
-    // Agregar mensaje del usuario
-    const userMessage: IMessage = {
-      id: Date.now().toString(),
-      content: message,
-      role: 'user',
-      timestamp: new Date()
-    };
+  async onMessageSent(message: IMessage): Promise<void> {
 
     // Simular respuesta del bot
     this.isTyping = true;
 
-    setTimeout(() => {
-      const botResponse: IMessage = {
-        id: (Date.now() + 1).toString(),
-        content: '',
-        role: '',
-        timestamp: new Date()
-      };
+    // setTimeout(() => {
+    //   const botResponse: IMessage = {
+    //     id: (Date.now() + 1).toString(),
+    //     content: '',
+    //     role: '',
+    //     timestamp: new Date()
+    //   };
 
 
-      this.isTyping = false;
-    }, 2000 + Math.random() * 2000); // 2-4 segundos de respuesta
+    //   this.isTyping = false;
+    // }, 2000 + Math.random() * 2000); // 2-4 segundos de respuesta
+    await this.chatStore.sendChat(message);
+    console.log('visual studio');
+    this.isTyping = false;
   }
 }

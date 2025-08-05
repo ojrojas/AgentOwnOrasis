@@ -9,7 +9,7 @@
 
   </div>
   <mat-card-actions>
-    <select class="select-models-field" [disabled]="isLoading">
+    <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
       @for (model of this.chatStore.models()?.models; track model) {
       <option [value]="model.model">{{model.name}}</option>
       }

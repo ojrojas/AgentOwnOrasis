@@ -2,10 +2,12 @@ import { commands, ExtensionContext, OutputChannel, Uri, ViewColumn, window } fr
 import { WebviewProvider } from '../../providers/webview/webview.provider';
 import path from 'path';
 import { IOllamaApiService } from '../interfaces/ollama.interface.service';
+import { WorkspaceStateRepository } from '../services/workspace-repository.service';
+import { IChatMessage } from '../types/chat-message.type';
 
 // Webviews
-export const openPanelCommand = async (context: ExtensionContext, outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {
-    const tabWebview = new WebviewProvider(context, outputChannel, ollamaService);
+export const openPanelCommand = async (context: ExtensionContext, outputChannel: OutputChannel, ollamaService: IOllamaApiService, chatMessageRepository: WorkspaceStateRepository<IChatMessage>) => {
+    const tabWebview = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
     const lastCol = Math.max(...window.visibleTextEditors.map((editor) => editor.viewColumn || 0));
 
     const hasVisibleEditors = window.visibleTextEditors.length > 0;

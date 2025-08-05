@@ -30,8 +30,16 @@ export const ChatStore = signalStore(
   })),
   withMethods((store, vscodeService = inject(VscodeService)) => ({
     async sendChat(message: IMessage) {
+        patchState(store, (state) => ({
+        messages: [...state.messages, message]
+      }));
+
       patchState(store, setPending());
       const response = await vscodeService.request('sendChat', message);
+      patchState(store, (state) => ({
+        messages: [...state.messages, response as IMessage]
+      }));
+
       patchState(store, setFulfilled());
     },
     async loadModels() {

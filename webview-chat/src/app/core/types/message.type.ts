@@ -4,7 +4,8 @@ export interface IMessage {
   content: string;
   images?: Uint8Array[] | string[];
   tool_calls?: IToolCall[];
-   timestamp: Date;
+  timestamp: Date;
+  model: string;
 }
 
 export interface IToolCall {

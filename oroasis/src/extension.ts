@@ -12,6 +12,8 @@ import { IOllamaApiService } from './core/interfaces/ollama.interface.service';
 import { CompletionProvider } from './providers/completions/completion.provider';
 import { WebviewProvider } from './providers/webview/webview.provider';
 import { registerWebView } from './core/webview/webview.register';
+import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
+import { IChatMessage } from './core/types/chat-message.type';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
@@ -25,9 +27,10 @@ function addSubscriber(item: any) {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	const chatMessageRepository = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
 	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
 	const completionsProvider = new CompletionProvider(ollamaService);
-	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService);
+	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
 
 	// providers
 	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, completionsProvider));
@@ -47,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.deleteAllComments', (thread: vscode.CommentThread) => deleteAllCommentsCommand(thread)));
 
 	// commands agent
-	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel, ollamaService)));
+	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel, ollamaService, chatMessageRepository)));
 	addSubscriber(createCommand('oroasis.askAgent', (commentReply: vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.editAgent', (comment: CommentComponent) => editAgentCommand(comment, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel, ollamaService)));

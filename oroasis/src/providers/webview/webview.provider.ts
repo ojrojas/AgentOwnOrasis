@@ -17,6 +17,9 @@ import { getNonce } from '../../shared/generics/nonce';
 import { getUri } from '../../shared/generics/uri';
 import { get, IncomingMessage } from 'node:http';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
+import { WorkspaceStateRepository } from '../../core/services/workspace-repository.service';
+import { IChatMessage } from '../../core/types/chat-message.type';
+import { Message } from 'ollama';
 
 export class WebviewProvider implements WebviewViewProvider {
     static readonly PrimarySidebar: string = "oroasis.primary-sidebar-provider";
@@ -29,7 +32,8 @@ export class WebviewProvider implements WebviewViewProvider {
     constructor(
         readonly context: ExtensionContext,
         private readonly outputChannel: OutputChannel,
-        private readonly ollamaService: IOllamaApiService
+        private readonly ollamaService: IOllamaApiService,
+        private readonly chatRepository: WorkspaceStateRepository<IChatMessage>
     ) {
         WebviewProvider.activeInstances.add(this);
     }
@@ -139,15 +143,33 @@ export class WebviewProvider implements WebviewViewProvider {
                     break;
 
                 case 'sendChat:request':
+                    await this.chatRepository.clear();
+                    await this.chatRepository.insert(payload);
+                    const messages = this.chatRepository.findAllSync().map(item => ({
+                        content: item.content,
+                        role: item.role
+                    }));
                     const response = await this.ollamaService.chat({
                         model: payload.model,
-                        messages:[]
+                        messages: messages
                     });
+                    let accumulated = '';
+                    for await (const chunk of response) {
+                        if (chunk.done) {
+                            break;
+                        }
+                        const token = chunk.message.content || '';
+                        accumulated += token;
+
+                        webviewView.webview.postMessage({
+                            type: 'sendChat:response:chunk',
+                            requestId,
+                            payload: response,
+                        });
+                    }
 
                     webviewView.webview.postMessage({
-                        type: 'getModels:response',
-                        requestId,
-                        payload: response,
+                        type: 'sendChat:response:done'
                     });
                     break;
 

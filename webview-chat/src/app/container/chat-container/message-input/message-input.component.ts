@@ -11,6 +11,8 @@ import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { ChatStore } from '../../../store/chat-store';
+import { IMessage } from '../../../core/types/message.type';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-message-input',
@@ -34,7 +36,8 @@ export class MessageInputComponent {
   readonly chatStore = inject(ChatStore);
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
-  @Output() messageSent = new EventEmitter<string>();
+  @Output() messageSent = new EventEmitter<IMessage>();
+  modelText:string = '';
 
   messageText: string = '';
 
@@ -58,7 +61,13 @@ export class MessageInputComponent {
 
   sendMessage(): void {
     if (this.messageText.trim() && !this.isLoading) {
-      this.messageSent.emit(this.messageText.trim());
+      this.messageSent.emit({
+        content: this.messageText,
+        role: 'user',
+        id: uuidv4(),
+        timestamp : new Date(),
+        model: this.modelText
+      });
       this.messageText = '';
     }
   }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
@@ -30,6 +31,28 @@ export class VscodeService {
     return new Promise((resolve) => {
       this.pendingRequests.set(requestId, resolve);
       this.vscode.postMessage({ type: messageType, requestId, payload });
+    });
+  }
+
+  requestStream<T = any>(type: string, payload?: any): Observable<T> {
+    const requestId = uuidv4();
+    const vsCodeApi = window.acquireVsCodeApi();
+    vsCodeApi.postMessage({ type: `${type}:request`, requestId, payload });
+
+    return new Observable<T>((observer) => {
+      const listener = (event: MessageEvent) => {
+        const msg = event.data;
+        if (!msg?.type?.startsWith(type) || msg.requestId !== requestId) return;
+
+        if (msg.type.endsWith(':chunk')) {
+          observer.next(msg.payload);
+        } else if (msg.type.endsWith(':done')) {
+          observer.complete();
+          window.removeEventListener('message', listener);
+        }
+      };
+
+      window.addEventListener('message', listener);
     });
   }
 
