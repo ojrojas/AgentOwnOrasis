@@ -19,7 +19,9 @@ import { get, IncomingMessage } from 'node:http';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
 import { WorkspaceStateRepository } from '../../core/services/workspace-repository.service';
 import { IChatMessage } from '../../core/types/chat-message.type';
-import { Message } from 'ollama';
+import { v4 as uuidv4 } from 'uuid';
+
+
 
 export class WebviewProvider implements WebviewViewProvider {
     static readonly PrimarySidebar: string = "oroasis.primary-sidebar-provider";
@@ -149,22 +151,37 @@ export class WebviewProvider implements WebviewViewProvider {
                         content: item.content,
                         role: item.role
                     }));
+
+                    webviewView.webview.postMessage({
+                        type: 'sendChat:response',
+                        requestId,
+                        payload: {
+                            content: 'Orasis is thinking',
+                            role: 'assistant',
+                            done: false,
+                            id: uuidv4()
+                        },
+                    });
+
                     const response = await this.ollamaService.chat({
                         model: payload.model,
                         messages: messages
                     });
-                    let accumulated = '';
+
+                    let accumulated  ='';
                     for await (const chunk of response) {
-                        if (chunk.done) {
-                            break;
-                        }
-                        const token = chunk.message.content || '';
-                        accumulated += token;
+                        // const token = chunk.message.content || '';
+                         accumulated += chunk.message.content || '';
 
                         webviewView.webview.postMessage({
-                            type: 'sendChat:response:chunk',
+                            type: 'sendChat:response',
                             requestId,
-                            payload: response,
+                            payload:  {
+                                content: accumulated,
+                                role: 'assistant',
+                                done: chunk.done,
+                                id: uuidv4()
+                            },
                         });
                     }
 

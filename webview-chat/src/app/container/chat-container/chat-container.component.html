@@ -1,9 +1,9 @@
 <div class="chat-container">
   <app-chat-header class="chat-container-header"></app-chat-header>
 
-  <app-message-list class="chat-container-message-list" [messages]="chatStore.messages()" [isTyping]="isTyping">
+  <app-message-list class="chat-container-message-list" [messages]="chatStore.messages()" [isTyping]="this.chatStore.requestStatus() === 'pending'">
   </app-message-list>
 
-  <app-message-input class="chat-container-message-input" [isLoading]="isTyping" (messageSent)="onMessageSent($event)">
+  <app-message-input class="chat-container-message-input" [isLoading]="this.chatStore.requestStatus() === 'pending'" (messageSent)="onMessageSent($event)">
   </app-message-input>
 </div>

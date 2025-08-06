@@ -27,6 +27,6 @@ export class MessageListComponent implements AfterViewChecked {
   }
 
   trackByMessageId(index: number, message: IMessage): string {
-    return message.id;
+    return message.id ?? index;
   }
 }

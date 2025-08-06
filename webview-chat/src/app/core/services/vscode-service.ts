@@ -36,8 +36,7 @@ export class VscodeService {
 
   requestStream<T = any>(type: string, payload?: any): Observable<T> {
     const requestId = uuidv4();
-    const vsCodeApi = window.acquireVsCodeApi();
-    vsCodeApi.postMessage({ type: `${type}:request`, requestId, payload });
+    this.vscode.postMessage({ type: `${type}:request`, requestId, payload });
 
     return new Observable<T>((observer) => {
       const listener = (event: MessageEvent) => {
@@ -55,6 +54,19 @@ export class VscodeService {
       window.addEventListener('message', listener);
     });
   }
+
+  sendMessage(type: string, payload?: any): void {
+  this.vscode.postMessage({ type: `${type}:request`, payload });
+}
+
+onMessage<T>(type: string, handler: (payload: T) => void) {
+  window.addEventListener('message', (event) => {
+    if (event.data?.type === type) {
+      handler(event.data.payload);
+    }
+  });
+}
+
 
   public send(type: string, payload?: any) {
     this.vscode.postMessage({ type, payload });
