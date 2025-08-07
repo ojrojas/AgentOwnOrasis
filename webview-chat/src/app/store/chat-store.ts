@@ -33,13 +33,10 @@ export const ChatStore = signalStore(
       patchState(store, (state) => ({
         messages: [...state.messages, message]
       }));
-      patchState(store, setFulfilled());
+      patchState(store, setPending());
     },
     sendChat(message: IMessage) {
-      patchState(store, setPending());
-
       vscodeService.sendMessage('sendChat', message);
-      patchState(store, setFulfilled());
       vscodeService.onMessage<IMessage>('sendChat:response', (partialResponse) => {
         patchState(store, (state) => {
           if (isDevMode()) {
@@ -47,15 +44,17 @@ export const ChatStore = signalStore(
           }
           // Actualiza el último mensaje si ya existe
           const lastMsgIndex = state.messages.findIndex(m => m.role === 'assistant' && !m.done);
-          if (lastMsgIndex !== -1) {
+          if (lastMsgIndex !== -1 && !message.done) {
             const updatedMessages = [...state.messages];
             updatedMessages[lastMsgIndex] =
             {
               ...updatedMessages[lastMsgIndex],
               ...partialResponse
             };
+            console.log("Update response");
             return { messages: updatedMessages };
           }
+          console.log("Partial response");
           return {
             messages: [...state.messages, partialResponse]
           };
