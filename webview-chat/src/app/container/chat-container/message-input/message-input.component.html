@@ -12,7 +12,7 @@
     <div>
       <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
         @for (model of this.chatStore.models()?.models; track model) {
-        <option [value]="model.model" (change)="(chatStore.preferredModel())" selected="{{chatStore.preferredModel() === model.model}}" >{{model.name}}</option>
+        <option [ngValue]="model.model">{{model.name}}</option>
         }
       </select>
     </div>
