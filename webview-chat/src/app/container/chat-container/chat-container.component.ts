@@ -22,23 +22,10 @@ export class ChatContainerComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.chatStore.loadModels();
+    await this.chatStore.getPreferredModel();
   }
 
   async onMessageSent(message: IMessage): Promise<void> {
-
-    // Simular respuesta del bot
-
-    // setTimeout(() => {
-    //   const botResponse: IMessage = {
-    //     id: (Date.now() + 1).toString(),
-    //     content: '',
-    //     role: '',
-    //     timestamp: new Date()
-    //   };
-
-
-    //   this.isTyping = false;
-    // }, 2000 + Math.random() * 2000); // 2-4 segundos de respuesta
     await this.chatStore.postMessage(message);
     this.chatStore.sendChat(message);
     console.log('visual studio');

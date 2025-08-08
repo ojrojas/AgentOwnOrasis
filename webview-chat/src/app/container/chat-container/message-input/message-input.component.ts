@@ -53,7 +53,7 @@ export class MessageInputComponent {
   }
 
   onEnterPressed(event: any): void {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && this.modelText.length !== 0) {
       event.preventDefault();
       this.sendMessage();
     }

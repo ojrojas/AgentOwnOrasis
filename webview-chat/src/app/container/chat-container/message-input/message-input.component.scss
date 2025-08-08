@@ -2,12 +2,13 @@
   background-color: #2d2d2d;
   border-top: 1px solid #0084ff;
   padding: 16px;
-  min-width: 248px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  display: flex;
 }
 
 .input-wrapper {
   display: flex;
-  gap: 10px;
 }
 
 .message-field {
@@ -16,10 +17,13 @@
 }
 
 .select-models-field {
-  min-width: 100px !important;
   background-color: #2d2d2d;
   color: var(--vscode-editor-foreground);
   border-radius: 5px;
+}
+
+.select-models-field:focus{
+  outline: none;
 }
 
 mat-card-actions {
@@ -83,6 +87,14 @@ textarea {
   max-height: 120px;
   min-height: 24px;
   color: var(--vscode-editor-foreground) !important;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  overflow-y: hidden;
+}
+
+textarea:focus {
+  outline: none !important;
 }
 
 textarea::placeholder {

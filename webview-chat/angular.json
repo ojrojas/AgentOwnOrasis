@@ -33,7 +33,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "node_modules/highlight.js/scss/github-dark.scss",
+              "node_modules/highlight.js/scss/atom-one-dark.scss",
               "src/styles.scss"
             ],
             "scripts": []

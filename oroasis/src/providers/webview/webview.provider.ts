@@ -19,7 +19,7 @@ import { get, IncomingMessage } from 'node:http';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
 import { WorkspaceStateRepository } from '../../core/services/workspace-repository.service';
 import { IChatMessage } from '../../core/types/chat-message.type';
-import { v4 as uuidv4 } from 'uuid';
+import { commandOnDidReceived } from '../../core/commands/commands.webview';
 
 
 
@@ -30,6 +30,7 @@ export class WebviewProvider implements WebviewViewProvider {
     private static activeInstances: Set<WebviewProvider> = new Set();
     view?: WebviewView | WebviewPanel;
     disposables: Disposable[] = [];
+    model: string | undefined;
 
     constructor(
         readonly context: ExtensionContext,
@@ -38,6 +39,9 @@ export class WebviewProvider implements WebviewViewProvider {
         private readonly chatRepository: WorkspaceStateRepository<IChatMessage>
     ) {
         WebviewProvider.activeInstances.add(this);
+
+        const settings = workspace.getConfiguration('oroasisSettings');
+        this.model = settings.get('modelDefault');
     }
 
     async dispose() {
@@ -122,77 +126,8 @@ export class WebviewProvider implements WebviewViewProvider {
         }
 
         webviewView.webview.onDidReceiveMessage(async (message) => {
-            const { type, requestId, payload } = message;
-
-
-            switch (type) {
-                case 'emitStatusAppChat:request':
-                    const appData = { id: '200OK', name: 'OrasisApp' }; // Simula lógica
-                    webviewView.webview.postMessage({
-                        type: 'emitStatusAppChat:response',
-                        requestId,
-                        payload: appData,
-                    });
-                    break;
-                case 'getModels:request':
-                    const models = await this.ollamaService.listModels();
-
-                    webviewView.webview.postMessage({
-                        type: 'getModels:response',
-                        requestId,
-                        payload: models,
-                    });
-                    break;
-
-                case 'sendChat:request':
-                    await this.chatRepository.clear();
-                    await this.chatRepository.insert(payload);
-                    const messages = this.chatRepository.findAllSync().map(item => ({
-                        content: item.content,
-                        role: item.role
-                    }));
-
-                    webviewView.webview.postMessage({
-                        type: 'sendChat:response',
-                        requestId,
-                        payload: {
-                            content: 'Orasis is thinking',
-                            role: 'assistant',
-                            done: false,
-                            id: uuidv4()
-                        },
-                    });
-
-                    const response = await this.ollamaService.chat({
-                        model: payload.model,
-                        messages: messages
-                    });
-
-                    let accumulated  ='';
-                    for await (const chunk of response) {
-                        // const token = chunk.message.content || '';
-                         accumulated += chunk.message.content || '';
-
-                        webviewView.webview.postMessage({
-                            type: 'sendChat:response',
-                            requestId,
-                            payload:  {
-                                content: accumulated,
-                                role: 'assistant',
-                                done: chunk.done,
-                                id: uuidv4()
-                            },
-                        });
-                    }
-
-                    webviewView.webview.postMessage({
-                        type: 'sendChat:response:done'
-                    });
-                    break;
-
-                default:
-                    break;
-            }
+            this.chatRepository.clear();
+            commandOnDidReceived(webviewView.webview, this.model!, this.chatRepository, this.ollamaService, message);
         });
 
         // Listen for when the view is disposed
@@ -271,7 +206,7 @@ export class WebviewProvider implements WebviewViewProvider {
 
         const csp = [
             "default-src 'none'",
-            `font-src ${webview.cspSource}`,
+            `font-src ${webview.cspSource} 'nonce-${nonce}'`,
             `style-src ${webview.cspSource} 'unsafe-inline' https://* http://${localServerUrl} http://0.0.0.0:${localPort}`,
             `img-src ${webview.cspSource} https: data:`,
             `script-src 'unsafe-eval' https://* http://${localServerUrl} http://0.0.0.0:${localPort} 'nonce-${nonce}'`,

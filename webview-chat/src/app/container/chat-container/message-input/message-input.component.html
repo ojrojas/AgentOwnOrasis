@@ -1,36 +1,37 @@
 <mat-card class="message-input-container">
   <div class="input-wrapper">
-    <mat-form-field appearance="outline" class="message-field">
+    <div appearance="outline" class="message-field">
       <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
-        (keydown.enter)="onEnterPressed($event)" rows="1" #messageTextarea>
+        (keydown.enter)="onEnterPressed($event)" rows="3" #messageTextarea>
       </textarea>
-    </mat-form-field>
+    </div>
 
 
   </div>
   <mat-card-actions>
-    <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
-      @for (model of this.chatStore.models()?.models; track model) {
-      <option [value]="model.model">{{model.name}}</option>
-      }
-    </select>
-    <button [class]="{'active-microphone': true,  'is-active': this.isActiveMicrophone }" matMiniFab
-      (click)="activeMicrophone()" [disabled]="isLoading">
-      <ng-icon name="matMicOutline" />
-    </button>
-    <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading" (click)="sendMessage()">
-      @if (!isLoading) {
-      <ng-icon name="matSendOutline" />
-      }
-      @if (isLoading) {
-      <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
-      }
-    </button>
+    <div>
+      <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
+        @for (model of this.chatStore.models()?.models; track model) {
+        <option [value]="model.model" (change)="(chatStore.preferredModel())" selected="{{chatStore.preferredModel() === model.model}}" >{{model.name}}</option>
+        }
+      </select>
+    </div>
+    <div>
+    </div>
+    <div>
+      <button [class]="{'active-microphone': true,  'is-active': this.isActiveMicrophone }" matMiniFab
+        (click)="activeMicrophone()" [disabled]="isLoading">
+        <ng-icon name="matMicOutline" />
+      </button>
+      <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading || modelText.length === 0"
+        (click)="sendMessage()">
+        @if (!isLoading) {
+        <ng-icon name="matSendOutline" />
+        }
+        @if (isLoading) {
+        <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
+        }
+      </button>
+    </div>
   </mat-card-actions>
-
-  @if (isLoading) {
-  <div class="input-status">
-    <span class="status-text typing-animation">Waiting for response</span>
-  </div>
-  }
 </mat-card>

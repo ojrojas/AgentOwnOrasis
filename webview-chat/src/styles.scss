@@ -6,6 +6,13 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+:root {
+  --background-color: var(--vscode-editor-background);
+  --text-color: var(--vscode-editor-foreground);
+  --code-bg-color: var(--vscode-editorWidget-background);
+  --border-color: var(--vscode-editorWidget-border);
+}
+
 html {
   @include mat.theme((
     color: (
@@ -17,6 +24,8 @@ html {
   ));
 }
 
+
+
 body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
@@ -26,23 +35,22 @@ body {
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
   // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  // background-color: var(--mat-sys-surface);
+  // color: var(--mat-sys-on-surface);
+
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+
 
   // Reset the user agent margin.
   margin: 0;
+  padding: 0;
 }
 
 /* You can add global styles to this file, and also import other style files */
 // @use '@angular/material' as mat;
 
-:root {
-  --background-color: var(--vscode-editor-background);
-  --text-color: var(--vscode-editor-foreground);
-  --code-bg-color: var(--vscode-editorWidget-background);
-  --border-color: var(--vscode-editorWidget-border);
-}
+
 
 code{
   background-color: transparent;
@@ -83,22 +91,10 @@ html {
     //   density: -5));
 }
 
-
-body {
-  background-color: var(--vscode-editor-background);
-  color: var(--vscode-editor-foreground);
-}
-
-
 body.vscode-dark {
   --panel-color: var(--vscode-panel-background);
 }
 
 body.vscode-light {
   --panel-color: var(--vscode-editor-background);
-}
-
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
