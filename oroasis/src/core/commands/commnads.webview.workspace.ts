@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { WorkspaceController } from '../controllers/workspace.controller';
 import { WorkspaceRepositoryService } from '../services/workspace-repository-files.service';
 
-export function registerWorkspaceCommands(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
+export function registerWorkspaceCommands(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, outputChannel: vscode.OutputChannel) {
   const workspaceService = new WorkspaceRepositoryService();
   const workspaceController = new WorkspaceController(workspaceService);
 

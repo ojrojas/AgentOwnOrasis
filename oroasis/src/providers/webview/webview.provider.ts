@@ -125,8 +125,8 @@ export class WebviewProvider implements WebviewViewProvider {
             );
         }
 
-        registerWorkspaceCommands(this.context, this.getWebview() as WebviewPanel);
-        registerChatCommands(this.context, this.getWebview() as WebviewPanel, this.ollamaService, this.chatRepository);
+        registerWorkspaceCommands(this.context, this.getWebview() as WebviewPanel, this.outputChannel);
+        registerChatCommands(this.context, this.getWebview() as WebviewPanel, this.ollamaService, this.chatRepository, this.outputChannel);
 
         // Listen for when the view is disposed
         // This happens when the user closes the view or when the view is closed programmatically

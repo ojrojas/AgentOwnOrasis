@@ -20,7 +20,7 @@
     </div>
     <div>
       <button [class]="{'active-microphone': true,  'is-active': this.isActiveMicrophone }" matMiniFab
-        (click)="activeMicrophone()" [disabled]="isLoading">
+        (click)="activeMicrophone()" [disabled]="isLoading || !modelText.trim()">
         <ng-icon name="matMicOutline" />
       </button>
       <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading || modelText.length === 0"

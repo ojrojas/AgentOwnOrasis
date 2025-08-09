@@ -4,12 +4,14 @@ import { IOllamaApiService } from '../interfaces/ollama.interface.service';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 import { IChatMessage } from '../types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
+import { OutputChannel } from 'vscode';
 
 export function registerChatCommands(
     context: vscode.ExtensionContext,
     panel: vscode.WebviewPanel,
     ollamaService: IOllamaApiService,
-    chatRepository: IWorkspaceStateRepository<IChatMessage>
+    chatRepository: IWorkspaceStateRepository<IChatMessage>,
+    outputChannel: OutputChannel
 ) {
     const chatController = new ChatController(ollamaService);
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
@@ -27,13 +29,22 @@ export function registerChatCommands(
                 break;
 
             case 'getModels:request':
-                const models = await chatController.listModels();
+                try {
+                    const models = await chatController.listModels();
 
-                panel.webview.postMessage({
-                    type: 'getModels:response',
-                    requestId,
-                    payload: models,
-                });
+                    panel.webview.postMessage({
+                        type: 'getModels:response',
+                        requestId,
+                        payload: models,
+                    });
+                } catch (error) {
+                    outputChannel.appendLine("No IA models were obtained or ollama service was not available.");
+                    panel.webview.postMessage({
+                        type: 'getModels:response',
+                        requestId,
+                        payload: { models: [] },
+                    });
+                }
                 break;
 
             case 'getPreferredModel:request':
@@ -51,37 +62,44 @@ export function registerChatCommands(
                     role: item.role
                 }));
 
-                const response = await chatController.chat({
-                    model: payload.model,
-                    messages: messages
-                });
+                try {
+                    const response = await chatController.chat({
+                        model: payload.model,
+                        messages: messages
+                    });
 
-                let accumulated = '';
-                for await (const chunk of response) {
-                    // const token = chunk.message.content || '';
-                    accumulated += chunk.message.content || '';
+                    let accumulated = '';
+                    for await (const chunk of response) {
+                        // const token = chunk.message.content || '';
+                        accumulated += chunk.message.content || '';
+
+                        panel.webview.postMessage({
+                            type: 'sendChat:response',
+                            requestId,
+                            payload: {
+                                content: accumulated,
+                                role: 'assistant',
+                                done: chunk.done,
+                                id: uuidv4()
+                            },
+                        });
+                    }
+
+                    await chatRepository.insert({
+                        content: accumulated,
+                        id: uuidv4(),
+                        role: 'assistant'
+                    });
 
                     panel.webview.postMessage({
-                        type: 'sendChat:response',
-                        requestId,
-                        payload: {
-                            content: accumulated,
-                            role: 'assistant',
-                            done: chunk.done,
-                            id: uuidv4()
-                        },
+                        type: 'sendChat:response:done'
+                    });
+                } catch (error) {
+                    outputChannel.appendLine("Error: request ollama service");
+                    panel.webview.postMessage({
+                        type: 'sendChat:response:done'
                     });
                 }
-
-                await chatRepository.insert({
-                    content: accumulated,
-                    id: uuidv4(),
-                    role: 'assistant'
-                });
-
-                panel.webview.postMessage({
-                    type: 'sendChat:response:done'
-                });
                 break;
 
             default:
