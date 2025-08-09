@@ -56,7 +56,7 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
             options: {
                 temperature: 0.3,
                 presence_penalty: 1,
-                top_p: .6
+                top_p: .3
             }
         });
 
@@ -130,7 +130,7 @@ export const editAgentCommand = (commentReply: CommentComponent, ollamaService: 
             options: {
                 temperature: 0,
                 presence_penalty: 1,
-                top_p: .6
+                top_p: .3
             }
         });
 

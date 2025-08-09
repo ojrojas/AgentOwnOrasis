@@ -1,5 +1,4 @@
 import {
-    CancellationToken,
     Disposable,
     ExtensionContext,
     ExtensionMode,
@@ -8,7 +7,6 @@ import {
     WebviewPanel,
     WebviewView,
     WebviewViewProvider,
-    WebviewViewResolveContext,
     window,
     workspace
 } from 'vscode';
@@ -17,9 +15,10 @@ import { getNonce } from '../../shared/generics/nonce';
 import { getUri } from '../../shared/generics/uri';
 import { get, IncomingMessage } from 'node:http';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
-import { WorkspaceStateRepository } from '../../core/services/workspace-repository.service';
 import { IChatMessage } from '../../core/types/chat-message.type';
-import { commandOnDidReceived } from '../../core/commands/commands.webview';
+import { IWorkspaceStateRepository } from '../../core/interfaces/workspace-repository-state.interface.service';
+import { registerWorkspaceCommands } from '../../core/commands/commnads.webview.workspace';
+import { registerChatCommands } from '../../core/commands/commands.webview.chat';
 
 
 
@@ -36,7 +35,7 @@ export class WebviewProvider implements WebviewViewProvider {
         readonly context: ExtensionContext,
         private readonly outputChannel: OutputChannel,
         private readonly ollamaService: IOllamaApiService,
-        private readonly chatRepository: WorkspaceStateRepository<IChatMessage>
+        private readonly chatRepository: IWorkspaceStateRepository<IChatMessage>
     ) {
         WebviewProvider.activeInstances.add(this);
 
@@ -82,6 +81,7 @@ export class WebviewProvider implements WebviewViewProvider {
             return false;
         });
     }
+
     getWebview() {
         return this.view;
     }
@@ -125,10 +125,8 @@ export class WebviewProvider implements WebviewViewProvider {
             );
         }
 
-        webviewView.webview.onDidReceiveMessage(async (message) => {
-            this.chatRepository.clear();
-            commandOnDidReceived(webviewView.webview, this.model!, this.chatRepository, this.ollamaService, message);
-        });
+        registerWorkspaceCommands(this.context, this.getWebview() as WebviewPanel);
+        registerChatCommands(this.context, this.getWebview() as WebviewPanel, this.ollamaService, this.chatRepository);
 
         // Listen for when the view is disposed
         // This happens when the user closes the view or when the view is closed programmatically

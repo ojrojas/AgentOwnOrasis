@@ -14,6 +14,9 @@ import { WebviewProvider } from './providers/webview/webview.provider';
 import { registerWebView } from './core/webview/webview.register';
 import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
 import { IChatMessage } from './core/types/chat-message.type';
+import { IWorkspaceStateRepository } from './core/interfaces/workspace-repository-state.interface.service';
+import { WorkspaceRepositoryService } from './core/services/workspace-repository-files.service';
+import { IWorkspaceRepositoryService } from './core/interfaces/workspace-repository-files.interface.service';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
@@ -27,11 +30,12 @@ function addSubscriber(item: any) {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	const chatMessageRepository = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
-	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
+	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
+	const workspaceRepositoryService: IWorkspaceRepositoryService = new WorkspaceRepositoryService();
+
 	const completionsProvider = new CompletionProvider(ollamaService);
 	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
-
+	
 	// providers
 	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, completionsProvider));
 	addSubscriber(registerWebView(sideBarWebView));
@@ -48,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.cancelSaveComment', (comment: CommentComponent) => cancelSaveCommentCommand(comment)));
 	addSubscriber(createCommand('oroasis.deleteComment', (comment: CommentComponent) => deleteCommentCommand(comment)));
 	addSubscriber(createCommand('oroasis.deleteAllComments', (thread: vscode.CommentThread) => deleteAllCommentsCommand(thread)));
-
+	
 	// commands agent
 	addSubscriber(createCommand('oroasis.openChatAgent', () => openPanelCommand(context, outputChannel, ollamaService, chatMessageRepository)));
 	addSubscriber(createCommand('oroasis.askAgent', (commentReply: vscode.CommentReply) => askAgentCommand(commentReply, ollamaService, outputChannel)));
@@ -58,7 +62,11 @@ export function activate(context: vscode.ExtensionContext) {
 	disposables.forEach(dis => {
 		context.subscriptions.push(dis);
 	});
+
+	outputChannel.appendLine('Congratulations, your extension "oroasis" is now active!');
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() { 
+	outputChannel.appendLine('Finish, running your extension "oroasis" is now deactive');
+}

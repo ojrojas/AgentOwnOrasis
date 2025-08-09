@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
+import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 
-export class WorkspaceStateRepository<T extends { id: string }> {
+export class WorkspaceStateRepository<T extends { id: string }> implements IWorkspaceStateRepository<T> {
   constructor(
     private storageKey: string,
     private workspaceState: vscode.Memento
-  ) {}
+  ) { }
 
   async insert(entity: T): Promise<void> {
     const data = this.findAllSync();

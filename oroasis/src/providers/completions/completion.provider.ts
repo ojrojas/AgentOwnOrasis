@@ -59,7 +59,7 @@ export class CompletionProvider implements InlineCompletionItemProvider {
                 options: {
                     temperature: 0.0,
                    presence_penalty: 1,
-                   top_p: 0.6
+                   top_p: 0.2
                 }
             });
 
