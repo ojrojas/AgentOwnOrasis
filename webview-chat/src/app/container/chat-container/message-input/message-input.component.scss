@@ -5,6 +5,42 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   display: flex;
+  min-width: 273px;
+}
+
+.message-input-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #0084ff,
+    #ff0084,
+    #00ff84,
+    #0084ff
+  );
+  background-size: 200% 100%;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+
+.border-animated::before {
+  opacity: 1;
+  border-radius: 10px;
+  animation: border-move 3s linear infinite;
+}
+
+@keyframes border-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 .input-wrapper {
@@ -72,11 +108,17 @@ mat-card-actions {
   }
 }
 
+mat-card-actions{
+  display: flex;
+  flex: 1;
+}
+
 .input-status {
   display: flex;
   align-items: center;
   color: #888;
   font-size: 14px;
+
 }
 
 .status-text {

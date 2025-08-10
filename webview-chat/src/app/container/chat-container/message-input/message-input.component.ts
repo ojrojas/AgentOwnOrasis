@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
     NgIcon,
     MatIconModule,
     MatCardModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   templateUrl: `message-input.component.html`,
   styleUrl: `message-input.component.scss`,
@@ -37,14 +37,14 @@ export class MessageInputComponent {
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
   @Output() messageSent = new EventEmitter<IMessage>();
-  modelText:string = '';
+  modelText: string = '';
 
   messageText: string = '';
 
   get placeholder(): string {
     return this.isLoading
-    ? '...'
-    : '@ to mention, ⌘L to add a selection. Enter instructions...';
+      ? ''
+      : '@ to mention, ⌘L to add a selection. Enter instructions...';
   }
 
   activeMicrophone() {
@@ -65,7 +65,7 @@ export class MessageInputComponent {
         content: this.messageText,
         role: 'user',
         id: uuidv4(),
-        timestamp : new Date(),
+        timestamp: new Date(),
         model: this.modelText
       });
       this.messageText = '';
