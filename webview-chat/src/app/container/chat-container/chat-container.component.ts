@@ -23,6 +23,7 @@ export class ChatContainerComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.chatStore.loadModels();
     await this.chatStore.getPreferredModel();
+    await this.chatStore.loadWorkSpaceFolders();
   }
 
   async onMessageSent(message: IMessage): Promise<void> {

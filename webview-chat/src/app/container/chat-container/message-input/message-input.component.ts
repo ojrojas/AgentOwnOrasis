@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, HostBinding, inject, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
@@ -70,5 +70,34 @@ export class MessageInputComponent {
       });
       this.messageText = '';
     }
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key !== '@') return;
+
+    console.log("KeyPress:", event.key);
+    event.preventDefault();
+
+    const dropdown = document.getElementById('fileDropdown') as HTMLUListElement | null;
+    if (!dropdown) return;
+
+    dropdown.innerHTML = '';
+
+    this.chatStore.folders().forEach(filePath => {
+      const fileName = filePath.split(/[/\\]/).pop() || '';
+
+      const li = document.createElement('li');
+      li.textContent = fileName;
+      li.tabIndex = 0;
+
+      li.addEventListener('click', () => {
+        this.messageText += `@${fileName} `;
+        dropdown.classList.remove('show');
+      });
+
+      dropdown.appendChild(li);
+    });
+
+    dropdown.classList.add('show');
   }
 }

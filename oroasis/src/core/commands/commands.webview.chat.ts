@@ -20,7 +20,7 @@ export function registerChatCommands(
         const { type, requestId, payload } = message;
         switch (type) {
             case 'emitStatusAppChat:request':
-                const appData = { id: '200OK', name: 'OrasisApp' }; // Simula lógica
+                const appData = { id: '200OK', name: 'OrasisApp' };
                 panel.webview.postMessage({
                     type: 'emitStatusAppChat:response',
                     requestId,

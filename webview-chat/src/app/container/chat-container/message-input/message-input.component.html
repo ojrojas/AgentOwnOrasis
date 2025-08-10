@@ -2,8 +2,9 @@
   <div class="input-wrapper">
     <div appearance="outline" class="message-field">
       <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
-        (keydown.enter)="onEnterPressed($event)" rows="3" #messageTextarea>
+        (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3" #messageTextarea>
       </textarea>
+      <div id="fileDropdown" class="dropdown"></div>
     </div>
 
 

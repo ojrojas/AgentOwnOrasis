@@ -12,15 +12,19 @@ type ChatState = {
   models: IListModelsResponse | undefined;
   messages: IMessage[];
   preferredModel: string | undefined;
+  folders: string[];
 }
 
-const chatState = signalState<ChatState>({
+const initialState: ChatState = {
   error: undefined,
   isLoading: false,
   messages: [],
   models: undefined,
-  preferredModel: undefined
-});
+  preferredModel: undefined,
+  folders: []
+};
+
+const chatState = signalState<ChatState>(initialState);
 
 export const ChatStore = signalStore(
   { providedIn: 'root' },
@@ -85,6 +89,19 @@ export const ChatStore = signalStore(
       patchState(store, setPending());
       const response = await vscodeService.request<string>("getPreferredModel");
       patchState(store, { preferredModel: response }, setFulfilled());
+    },
+    async loadWorkSpaceFolders() {
+      patchState(store, setPending());
+      const response = await vscodeService.request<string[]>("listFiles");
+      patchState(store, { folders: response }, setFulfilled());
+    },
+
+
+
+
+
+    clearState() {
+      patchState(store, initialState, setFulfilled());
     }
   })),
   withHooks(() => ({}))

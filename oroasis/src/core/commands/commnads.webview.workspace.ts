@@ -6,37 +6,46 @@ export function registerWorkspaceCommands(context: vscode.ExtensionContext, pane
   const workspaceService = new WorkspaceRepositoryService();
   const workspaceController = new WorkspaceController(workspaceService);
 
-  // Mensajes entrantes desde el WebView
   panel.webview.onDidReceiveMessage(async (message) => {
-    switch (message.type) {
-      case 'listFiles':
-        const files = await workspaceController.listFiles(message.pattern, message.exclude);
-        panel.webview.postMessage({ type: 'filesList', files });
+      const { type, requestId, payload } = message;
+    switch (type) {
+      case 'listFiles:request':
+        const files = await workspaceController.listFiles();
+        panel.webview.postMessage({ 
+          type: 'filesList:response',
+          requestId,
+          payload: files });
         break;
 
-      case 'writeFileWithPreview':
-        await workspaceController.previewAndSave(message.path, message.content);
+      case 'writeFileWithPreview:request':
+        await workspaceController.previewAndSave(payload.path, payload.content);
         break;
 
-      case 'writeFilesBatchWithPreview':
-        await workspaceController.previewAndSaveBatch(message.changes);
+      case 'writeFilesBatchWithPreview:request':
+        await workspaceController.previewAndSaveBatch(payload.changes);
         break;
 
-      case 'readFile':
-        const content = await workspaceController.readFile(message.path);
-        panel.webview.postMessage({ type: 'fileContent', content, path: message.path });
+      case 'readFile:request':
+        const content = await workspaceController.readFile(payload.path);
+        panel.webview.postMessage(
+          { type: 'fileContent:response', 
+            requestId,
+            payload: {
+              content, 
+              path: payload.path 
+            }});
         break;
 
-      case 'writeFile':
-        await workspaceController.writeFile(message.path, message.content);
+      case 'writeFile:request':
+        await workspaceController.writeFile(payload.path, payload.content);
         break;
 
-      case 'createFile':
-        await workspaceController.createFile(message.path, message.content);
+      case 'createFile:request':
+        await workspaceController.createFile(payload.path, payload.content);
         break;
 
-      case 'deleteFile':
-        await workspaceController.deleteFile(message.path);
+      case 'deleteFile:request':
+        await workspaceController.deleteFile(payload.path);
         break;
     }
   });

@@ -3,7 +3,9 @@ import { IWorkspaceRepositoryService } from '../interfaces/workspace-repository-
 
 export class WorkspaceRepositoryService implements IWorkspaceRepositoryService {
   
-  async getWorkspaceFiles(pattern = '**/*', exclude = '**/node_modules/**'): Promise<string[]> {
+  async getWorkspaceFiles(
+    pattern = '**/*', 
+    exclude = `{**/node_modules/**,**/dist/**,**/build/**,**/out/**,**/.git/**,**/.angular/**,**/.svn/**,**/.hg/**,**/.vs/**,**/bin/**,**/obj/**,**/coverage/**,**/tmp/**,**/temp/**,**/*.exe,**/*.dll,**/*.pdb,**/*.so,**/*.o,**/*.a,**/*.jar,**/*.class,**/*.zip,**/*.tar,**/*.gz,**/*.7z,**/*.rar,**/*.iso,**/*.db}`): Promise<string[]> {
     if (!vscode.workspace.workspaceFolders) {
       return [];
     }
