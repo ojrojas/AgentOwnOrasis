@@ -13,6 +13,7 @@ type ChatState = {
   messages: IMessage[];
   preferredModel: string | undefined;
   folders: string[];
+  typeMessage: 'Ask' | 'Edit' | 'Agent'
 }
 
 const initialState: ChatState = {
@@ -21,7 +22,8 @@ const initialState: ChatState = {
   messages: [],
   models: undefined,
   preferredModel: undefined,
-  folders: []
+  folders: [],
+  typeMessage: 'Ask'
 };
 
 const chatState = signalState<ChatState>(initialState);

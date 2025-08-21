@@ -34,15 +34,3 @@
   border: 1px solid #404040;
 }
 
-.message-content :deep(code) {
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 14px;
-}
-
-.message-content :deep(p) {
-  margin: 8px 0;
-}
-
-.message-content :deep(strong) {
-  font-weight: 600;
-}

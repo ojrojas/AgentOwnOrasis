@@ -1,11 +1,16 @@
+.container-input{
+  padding: 5px 5px 5px 5px;
+}
+
 .message-input-container {
   background-color: #2d2d2d;
   border-top: 1px solid #0084ff;
-  padding: 16px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  padding: 10px 8px;
   display: flex;
   min-width: 273px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 2fr 1fr;
 }
 
 .message-input-container::before {
@@ -51,11 +56,19 @@
   color: var(--vscode-editor-foreground);
 }
 
+.select-type-message-field{
+  background-color: #2d2d2d;
+  color: var(--vscode-editor-foreground);
+  border-radius: 5px;
+  margin:1px
+}
+
 .select-models-field {
   background-color: #2d2d2d;
   color: var(--vscode-editor-foreground);
   border-radius: 5px;
   min-width: 120px;
+  margin:1px
 }
 
 .select-models-field:focus {
@@ -156,19 +169,24 @@ textarea::placeholder {
   pointer-events: auto;
 }
 
-.dropdown {
-    position: absolute;
-    background-color: #2d2d2d;
+.list-append-file {
+  list-style-type: none;
+}
 
-    bottom: 100%;
-    left: 0;
-    width: 100%;
-    max-height: 150px;
-    overflow-y: auto;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    z-index: 100;
+.dropdown {
+  scrollbar-width: none;
+  border-top: 1px solid #0084ff;
+  border-radius: 10px;
+  position: absolute;
+  background-color: #252525;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
 }
 .dropdown li {
     padding: 5px 10px;

@@ -37,7 +37,8 @@ export class MessageInputComponent {
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
   @Output() messageSent = new EventEmitter<IMessage>();
-  modelText: string = '';
+  modelText: string = this.chatStore.preferredModel() ?? '';
+  typeMessage: string='Ask';
 
   messageText: string = '';
 
@@ -73,19 +74,21 @@ export class MessageInputComponent {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key !== '@') return;
+    if (event.key !== '@') { return; }
 
     console.log("KeyPress:", event.key);
     event.preventDefault();
 
     const dropdown = document.getElementById('fileDropdown') as HTMLUListElement | null;
-    if (!dropdown) return;
+    if (!dropdown) { return; }
 
     dropdown.innerHTML = '';
 
     this.chatStore.folders().forEach(filePath => {
       const fileName = filePath.split(/[/\\]/).pop() || '';
 
+      const ul = document.createElement('ul');
+      ul.classList.add("list-append-file");
       const li = document.createElement('li');
       li.textContent = fileName;
       li.tabIndex = 0;
@@ -95,7 +98,9 @@ export class MessageInputComponent {
         dropdown.classList.remove('show');
       });
 
-      dropdown.appendChild(li);
+      ul.appendChild(li);
+
+      dropdown.appendChild(ul);
     });
 
     dropdown.classList.add('show');

@@ -3,15 +3,17 @@
    display: flex;
    flex-direction: column;
    width: 100%;
- }
+  }
 
- .chat-container-header {
-   flex: 1;
- }
+  .chat-container-header {
+    flex: 1;
+  }
 
- .chat-container-message-list {
+  .chat-container-message-list {
+   scrollbar-width: none;
    flex: 16;
    overflow-y: scroll;
+   overflow-x: hidden;
  }
 
  .chat-container-message-input {

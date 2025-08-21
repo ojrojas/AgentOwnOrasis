@@ -1,20 +1,24 @@
-<mat-card class="message-input-container" [class.border-animated]="isLoading">
-  <div class="input-wrapper">
-    <div appearance="outline" class="message-field">
-      <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
-        (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3" #messageTextarea>
-      </textarea>
-      <div id="fileDropdown" class="dropdown"></div>
+<div class="container-input">
+  <mat-card class="message-input-container" [class.border-animated]="isLoading">
+    <div class="input-wrapper">
+      <div appearance="outline" class="message-field">
+        <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
+          (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3" #messageTextarea>
+        </textarea>
+        <div id="fileDropdown" class="dropdown"></div>
+      </div>
     </div>
-
-
-  </div>
-  <mat-card-actions>
-      <div>
+    <mat-card-actions>
+      <div style="display: flex;">
         <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
           @for (model of this.chatStore.models()?.models; track model) {
           <option [ngValue]="model.model">{{model.name}}</option>
           }
+        </select>
+        <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
+          <option ngValue="Ask">Ask</option>
+          <option ngValue="Edit">Edit</option>
+          <option ngValue="Agent">Agent</option>
         </select>
       </div>
       <div>
@@ -34,5 +38,6 @@
           }
         </button>
       </div>
-  </mat-card-actions>
-</mat-card>
+    </mat-card-actions>
+  </mat-card>
+</div>
