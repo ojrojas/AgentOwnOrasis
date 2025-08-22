@@ -62,6 +62,7 @@ export class MessageInputComponent {
 
   sendMessage(): void {
     if (this.messageText.trim() && !this.isLoading) {
+      const filesToSend = this.chatStore.resolveMentions(this.messageText);
       this.messageSent.emit({
         content: this.messageText,
         role: 'user',
@@ -84,7 +85,7 @@ export class MessageInputComponent {
 
     dropdown.innerHTML = '';
 
-    this.chatStore.folders().forEach(filePath => {
+    this.chatStore.files().forEach(filePath => {
       const fileName = filePath.split(/[/\\]/).pop() || '';
 
       const ul = document.createElement('ul');

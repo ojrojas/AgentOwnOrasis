@@ -5,6 +5,7 @@
 .message-input-container {
   background-color: #2d2d2d;
   border-top: 1px solid #0084ff;
+  position: relative;
   padding: 10px 8px;
   display: flex;
   min-width: 273px;
@@ -13,28 +14,25 @@
   grid-template-rows: 2fr 1fr;
 }
 
-.message-input-container::before {
+.border-animated::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  width: 100%;
-  background: linear-gradient(90deg,
-      #0084ff,
-      #ff0084,
-      #00ff84,
-      #0084ff);
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px; /* grosor del borde */
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ff1744,
+    transparent
+  );
   background-size: 200% 100%;
-  transition: opacity 0.3s;
-  opacity: 0;
-}
-
-.border-animated::before {
-  opacity: 1;
-  border-radius: 10px;
-  animation: border-move 3s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: border-move 2s ease-in-out infinite alternate;
 }
 
 @keyframes border-move {
@@ -43,7 +41,7 @@
   }
 
   100% {
-    background-position: 200% 50%;
+    background-position: 100% 50%;
   }
 }
 

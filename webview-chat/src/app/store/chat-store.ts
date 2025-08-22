@@ -12,7 +12,7 @@ type ChatState = {
   models: IListModelsResponse | undefined;
   messages: IMessage[];
   preferredModel: string | undefined;
-  folders: string[];
+  files: string[];
   typeMessage: 'Ask' | 'Edit' | 'Agent'
 }
 
@@ -22,7 +22,7 @@ const initialState: ChatState = {
   messages: [],
   models: undefined,
   preferredModel: undefined,
-  folders: [],
+  files: [],
   typeMessage: 'Ask'
 };
 
@@ -95,12 +95,28 @@ export const ChatStore = signalStore(
     async loadWorkSpaceFolders() {
       patchState(store, setPending());
       const response = await vscodeService.request<string[]>("listFiles");
-      patchState(store, { folders: response }, setFulfilled());
+      patchState(store, { files: response }, setFulfilled());
     },
 
+    extractMentions(text: string): string[] {
+      const regex = /@(\S+)/g;
+      const mentions: string[] = [];
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        mentions.push(match[1]);
+      }
+      return mentions;
+    },
 
+    resolveMentions(text: string): string[] {
+      const mentions = this.extractMentions(text);
+      const allFiles = store.files;
+      const resolved = mentions
+        .map(m => allFiles().find(f => f.endsWith(m)))
+        .filter((f): f is string => !!f);
 
-
+      return Array.from(new Set(resolved));
+    },
 
     clearState() {
       patchState(store, initialState, setFulfilled());

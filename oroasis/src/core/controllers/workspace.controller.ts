@@ -13,9 +13,9 @@ export class WorkspaceController {
 
     if (confirm) {
       await this.workspaceService.writeFileContent(filePath, newContent);
-      vscode.window.showInformationMessage(`Archivo actualizado: ${filePath}`);
+      vscode.window.showInformationMessage(`Updated file: ${filePath}`);
     } else {
-      vscode.window.showInformationMessage(`Cambios descartados para: ${filePath}`);
+      vscode.window.showInformationMessage(`Discard changes for: ${filePath}`);
     }
   }
 
@@ -24,11 +24,11 @@ export class WorkspaceController {
 
     for (const change of confirmed) {
       await this.workspaceService.writeFileContent(change.path, change.newContent);
-      vscode.window.showInformationMessage(`Archivo actualizado: ${change.path}`);
+      vscode.window.showInformationMessage(`Preview and update file: ${change.path}`);
     }
 
     if (confirmed.length === 0) {
-      vscode.window.showWarningMessage('No se aplicaron cambios.');
+      vscode.window.showWarningMessage('No apply changes to file.');
     }
   }
 
@@ -42,16 +42,16 @@ export class WorkspaceController {
 
   async writeFile(filePath: string, content: string) {
     await this.workspaceService.writeFileContent(filePath, content);
-    vscode.window.showInformationMessage(`Archivo actualizado: ${filePath}`);
+    vscode.window.showInformationMessage(`Wirte file success: ${filePath}`);
   }
 
   async createFile(filePath: string, content = '') {
     await this.workspaceService.createFile(filePath, content);
-    vscode.window.showInformationMessage(`Archivo creado: ${filePath}`);
+    vscode.window.showInformationMessage(`Created file success: ${filePath}`);
   }
 
   async deleteFile(filePath: string) {
     await this.workspaceService.deleteFile(filePath);
-    vscode.window.showInformationMessage(`Archivo eliminado: ${filePath}`);
+    vscode.window.showInformationMessage(`Deleted file success: ${filePath}`);
   }
 }
