@@ -48,21 +48,23 @@ export const ChatStore = signalStore(
       let payload: any;
       if (!modelChanged && context) {
         payload = {
-          model: preferredModel,
+          model: preferredModel(),
           prompt: message.content,
-          context,
+          context: context(),
           type: 'generated',
+          modeAgent: message.modeAgent
         };
       } else {
         payload = {
           ...message,
           id: message.id,
-          model: preferredModel,
+          model: preferredModel(),
           messages: [...messages(), message].map(m => ({
             role: m.role,
             content: m.content
           })),
-          type: 'chat'
+          type: 'chat',
+          modeAgent: message.modeAgent
         };
       }
 

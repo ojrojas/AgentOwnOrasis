@@ -71,7 +71,7 @@ export class MessageInputComponent {
     }
   }
 
-  sendMessage(): void {
+  async sendMessage(): Promise<void> {
     if (this.messageText.trim() && !this.isLoading) {
       const filesToSend = this.chatStore.resolveMentions(this.messageText);
       this.messageSent.emit({
@@ -80,25 +80,11 @@ export class MessageInputComponent {
         id: uuidv4(),
         timestamp: new Date(),
         model: this.modelText,
-        type: this.detectModeFromText(this.messageText)
+        modeAgent: this.typeMessage === 'Agent'
       });
       this.messageText = '';
     }
   }
-
-  detectModeFromText(message: string):  "chat" | "generate" {
-  const lower = message.toLowerCase();
-
-  if (lower.includes("usa herramienta") || lower.includes("tool") || lower.includes("razona") || lower.includes("think")) {
-    return "chat";
-  }
-
-  if (lower.includes("genera código") || lower.includes("crea función") || lower.includes("escribe un archivo")) {
-    return "generate";
-  }
-
-  return "generate";
-}
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key !== '@') { return; }

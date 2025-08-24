@@ -27,8 +27,7 @@ export class ChatContainerComponent implements OnInit {
   }
 
   async onMessageSent(message: IMessage): Promise<void> {
-    await this.chatStore.postMessage(message);
-    this.chatStore.sendChat(message);
-    console.log('visual studio');
+    const messageToSend = await this.chatStore.postMessage(message);
+    this.chatStore.sendChat(messageToSend);
   }
 }

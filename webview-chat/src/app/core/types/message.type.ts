@@ -8,7 +8,8 @@ export interface IMessage {
   model: string;
   done?: boolean;
   context?:number[],
-  type: 'generate' | 'chat';
+  type?: string;
+  modeAgent: boolean;
 }
 
 export interface IToolCall {

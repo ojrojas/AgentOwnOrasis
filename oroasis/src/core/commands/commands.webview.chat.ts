@@ -75,7 +75,6 @@ export function registerChatCommands(
                 break;
 
             case 'sendChat:request':
-                debugger;
                 await chatRepository.insert(payload);
                 const messages = chatRepository.findAllSync().map(item => ({
                     content: item.content,
@@ -85,7 +84,7 @@ export function registerChatCommands(
                 try {
                     const temp = parseFloat(temperature);
                     let response: AbortableAsyncIterator<ChatResponse | GenerateResponse>;
-                    if (payload.type === 'chat') {
+                    if (payload.type === 'chat' && payload.modelAgent) {
                         response = await chatController.chat({
                             model: payload.model,
                             messages: messages,
@@ -107,11 +106,13 @@ export function registerChatCommands(
                     }
 
                     let accumulated = '';
+                    let contextAccumulated: number[]= [];
                     for await (const chunk of response) {
                         if (isChatResponse(chunk)) {
                             accumulated += chunk.message.content || '';
                         } else if (isGenerateResponse(chunk)) {
                             accumulated += chunk.response;
+                            contextAccumulated = chunk.context;
                         }
 
                         panel.webview.postMessage({
@@ -121,7 +122,8 @@ export function registerChatCommands(
                                 content: accumulated,
                                 role: 'assistant',
                                 done: chunk.done,
-                                id: uuidv4()
+                                id: uuidv4(),
+                                context: contextAccumulated || undefined
                             },
                         });
                     }

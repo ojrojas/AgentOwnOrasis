@@ -1,8 +1,16 @@
 <div class="message-list-container" #messageContainer>
   <div class="messages">
     @for (message of messages; track message.id) {
-      <app-message [message]="message">
-      </app-message>
+      <app-message [message]="message"></app-message>
+    }
+
+    @if (isTyping) {
+      <div class="typing-indicator">
+        <div class="typing-content">
+          <span class="typing-text">typing</span>
+          <span class="loading-dots">...</span>
+        </div>
+      </div>
     }
   </div>
 </div>
