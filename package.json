@@ -107,12 +107,17 @@
         "oroasisSettings.modelDefault": {
           "type": "string",
           "default": "qwen2.5-coder:3b",
-          "description": "Model asigned by request to ollama"
+          "description": "Model asigned to request to ollama"
+        },
+        "oroasisSettings.modelTemperature": {
+          "type": "number",
+          "default": ".3",
+          "description": "Model temperature asigned to request to ollama"
         },
         "oroasisSettings.modelCompletionDefault": {
           "type": "string",
           "default": "qwen2.5-coder:1.5b",
-          "description": "Model asigned by request to ollama"
+          "description": "Model asigned to request to ollama"
         },
         "oroasisSettings.roleAgentDefault": {
           "type": "string",

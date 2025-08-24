@@ -3,7 +3,7 @@ import { IMessage } from "../core/types/message.type";
 import { IListModelsResponse } from "../core/types/models.types";
 import { setFulfilled, setPending, withRequestStatus } from "./request.status";
 import { withLogger } from "./logger.state";
-import { computed, inject, isDevMode } from "@angular/core";
+import { computed, effect, inject, isDevMode } from "@angular/core";
 import { VscodeService } from "../core/services/vscode-service";
 
 type ChatState = {
@@ -14,6 +14,8 @@ type ChatState = {
   preferredModel: string | undefined;
   files: string[];
   typeMessage: 'Ask' | 'Edit' | 'Agent'
+  context?: number[];
+  currentModel: string | undefined;
 }
 
 const initialState: ChatState = {
@@ -23,7 +25,9 @@ const initialState: ChatState = {
   models: undefined,
   preferredModel: undefined,
   files: [],
-  typeMessage: 'Ask'
+  typeMessage: 'Ask',
+  context: undefined,
+  currentModel: undefined
 };
 
 const chatState = signalState<ChatState>(initialState);
@@ -37,12 +41,39 @@ export const ChatStore = signalStore(
     hasResponse: computed(() => state.isLoading)
   })),
   withMethods((store, vscodeService = inject(VscodeService)) => ({
-    async postMessage(message: IMessage) {
+    postMessage(message: IMessage) {
       patchState(store, setPending());
+      const { currentModel, preferredModel, context, messages } = store;
+      const modelChanged = currentModel && currentModel !== preferredModel;
+      let payload: any;
+      if (!modelChanged && context) {
+        payload = {
+          model: preferredModel,
+          prompt: message.content,
+          context,
+          type: 'generated',
+        };
+      } else {
+        payload = {
+          ...message,
+          id: message.id,
+          model: preferredModel,
+          messages: [...messages(), message].map(m => ({
+            role: m.role,
+            content: m.content
+          })),
+          type: 'chat'
+        };
+      }
+
       patchState(store, (state) => ({
-        messages: [...state.messages, message]
+        messages: [...state.messages, message],
+        currentModel: preferredModel()
       }), setFulfilled());
+
+      return payload;
     },
+
     sendChat(message: IMessage) {
       patchState(store, setPending());
       vscodeService.sendMessage('sendChat', message);
@@ -52,7 +83,6 @@ export const ChatStore = signalStore(
           if (isDevMode()) {
             console.info(state.messages);
           }
-          // Actualiza el último mensaje si ya existe
           const lastMsgIndex = state.messages.findIndex(m => m.role === 'assistant' && !m.done);
           if (lastMsgIndex !== -1) {
             const updatedMessages = [...state.messages];
@@ -62,13 +92,14 @@ export const ChatStore = signalStore(
               ...partialResponse
             };
             console.log("Update response");
-            return { messages: updatedMessages };
+            return { messages: updatedMessages, context: partialResponse.context ?? state.context  };
           }
           console.log("Partial response");
           if (!comePartialResponse) {
             comePartialResponse = true;
             return {
-              messages: [...state.messages, partialResponse]
+              messages: [...state.messages, partialResponse],
+              context: partialResponse.context
             };
           } else {
             return {
@@ -122,6 +153,5 @@ export const ChatStore = signalStore(
       patchState(store, initialState, setFulfilled());
     }
   })),
-  withHooks(() => ({}))
-
+  // withHooks(() => ({}))
 );

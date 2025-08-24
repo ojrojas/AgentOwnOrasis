@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
@@ -33,14 +33,25 @@ import { v4 as uuidv4 } from 'uuid';
   viewProviders: [provideIcons({ matSendOutline, matHourglassEmptyOutline, matMicOutline })]
 })
 export class MessageInputComponent {
+
   readonly chatStore = inject(ChatStore);
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
   @Output() messageSent = new EventEmitter<IMessage>();
-  modelText: string = this.chatStore.preferredModel() ?? '';
-  typeMessage: string='Ask';
-
+  modelText: string = '';
+  typeMessage: string = 'Ask';
   messageText: string = '';
+
+  constructor() {
+    effect(() => {
+      const list = this.chatStore.models()?.models ?? [];
+      if (list.length) {
+        this.chatStore.getPreferredModel().then(pref => {
+          this.modelText = this.chatStore.preferredModel() ?? '';
+        });
+      }
+    });
+  }
 
   get placeholder(): string {
     return this.isLoading
@@ -68,11 +79,26 @@ export class MessageInputComponent {
         role: 'user',
         id: uuidv4(),
         timestamp: new Date(),
-        model: this.modelText
+        model: this.modelText,
+        type: this.detectModeFromText(this.messageText)
       });
       this.messageText = '';
     }
   }
+
+  detectModeFromText(message: string):  "chat" | "generate" {
+  const lower = message.toLowerCase();
+
+  if (lower.includes("usa herramienta") || lower.includes("tool") || lower.includes("razona") || lower.includes("think")) {
+    return "chat";
+  }
+
+  if (lower.includes("genera código") || lower.includes("crea función") || lower.includes("escribe un archivo")) {
+    return "generate";
+  }
+
+  return "generate";
+}
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key !== '@') { return; }
@@ -80,7 +106,7 @@ export class MessageInputComponent {
     console.log("KeyPress:", event.key);
     event.preventDefault();
 
-    const dropdown = document.getElementById('fileDropdown') as HTMLUListElement | null;
+    const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
     if (!dropdown) { return; }
 
     dropdown.innerHTML = '';

@@ -24,8 +24,12 @@ export class OllamaApiService implements IOllamaApiService {
             options: request.options,
             context: request.context,
             format: request.format,
-            system: request.system, 
-            stream: true
+            system: request.system,
+            stream: true,
+            images: request.images,
+            keep_alive: request.keep_alive,
+            raw: request.raw,
+            suffix: request.suffix
         });
     };
 

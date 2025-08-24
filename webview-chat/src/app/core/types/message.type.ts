@@ -1,12 +1,14 @@
 export interface IMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
-  images?: Uint8Array[] | string[];
+  images?: Uint8Array<ArrayBufferLike>[] | string[] | undefined;
   tool_calls?: IToolCall[];
   timestamp: Date;
   model: string;
   done?: boolean;
+  context?:number[],
+  type: 'generate' | 'chat';
 }
 
 export interface IToolCall {
@@ -17,3 +19,4 @@ export interface IToolCall {
     };
   };
 }
+

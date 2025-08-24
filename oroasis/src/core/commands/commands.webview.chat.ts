@@ -5,6 +5,22 @@ import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-st
 import { IChatMessage } from '../types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { OutputChannel } from 'vscode';
+import { AbortableAsyncIterator, ChatResponse, GenerateResponse, Message } from 'ollama';
+
+const buildPromptFromMessages = (messages: Message[]) => {
+    return messages
+        .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+        .join("\n");
+};
+
+
+function isChatResponse(obj: any): obj is ChatResponse {
+    return obj && typeof obj === "object" && "message" in obj;
+}
+
+function isGenerateResponse(obj: any): obj is GenerateResponse {
+    return obj && typeof obj === "object" && "response" in obj;
+}
 
 export function registerChatCommands(
     context: vscode.ExtensionContext,
@@ -16,6 +32,9 @@ export function registerChatCommands(
     const chatController = new ChatController(ollamaService);
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
     const preferredModel = settings.get('modelDefault');
+    const temperature = settings.get('modelTemperature') as string;
+    const promptDefault = settings.get('templatePromptGenerate');
+
     panel.webview.onDidReceiveMessage(async (message) => {
         const { type, requestId, payload } = message;
         switch (type) {
@@ -56,6 +75,7 @@ export function registerChatCommands(
                 break;
 
             case 'sendChat:request':
+                debugger;
                 await chatRepository.insert(payload);
                 const messages = chatRepository.findAllSync().map(item => ({
                     content: item.content,
@@ -63,15 +83,36 @@ export function registerChatCommands(
                 }));
 
                 try {
-                    const response = await chatController.chat({
-                        model: payload.model,
-                        messages: messages
-                    });
+                    const temp = parseFloat(temperature);
+                    let response: AbortableAsyncIterator<ChatResponse | GenerateResponse>;
+                    if (payload.type === 'chat') {
+                        response = await chatController.chat({
+                            model: payload.model,
+                            messages: messages,
+                            options: {
+                                temperature: temp  ?? 0.1,
+                            }
+                        });
+
+                    } else {
+                        response = await chatController.generate({
+                            model: payload.model,
+                            prompt: buildPromptFromMessages(messages),
+                            context: payload.context,
+                            system: promptDefault as string,
+                            options: {
+                                temperature: temp  ?? 0.1,
+                            }
+                        });
+                    }
 
                     let accumulated = '';
                     for await (const chunk of response) {
-                        // const token = chunk.message.content || '';
-                        accumulated += chunk.message.content || '';
+                        if (isChatResponse(chunk)) {
+                            accumulated += chunk.message.content || '';
+                        } else if (isGenerateResponse(chunk)) {
+                            accumulated += chunk.response;
+                        }
 
                         panel.webview.postMessage({
                             type: 'sendChat:response',
