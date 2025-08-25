@@ -7,6 +7,8 @@ import {
   AfterViewInit,
   OnDestroy
 } from '@angular/core';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 import { IMessage } from '../../../core/types/message.type';
 import { MessageComponent } from '../message/message.component';
 import { Subscription } from 'rxjs';
@@ -14,7 +16,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-message-list',
   standalone: true,
-  imports: [MessageComponent],
+  imports: [MessageComponent, MatProgressBarModule],
   templateUrl: './message-list.component.html',
   styleUrl: './message-list.component.scss'
 })
@@ -36,7 +38,7 @@ export class MessageListComponent implements AfterViewInit, OnDestroy {
   }
 
   private scrollToBottom(): void {
-    if (!this.messageContainer) return;
+    if (!this.messageContainer) {return;}
     const container = this.messageContainer.nativeElement;
     container.scrollTop = container.scrollHeight;
   }

@@ -8,9 +8,13 @@ export class OllamaApiService implements IOllamaApiService {
     settings: WorkspaceConfiguration;
     constructor() {
         this.settings = workspace.getConfiguration("oroasisSettings");
-        this.templateGenerate = this.settings.get('templatePromptGenerate');
         this.ollama = new Ollama({ host: this.settings.get('ollamaBaseUrl') });
     }
+    pullModel =  (nameModel: string) => {
+        this.ollama.pull({
+            model: nameModel
+        });
+    };
 
     listModels = (): Promise<ListResponse> => {
         return this.ollama.list();
@@ -20,7 +24,7 @@ export class OllamaApiService implements IOllamaApiService {
         return this.ollama.generate({
             model: request.model,
             prompt: request.prompt,
-            template: this.templateGenerate,
+            template: request.template,
             options: request.options,
             context: request.context,
             format: request.format,
@@ -45,7 +49,7 @@ export class OllamaApiService implements IOllamaApiService {
         });
     };
 
-    public udpdateModels = (): void => {
+    public udpdateListModels = (): void => {
         const response = this.listModels();
         response.then(list => {
             if (list.models.length > 0) {

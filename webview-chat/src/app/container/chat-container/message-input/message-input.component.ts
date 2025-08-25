@@ -80,7 +80,7 @@ export class MessageInputComponent {
         id: uuidv4(),
         timestamp: new Date(),
         model: this.modelText,
-        modeAgent: this.typeMessage === 'Agent'
+        type : this.typeMessage
       });
       this.messageText = '';
     }

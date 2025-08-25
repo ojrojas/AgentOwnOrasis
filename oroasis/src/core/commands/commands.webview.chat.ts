@@ -7,13 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { OutputChannel } from 'vscode';
 import { AbortableAsyncIterator, ChatResponse, GenerateResponse, Message } from 'ollama';
 
-const buildPromptFromMessages = (messages: Message[]) => {
-    return messages
-        .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
-        .join("\n");
-};
-
-
 function isChatResponse(obj: any): obj is ChatResponse {
     return obj && typeof obj === "object" && "message" in obj;
 }
@@ -84,7 +77,7 @@ export function registerChatCommands(
                 try {
                     const temp = parseFloat(temperature);
                     let response: AbortableAsyncIterator<ChatResponse | GenerateResponse>;
-                    if (payload.type === 'chat' && payload.modelAgent) {
+                    if (payload.type === 'chat') {
                         response = await chatController.chat({
                             model: payload.model,
                             messages: messages,
@@ -96,11 +89,11 @@ export function registerChatCommands(
                     } else {
                         response = await chatController.generate({
                             model: payload.model,
-                            prompt: buildPromptFromMessages(messages),
-                            context: payload.context,
+                            prompt: payload.prompt,
                             system: promptDefault as string,
+                            context: payload.context,
                             options: {
-                                temperature: temp  ?? 0.1,
+                                temperature: temp  ?? 0.3,
                             }
                         });
                     }
@@ -138,7 +131,7 @@ export function registerChatCommands(
                         type: 'sendChat:response:done'
                     });
                 } catch (error) {
-                    outputChannel.appendLine("Error: request ollama service");
+                    outputChannel.appendLine(`Error: request ollama service ${error}`, );
                     panel.webview.postMessage({
                         type: 'sendChat:response:done'
                     });

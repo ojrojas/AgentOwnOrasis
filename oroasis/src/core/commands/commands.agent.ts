@@ -8,7 +8,7 @@ import { editCommentCommand } from "./commands.comment";
 // Agent IA
 export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {
     outputChannel.appendLine("Updating models from ollama");
-    ollamaService.udpdateModels();
+    ollamaService.udpdateListModels();
     outputChannel.appendLine("Models updated");
 };
 

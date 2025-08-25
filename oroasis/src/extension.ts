@@ -15,13 +15,11 @@ import { registerWebView } from './core/webview/webview.register';
 import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
 import { IChatMessage } from './core/types/chat-message.type';
 import { IWorkspaceStateRepository } from './core/interfaces/workspace-repository-state.interface.service';
-import { WorkspaceRepositoryService } from './core/services/workspace-repository-files.service';
-import { IWorkspaceRepositoryService } from './core/interfaces/workspace-repository-files.interface.service';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
 const ollamaService: IOllamaApiService = new OllamaApiService();
-ollamaService.udpdateModels();
+ollamaService.udpdateListModels();
 
 function addSubscriber(item: any) {
 	disposables.push(item);
@@ -31,7 +29,6 @@ function addSubscriber(item: any) {
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
-	const workspaceRepositoryService: IWorkspaceRepositoryService = new WorkspaceRepositoryService();
 
 	const completionsProvider = new CompletionProvider(ollamaService);
 	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);

@@ -13,7 +13,11 @@ export class ChatController {
     async chat(request: ChatRequest): Promise<AbortableAsyncIterator<ChatResponse>> {
         return await this.ollamaApiService.chat(request);
     }
-    udpdateModels(): void {
-        this.ollamaApiService.udpdateModels();
+    udpdateListModels(): void {
+        this.ollamaApiService.udpdateListModels();
+    }
+
+    pullModel(nameModel: string): void {
+        this.ollamaApiService.pullModel(nameModel);
     }
 }

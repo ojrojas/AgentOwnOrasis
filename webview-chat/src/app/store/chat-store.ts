@@ -1,4 +1,4 @@
-import { patchState, signalState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
+import { getState, patchState, signalState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
 import { IMessage } from "../core/types/message.type";
 import { IListModelsResponse } from "../core/types/models.types";
 import { setFulfilled, setPending, withRequestStatus } from "./request.status";
@@ -43,34 +43,32 @@ export const ChatStore = signalStore(
   withMethods((store, vscodeService = inject(VscodeService)) => ({
     postMessage(message: IMessage) {
       patchState(store, setPending());
-      const { currentModel, preferredModel, context, messages } = store;
-      const modelChanged = currentModel && currentModel !== preferredModel;
+      debugger;
+      const { preferredModel, context, messages } = getState(store);
       let payload: any;
-      if (!modelChanged && context) {
+      if (message.type !== 'Agent') {
         payload = {
-          model: preferredModel(),
+          model: message.model,
           prompt: message.content,
-          context: context(),
+          context: context,
           type: 'generated',
-          modeAgent: message.modeAgent
         };
       } else {
         payload = {
           ...message,
           id: message.id,
-          model: preferredModel(),
-          messages: [...messages(), message].map(m => ({
+          model: message.model,
+          messages: [...messages, message].map(m => ({
             role: m.role,
             content: m.content
           })),
           type: 'chat',
-          modeAgent: message.modeAgent
         };
       }
 
       patchState(store, (state) => ({
         messages: [...state.messages, message],
-        currentModel: preferredModel()
+        currentModel: preferredModel
       }), setFulfilled());
 
       return payload;

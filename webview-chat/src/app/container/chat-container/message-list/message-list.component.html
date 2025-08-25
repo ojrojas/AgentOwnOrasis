@@ -6,10 +6,7 @@
 
     @if (isTyping) {
       <div class="typing-indicator">
-        <div class="typing-content">
-          <span class="typing-text">typing</span>
-          <span class="loading-dots">...</span>
-        </div>
+        <mat-progress-bar style="width: 40px;" mode="buffer"></mat-progress-bar>
       </div>
     }
   </div>

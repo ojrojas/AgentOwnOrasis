@@ -4,5 +4,6 @@ export interface IOllamaApiService {
     listModels: () => Promise<ListResponse>;
     generate: (request: GenerateRequest) => Promise<AbortableAsyncIterator<GenerateResponse>>;
     chat: (request: ChatRequest) => Promise<AbortableAsyncIterator<ChatResponse>>;
-    udpdateModels: () => void;
+    udpdateListModels: () => void;
+    pullModel : (nameModel:string) => void;
 }

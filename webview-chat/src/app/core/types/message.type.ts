@@ -9,7 +9,6 @@ export interface IMessage {
   done?: boolean;
   context?:number[],
   type?: string;
-  modeAgent: boolean;
 }
 
 export interface IToolCall {
