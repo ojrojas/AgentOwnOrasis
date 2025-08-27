@@ -116,6 +116,9 @@ export class MessageInputComponent {
       dropdown.appendChild(ul);
     });
 
-    dropdown.classList.add('show');
+    if(this.chatStore.files().length > 0)
+    {
+      dropdown.classList.add('show');
+    }
   }
 }

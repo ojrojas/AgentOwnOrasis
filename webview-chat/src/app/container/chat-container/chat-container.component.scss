@@ -1,22 +1,28 @@
- .chat-container {
-   height: 100vh;
-   display: flex;
-   flex-direction: column;
-   width: 100%;
-  }
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-  .chat-container-header {
-    flex: 1;
-  }
+/* Header fijo arriba */
+.chat-container-header {
+  flex: 0 0 auto;
+}
 
-  .chat-container-message-list {
-   scrollbar-width: none;
-   flex: 16;
-   overflow-y: scroll;
-   overflow-x: hidden;
- }
+/* Contenido central (ya sea chat-list o message-list) */
+.chat-container-list-chat,
+app-message-list {
+  flex: 1 1 auto;       // ocupa todo el espacio sobrante
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none;
+}
 
- .chat-container-message-input {
-   flex: 1;
-   display: block;
- }
+/* Input siempre fijo abajo */
+.chat-container-message-input {
+  flex: 0 0 auto;   // altura automática
+  display: block;
+}

@@ -31,7 +31,7 @@ export const openPanelCommand = async (
     const panel = window.createWebviewPanel(WebviewProvider.SecodarySidebar, "Orasis", targetCol, {
         enableScripts: true,
         retainContextWhenHidden: true,
-        localResourceRoots: [Uri.file(path.join(context.extensionPath, "webview-agents/dist"))],
+        localResourceRoots: [Uri.file(path.join(context.extensionPath, "webview-chat/dist"))],
     });
   
     panel.iconPath = {

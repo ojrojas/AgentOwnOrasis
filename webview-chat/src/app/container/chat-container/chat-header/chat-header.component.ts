@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,12 +14,10 @@ import { matAddOutline, matHistoryOutline, matSettingsOutline, matCloseOutline }
   viewProviders: [provideIcons({ matAddOutline, matHistoryOutline, matSettingsOutline, matCloseOutline })]
 })
 export class ChatHeaderComponent {
+  @Output() onHistory = new EventEmitter<void>();
+
   onNewChat() {
     console.log('New chat clicked');
-  }
-
-  onHistory() {
-    console.log('History clicked');
   }
 
   onSettings() {

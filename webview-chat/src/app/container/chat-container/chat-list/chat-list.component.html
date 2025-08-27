@@ -1,0 +1,5 @@
+<ul>
+  <li *ngFor="let chat of chats" (click)="chatSelected.emit(chat.id)">
+    {{ chat.name }}
+  </li>
+</ul>

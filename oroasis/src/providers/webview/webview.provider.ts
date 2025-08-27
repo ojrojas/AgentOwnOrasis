@@ -183,7 +183,7 @@ export class WebviewProvider implements WebviewViewProvider {
 
         // The CSS file from the Angular build output
         const stylesUri = `http://${localServerUrl}/styles.css`;
-        // The JS files from the Angular webview-agents output
+        // The JS files from the Angular webview-chat output
         const polyfillsUri = `http://${localServerUrl}/polyfills.js`;
         const scriptUri = `http://${localServerUrl}/main.js`;
         const viteClient = `http://${localServerUrl}/@vite/client`;
@@ -240,13 +240,13 @@ export class WebviewProvider implements WebviewViewProvider {
   */
     private getHtmlForWebview(webview: Webview) {
         // The CSS file from the Angular build output
-        const stylesUri = getUri(webview, this.context.extensionUri, ["webview-agents", "dist", "webview-agents", "browser", "styles.css"]);
-        // The JS files from the Angular webview-agents output
-        // const runtimeUri = getUri(webview, this.context.extensionUri, ["webview-agents", "dist", "webview-agents" , "browser", "runtime.js"]);
-        const polyfillsUri = getUri(webview, this.context.extensionUri, ["webview-agents", "dist", "webview-agents", "browser", "polyfills.js"]);
-        const scriptUri = getUri(webview, this.context.extensionUri, ["webview-agents", "dist", "webview-agents", "browser", "main.js"]);
+        const stylesUri = getUri(webview, this.context.extensionUri, ["webview-chat", "dist", "webview-chat", "browser", "styles.css"]);
+        // The JS files from the Angular webview-chat output
+        // const runtimeUri = getUri(webview, this.context.extensionUri, ["webview-chat", "dist", "webview-chat" , "browser", "runtime.js"]);
+        const polyfillsUri = getUri(webview, this.context.extensionUri, ["webview-chat", "dist", "webview-chat", "browser", "polyfills.js"]);
+        const scriptUri = getUri(webview, this.context.extensionUri, ["webview-chat", "dist", "webview-chat", "browser", "main.js"]);
 
-        const indexUri = getUri(webview, this.context.extensionUri, ["webview-agents", "dist", "webview-agents", "browser", "index.html"]);
+        const indexUri = getUri(webview, this.context.extensionUri, ["webview-chat", "dist", "webview-chat", "browser", "index.html"]);
 
 
         const nonce = getNonce();
