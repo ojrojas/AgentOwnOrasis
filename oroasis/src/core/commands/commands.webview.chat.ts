@@ -89,7 +89,7 @@ export function registerChatCommands(
                     } else {
                         response = await chatController.generate({
                             model: payload.model,
-                            prompt: payload.prompt,
+                            prompt: payload.content,
                             system: promptDefault as string,
                             context: payload.context,
                             options: {

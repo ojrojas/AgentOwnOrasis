@@ -1,8 +1,20 @@
 <div class="chat-container">
-  <app-chat-header class="chat-container-header"></app-chat-header>
+  <app-chat-header class="chat-container-header"
+   (onHistory)="chatStore.backToChatList()"  
+  ></app-chat-header>
+  
+  <app-chat-list class="chat-container-list-chat"
+   *ngIf="!chatStore.selectedChatId()"
+    (chatSelected)="chatStore.selectChat($event)">
+  </app-chat-list>
 
-  <app-message-list class="chat-container-message-list" [messages]="chatStore.messages()" [isTyping]="this.chatStore.requestStatus() === 'pending'">
-  </app-message-list>
+  <ng-container *ngIf="chatStore.selectedChatId()">
+<app-message-list
+  *ngIf="chatStore.selectedChatId()"
+  [messages]="chatStore.currentMessages()"
+  [isTyping]="chatStore.requestStatus() === 'pending'">
+</app-message-list>
+    </ng-container>
 
   <app-message-input class="chat-container-message-input" [isLoading]="this.chatStore.requestStatus() === 'pending'" (messageSent)="onMessageSent($event)">
   </app-message-input>
