@@ -1,5 +1,9 @@
-<ul>
-  <li *ngFor="let chat of chats" (click)="chatSelected.emit(chat.id)">
-    {{ chat.name }}
-  </li>
-</ul>
+<mat-list>
+  @for (chat of chatStore.listChat(); track chat) {
+    <mat-list-item class="chat-item" (click)="chatSelected.emit(chat.id)" >
+      <span matListItemTitle>
+        {{ getLastUserMessage(chat) }}
+      </span>
+    </mat-list-item>
+  }
+</mat-list>

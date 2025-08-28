@@ -56,6 +56,10 @@ export function activate(context: vscode.ExtensionContext) {
 	addSubscriber(createCommand('oroasis.editAgent', (comment: CommentComponent) => editAgentCommand(comment, ollamaService, outputChannel)));
 	addSubscriber(createCommand('oroasis.updateModels', () => updateModelsCommand(outputChannel, ollamaService)));
 
+	// command chats
+	addSubscriber(createCommand('oroasis.cleanChats', () => chatMessageRepository.clear()));
+
+
 	disposables.forEach(dis => {
 		context.subscriptions.push(dis);
 	});

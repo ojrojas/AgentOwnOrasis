@@ -96,6 +96,10 @@
         "command": "oroasis.editAgent",
         "title": "Oroasis: Edit agent",
         "enablement": "!commentIsEmpty"
+      },
+      {
+        "command": "oroasis.cleanChats",
+        "title": "Cleaning chats"
       }
     ],
     "configuration": {
