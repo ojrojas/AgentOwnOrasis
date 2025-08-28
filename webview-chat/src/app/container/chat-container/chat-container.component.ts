@@ -1,13 +1,12 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-
+import { Component, computed, effect, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatHeaderComponent } from './chat-header/chat-header.component';
 import { MessageInputComponent } from './message-input/message-input.component';
 import { MessageListComponent } from './message-list/message-list.component';
-import { ChatStore } from '../../store/chat-store';
-import { IMessage } from '../../core/types/message.type';
 import { ChatListComponent } from './chat-list/chat-list.component';
-import { CommonModule } from '@angular/common';
-import { v4 as uuidv4 } from 'uuid';
+import { ChatStore } from '../../store/chat/chat.store';
+import { IMessage } from '../../core/types/message.type';
 import { IChat } from '../../core/types/chat.type';
 
 @Component({
@@ -23,46 +22,43 @@ import { IChat } from '../../core/types/chat.type';
   templateUrl: 'chat-container.component.html',
   styleUrl: 'chat-container.component.scss'
 })
-export class ChatContainerComponent implements OnInit {
+export class ChatContainerComponent {
   readonly chatStore = inject(ChatStore);
-  selectedChatId = signal<string | null>(null);
 
-
-  async ngOnInit(): Promise<void> {
-    await this.chatStore.loadModels();
-    await this.chatStore.loadMessages();
-    await this.chatStore.getPreferredModel();
-    await this.chatStore.loadWorkSpaceFolders();
+  constructor() {
+    effect(() => {
+      this.chatStore.loadModels();
+      this.chatStore.loadMessages();
+      this.chatStore.getPreferredModel();
+      this.chatStore.loadWorkSpaceFolders();
+    });
   }
 
   onChatSelected(chatId: string) {
-    this.selectedChatId.set(chatId);
-    // this.chatStore.loadMessages(chatId);
+    this.chatStore.selectChat(chatId);
   }
 
   onMessageSent(message: IMessage): void {
-    debugger;
-    const selectedId = this.chatStore.selectedChatId();
-    if (!selectedId) {
-      const newChat: IChat = {
-        id: uuidv4(),
-        messages: []
-      };
+    this.ensureChatAndSend(message);
+  }
 
+  private ensureChatAndSend(message: IMessage): void {
+    let chatId = this.chatStore.selectedChatId();
+
+    if (!chatId) {
+      const newChat: IChat = { id: uuidv4(), messages: [] };
       this.chatStore.createChat(newChat);
       this.chatStore.selectChat(newChat.id);
+      chatId = newChat.id;
     }
 
-    const id = this.chatStore.selectedChatId();
-    if (id !== null) { message.chatId = id; }
-
+    message.chatId = chatId;
     const messageToSend = this.chatStore.postMessage(message);
     this.chatStore.sendChat(messageToSend);
   }
 
   currentMessages = computed(() => {
     const selectedId = this.chatStore.selectedChatId();
-    if (!selectedId) { return []; }
     return this.chatStore.listChat().find(c => c.id === selectedId)?.messages ?? [];
   });
 }

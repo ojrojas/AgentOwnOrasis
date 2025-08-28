@@ -1,40 +1,60 @@
 <div class="container-input">
   <mat-card class="message-input-container" [class.border-animated]="isLoading">
+    
     <div class="input-wrapper">
-      <div appearance="outline" class="message-field">
-        <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
-          (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3" #messageTextarea>
+      <div class="message-field">
+        <textarea
+          matInput
+          [(ngModel)]="messageText"
+          [placeholder]="placeholder"
+          [disabled]="isLoading"
+          (keydown.enter)="onEnterPressed($event)"
+          (keydown)="onKeyDown($event)"
+          rows="3"
+          #messageTextarea>
         </textarea>
         <div id="fileDropdown" class="dropdown"></div>
       </div>
     </div>
-    <mat-card-actions>
-      <div style="display: flex;">
+
+    <mat-card-actions class="actions-container">
+      <div class="actions-selects">
         <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
-          @for (model of this.chatStore.models()?.models; track model) {
-          <option [ngValue]="model.model">{{model.name}}</option>
+          @for (model of chatStore.models()?.models; track model) {
+            <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>
+
         <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
           <option ngValue="Ask">Ask</option>
           <option ngValue="Edit">Edit</option>
           <option ngValue="Agent">Agent</option>
         </select>
       </div>
-      <div>
-      </div>
-      <div>
-        <button [class]="{'active-microphone': true,  'is-active': this.isActiveMicrophone }" matMiniFab
-          (click)="activeMicrophone()" [disabled]="isLoading || !modelText.trim()">
+
+      <div class="actions-buttons">
+        <button
+          mat-icon-button
+          class="microphone-button"
+          [class.is-active]="isActiveMicrophone"
+          (click)="activeMicrophone()"
+          [disabled]="isMicDisabled"
+          aria-label="Activate microphone">
           <ng-icon name="matMicOutline" />
         </button>
-        <button matMiniFab class="send-button" [disabled]="!messageText.trim() || isLoading || modelText.length === 0"
-          (click)="sendMessage()">
+
+        <button
+          mat-icon-button
+          class="send-button"
+          (click)="sendMessage()"
+          [disabled]="isSendDisabled"
+          aria-label="Send message">
+
           @if (!isLoading) {
-          <ng-icon name="matSendOutline" />
+            <ng-icon name="matSendOutline" />
           }
           @if (isLoading) {
-          <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
+            <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
           }
         </button>
       </div>

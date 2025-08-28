@@ -80,7 +80,7 @@ mat-card-actions {
 }
 
 .send-button {
-  background-color: #0084ff;
+   background-color: var(--mat-primary);
   color: var(--vscode-editor-foreground) !important;
   width: 30px !important;
   height: 28px !important;
@@ -88,7 +88,7 @@ mat-card-actions {
 }
 
 .send-button:disabled {
-  background-color: #555;
+  background-color: var(--mat-primary);
   color: var(--vscode-editor-foreground) !important;
 }
 
@@ -195,4 +195,25 @@ textarea::placeholder {
 }
 .hidden {
     display: none;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions-selects {
+  display: flex;
+  gap: 8px;
+}
+
+.actions-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.microphone-button.is-active {
+  background-color: var(--mat-primary);
+  color: white;
 }
