@@ -1,10 +1,15 @@
- .chat-container {
-   height: 100vh;
-   display: flex;
-   flex-direction: column;
-   width: 100%;
-  }
+.chat-item {
+  background-color: #2d2d2d;
+  min-height: 40px;
+  border-radius: 6px;
+  border:1px dotted var(--vscode-editor-foreground);
 
-  .chat-container-header {
-    flex: 1;
+  color: var(--vscode-editor-foreground) !important;
+
+  ::ng-deep .mdc-list-item__primary-text,
+  ::ng-deep [matListItemTitle] {
+    color: var(--vscode-editor-foreground) !important;
+    font-weight: 600;
+    font-size: 14px;
   }
+}

@@ -56,12 +56,13 @@ export const ChatStore = signalStore(
     })
   })),
   withMethods((store, vscodeService = inject(VscodeService)) => ({
+
     postMessage(message: IMessage) {
       patchState(store, setPending());
       const { preferredModel } = getState(store);
 
       patchState(store, state =>
-        this.updateSelectedChat(state, chat => ({
+        this.updateChatById(state, message.chatId!, chat => ({
           ...chat,
           messages: [...chat.messages, message],
         }))
@@ -98,7 +99,7 @@ export const ChatStore = signalStore(
 
       vscodeService.onMessage<IMessage>('sendChat:response', (partialResponse) => {
         patchState(store, state =>
-          this.updateSelectedChat(state, chat => {
+          this.updateChatById(state, message.chatId!, chat => {
             const lastMsgIndex = chat.messages.findIndex(m => m.role === 'assistant' && !m.done);
             if (lastMsgIndex !== -1) {
               const updated = [...chat.messages];
@@ -127,16 +128,25 @@ export const ChatStore = signalStore(
       });
     },
 
+    createChat(chat: IChat) {
+      patchState(store, setPending());
+      patchState(store, { listChat: [...store.listChat(), chat] }, setFulfilled());
+    },
+
+    clearChats() {
+      patchState(store, setPending());
+      patchState(store, { listChat: [] }, setFulfilled());
+    },
+
     getSelectedChat(state: ChatState): IChat | undefined {
       return state.listChat.find(c => c.id === state.selectedChatId);
     },
 
-    loadAllMessages() {
-
-    },
-
-    loadMessages(chatId: string) {
-
+    async loadMessages() {
+      patchState(store, setPending);
+      const chats = await vscodeService.request<IChat[]>('getAllMessages');
+      debugger;
+      patchState(store, { listChat: chats }, setFulfilled());
     },
 
     selectChat(chatId: string) {
@@ -149,17 +159,16 @@ export const ChatStore = signalStore(
       });
     },
 
-    updateSelectedChat(state: ChatState, updater: (chat: IChat) => IChat): ChatState {
+    updateChatById(state: ChatState, chatId: string, updater: (chat: IChat) => IChat): ChatState {
       return {
         ...state,
         listChat: state.listChat.map(c =>
-          c.id === state.selectedChatId ? updater(c) : c
+          c.id === chatId ? updater(c) : c
         ),
       };
     },
 
     backToChatList() {
-      debugger;
       patchState(store, { selectedChatId: null });
     },
 
@@ -194,11 +203,9 @@ export const ChatStore = signalStore(
     resolveMentions(text: string): string[] {
       const mentions = this.extractMentions(text);
       const allFiles = store.files;
-      const resolved = mentions
+      return mentions
         .map(m => allFiles().find(f => f.endsWith(m)))
         .filter((f): f is string => !!f);
-
-      return Array.from(new Set(resolved));
     },
 
     clearState() {

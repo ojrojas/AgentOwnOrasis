@@ -67,12 +67,35 @@ export function registerChatCommands(
                 });
                 break;
 
+            case 'getAllMessages:request':
+                panel.webview.postMessage({
+                    type: 'getAllMessages:response',
+                    requestId,
+                    payload: chatRepository.findAllSync(),
+                });
+                break;
+
             case 'sendChat:request':
-                await chatRepository.insert(payload);
-                const messages = chatRepository.findAllSync().map(item => ({
-                    content: item.content,
-                    role: item.role
-                }));
+                const exists = chatRepository.findById(payload.chatId);
+                const chatIncomming = {
+                    id: payload.chatId,
+                    messages: payload.messages,
+                    context: payload.context
+                };
+                if (exists === undefined) {
+                    await chatRepository.insert(chatIncomming);
+                }
+                else {
+                    exists.messages.push({ 
+                        content: payload.content,
+                        id: payload.id,
+                        model: payload.model,
+                        role: payload.role,
+                        timestamp: payload.timestamp,
+                        context: payload.context
+                    } );
+                    await chatRepository.updateById(payload.chatId, exists);
+                }
 
                 try {
                     const temp = parseFloat(temperature);
@@ -80,9 +103,9 @@ export function registerChatCommands(
                     if (payload.type === 'chat') {
                         response = await chatController.chat({
                             model: payload.model,
-                            messages: messages,
+                            messages: exists?.messages ?? chatIncomming.messages,
                             options: {
-                                temperature: temp  ?? 0.1,
+                                temperature: temp ?? 0.1,
                             }
                         });
 
@@ -93,13 +116,13 @@ export function registerChatCommands(
                             system: promptDefault as string,
                             context: payload.context,
                             options: {
-                                temperature: temp  ?? 0.3,
+                                temperature: temp ?? 0.3,
                             }
                         });
                     }
 
                     let accumulated = '';
-                    let contextAccumulated: number[]= [];
+                    let contextAccumulated: number[] = [];
                     for await (const chunk of response) {
                         if (isChatResponse(chunk)) {
                             accumulated += chunk.message.content || '';
@@ -121,17 +144,29 @@ export function registerChatCommands(
                         });
                     }
 
-                    await chatRepository.insert({
+                    exists?.messages.push({
                         content: accumulated,
                         id: uuidv4(),
-                        role: 'assistant'
+                        role: 'assistant',
+                        model: payload.model,
+                        timestamp: new Date()
                     });
+
+                    chatIncomming.messages.push({
+                        content: accumulated,
+                        id: uuidv4(),
+                        role: 'assistant',
+                        model: payload.model,
+                        timestamp: new Date()
+                    });
+
+                    await chatRepository.updateById(payload.chatId, exists ?? chatIncomming);
 
                     panel.webview.postMessage({
                         type: 'sendChat:response:done'
                     });
                 } catch (error) {
-                    outputChannel.appendLine(`Error: request ollama service ${error}`, );
+                    outputChannel.appendLine(`Error: request ollama service ${error}`,);
                     panel.webview.postMessage({
                         type: 'sendChat:response:done'
                     });

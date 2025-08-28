@@ -5,24 +5,22 @@
   width: 100%;
 }
 
-/* Header fijo arriba */
 .chat-container-header {
   flex: 0 0 auto;
 }
 
-/* Contenido central (ya sea chat-list o message-list) */
 .chat-container-list-chat,
 app-message-list {
-  flex: 1 1 auto;       // ocupa todo el espacio sobrante
+  flex: 1 1 auto;       
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
   scrollbar-width: none;
+  margin: 5px;
 }
 
-/* Input siempre fijo abajo */
 .chat-container-message-input {
-  flex: 0 0 auto;   // altura automática
+  flex: 0 0 auto; 
   display: block;
 }
