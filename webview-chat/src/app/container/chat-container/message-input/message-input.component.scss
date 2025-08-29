@@ -79,28 +79,15 @@ mat-card-actions {
   justify-content: space-between;
 }
 
-.send-button {
-   background-color: var(--mat-primary);
-  color: var(--vscode-editor-foreground) !important;
-  width: 30px !important;
-  height: 28px !important;
 
+.send-button.is-active {
+  background-color: var(--mat-primary);
+  color: azure;
 }
+
 
 .send-button:disabled {
   background-color: var(--mat-primary);
-  color: var(--vscode-editor-foreground) !important;
-}
-
-.active-microphone {
-  background-color: #555;
-  color: var(--vscode-editor-foreground) !important;
-  width: 30px !important;
-  height: 28px !important;
-}
-
-.is-active {
-  background-color: #0084ff;
 }
 
 .loading-icon {

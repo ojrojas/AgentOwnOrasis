@@ -35,7 +35,7 @@
       "orasis-aii": [
         {
           "id": "oroasis.primary-sidebar-provider",
-          "name": "Agent OR IA",
+          "name": "",
           "icon": "resources/oroasisBotDark.png",
           "type": "webview"
         }
@@ -100,6 +100,26 @@
       {
         "command": "oroasis.cleanChats",
         "title": "Cleaning chats"
+      },
+      {
+        "command": "oroasis.addNewChatButton",
+        "title": "New Chat",
+        "icon": "$(add)"
+      },
+      {
+        "command": "oroasis.historyChatsButton",
+        "title": "History Chat",
+        "icon": "$(history)"
+      },
+      {
+        "command": "oroasis.settingsChatsButton",
+        "title": "Settings Chat",
+        "icon": "$(settings)"
+      },
+      {
+        "command": "oroasis.closeChatsButton",
+        "title": "Close Chat",
+        "icon": "$(close)"
       }
     ],
     "configuration": {
@@ -150,6 +170,28 @@
       }
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "oroasis.addNewChatButton",
+          "group": "navigation@1",
+          "when": "view == oroasis.primary-sidebar-provider"
+        },
+        {
+          "command": "oroasis.historyChatsButton",
+          "group": "navigation@2",
+          "when": "view == oroasis.primary-sidebar-provider"
+        },
+        {
+          "command": "oroasis.settingsChatsButton",
+          "group": "navigation@3",
+          "when": "view == oroasis.primary-sidebar-provider"
+        },
+        {
+          "command": "oroasis.closeChatsButton",
+          "group": "navigation@4",
+          "when": "view == oroasis.primary-sidebar-provider"
+        }
+      ],
       "comments/comment/title": [
         {
           "command": "oroasis.editComment",

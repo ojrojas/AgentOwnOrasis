@@ -10,8 +10,7 @@
           [disabled]="isLoading"
           (keydown.enter)="onEnterPressed($event)"
           (keydown)="onKeyDown($event)"
-          rows="3"
-          #messageTextarea>
+          rows="3">
         </textarea>
         <div id="fileDropdown" class="dropdown"></div>
       </div>
@@ -46,6 +45,7 @@
         <button
           mat-icon-button
           class="send-button"
+          [class.is-active]="!isSendDisabled"
           (click)="sendMessage()"
           [disabled]="isSendDisabled"
           aria-label="Send message">

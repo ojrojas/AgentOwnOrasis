@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, effect } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
@@ -37,6 +37,7 @@ export class MessageInputComponent {
   readonly chatStore = inject(ChatStore);
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
+
   @Output() messageSent = new EventEmitter<IMessage>();
   modelText: string = '';
   typeMessage: string = 'Ask';
@@ -96,10 +97,10 @@ export class MessageInputComponent {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key !== '@') { 
-      return; 
+    if (event.key !== '@') {
+      return;
     }
-    
+
     console.log("KeyPress:", event.key);
     event.preventDefault();
 
