@@ -1,5 +1,5 @@
 import { Comment, CommentAuthorInformation, CommentMode, CommentThread, MarkdownString } from 'vscode';
-import { CommnetType } from './comment.types';
+import { CommnetType } from '../../core/types/comment.type';
 import { getIdentifier } from '../../core/services/identifier.service';
 export class CommentComponent implements Comment {
     public readonly id:string = getIdentifier();

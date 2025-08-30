@@ -1,6 +1,6 @@
 import { CommentMode, CommentThread, MarkdownString, Uri } from 'vscode';
 import { CommentComponent } from './comment.provider';
-import { ActorType, CommnetType } from './comment.types';
+import { ActorType, CommnetType } from '../../core/types/comment.type';
 
 export const createComment = (data: string, actor: ActorType, commentThread: CommentThread, commentType: CommnetType, isToUpdate: boolean = false) => {
     if (isToUpdate) {
