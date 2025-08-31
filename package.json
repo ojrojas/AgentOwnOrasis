@@ -164,9 +164,15 @@
         },
         "oroasisSettings.templatePromptAutoComplete": {
           "type": "string",
-          "default": "You are an AI code completion engine. Do not explain, do not add comments, do not add markdown language, do not add format highlight code, only return valid",
+          "default": "You are an AI code completion engine. Complete the next line of code based on the following context. Do not explain, do not add comments, do not add markdown language, do not add format highlight code, only return valid to context:",
           "editPresentation": "multilineText",
-          "description": "Template prompt use to generate"
+          "description": "Template prompt use to autocomplete suggestions"
+        },
+        "oroasisSettings.templatePromptRefactor": {
+          "type": "string",
+          "default": "You are an expert software assistant. Improve refactorization to the following code for readability, performance, and best practices. Do not explain, do not add comments, do not add markdown language, do not add format highlight code, only return valid to context:",
+          "editPresentation": "multilineText",
+          "description": "Template prompt use to refactorize code, base on code actions"
         }
       }
     },

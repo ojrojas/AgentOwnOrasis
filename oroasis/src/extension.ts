@@ -15,6 +15,7 @@ import { registerWebView } from './core/webview/webview.register';
 import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
 import { IChatMessage } from './core/types/chat-message.type';
 import { IWorkspaceStateRepository } from './core/interfaces/workspace-repository-state.interface.service';
+import { RefactorProvider } from './providers/codeactions/refactor.provider';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: any[] = [];
@@ -31,10 +32,12 @@ export function activate(context: vscode.ExtensionContext) {
 	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
 
 	const completionsProvider = new CompletionProvider(ollamaService);
+	const refactorProvider = new RefactorProvider(ollamaService);
 	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
 	
 	// providers
 	addSubscriber(vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, completionsProvider));
+	addSubscriber(vscode.languages.registerCodeActionsProvider({ pattern: "**" }, refactorProvider,  { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }));
 	addSubscriber(registerWebView(sideBarWebView));
 	// controllers
 	addSubscriber(createCommentController());

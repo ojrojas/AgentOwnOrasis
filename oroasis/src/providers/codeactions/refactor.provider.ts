@@ -1,38 +1,36 @@
 import {
     CancellationToken,
-    InlineCompletionContext,
-    InlineCompletionItemProvider,
+    CodeAction,
+    CodeActionContext,
+    CodeActionKind,
+    CodeActionProvider,
+    Command,
     InlineCompletionList,
-    Position,
     Range,
+    Selection,
     TextDocument,
     window,
     workspace,
+    WorkspaceEdit,
 } from 'vscode';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
 
-export class CompletionProvider implements InlineCompletionItemProvider {
+export class RefactorProvider implements CodeActionProvider {
 
     constructor(private ollamaService: IOllamaApiService) { }
-
-    async provideInlineCompletionItems(
+    async provideCodeActions(
         document: TextDocument,
-        position: Position,
-        context: InlineCompletionContext,
-        token: CancellationToken
-    ): Promise<InlineCompletionList | null | undefined> {
+        range: Range | Selection,
+        context: CodeActionContext,
+        token: CancellationToken): Promise<(CodeAction | Command)[] | null | undefined> {
         const settings = workspace.getConfiguration('oroasisSettings');
-        const roleAgent = settings.get<string>('templatePromptAutoComplete');
+        const roleAgent = settings.get<string>('templatePromptRefactor');
         const model = settings.get<string>('modelCompletionDefault');
         const languageId = document.languageId;
 
         if (token.isCancellationRequested) {
             return null;
         }
-
-        const result: InlineCompletionList = {
-            items: [],
-        };
 
         if (document.uri.scheme === "vscode-scm") {
             return null;
@@ -43,16 +41,14 @@ export class CompletionProvider implements InlineCompletionItemProvider {
             return null;
         }
 
-        if (position.line <= 0) {
-            return null;
-        }
+        const codeContext = document.getText(range).trim();
 
-        const startLine = Math.max(0, position.line - 10);
-        const codeContext = document.getText(new Range(startLine, 0, position.line, position.character));
+        if (codeContext.length <= 0) { return null; }
 
         const request = `${roleAgent}. Here is the context:${codeContext}, only return valid ${languageId} code`;
 
         try {
+
             const response = await this.ollamaService.generate({
                 model: model as string,
                 prompt: request,
@@ -68,23 +64,18 @@ export class CompletionProvider implements InlineCompletionItemProvider {
             }
 
             accumulated = this.cleanResponse(accumulated).trim();
-            console.log("completion:" + accumulated);
+            console.log("refactor:" + accumulated);
 
+            const action = new CodeAction("AI: Improve code from oroasis", CodeActionKind.QuickFix);
+            action.edit = new WorkspaceEdit();
+            action.edit.replace(document.uri, range, accumulated);
 
-            result.items.push(
-                {
-                    insertText: accumulated,
-                    range: new Range(position.line, position.character, position.line, position.character)
-                }
-            );
-
-            return result;
-
+            return [action];
         } catch (error) {
-            console.error("CompletionProvider error:", error);
-            return null;
+            console.error("Error generating refactor code, ", error);
         }
     }
+
 
     cleanResponse(text: string): string {
         return text
