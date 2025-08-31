@@ -15,6 +15,7 @@
   ],
   "main": "./oroasis/out/extension.js",
   "contributes": {
+    
     "viewsContainers": {
       "activitybar": [
         {
@@ -163,7 +164,7 @@
         },
         "oroasisSettings.templatePromptAutoComplete": {
           "type": "string",
-          "default": "You are autocomplete programming code, always end your suggestions on a complete sentence:",
+          "default": "You are an AI code completion engine. Do not explain, do not add comments, do not add markdown language, do not add format highlight code, only return valid",
           "editPresentation": "multilineText",
           "description": "Template prompt use to generate"
         }

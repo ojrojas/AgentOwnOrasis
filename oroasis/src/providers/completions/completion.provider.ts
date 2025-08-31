@@ -1,11 +1,12 @@
 import {
     CancellationToken,
     InlineCompletionContext,
+    InlineCompletionItem,
     InlineCompletionItemProvider,
     InlineCompletionList,
     Position,
+    ProviderResult,
     Range,
-    SnippetString,
     TextDocument,
     window,
     workspace,
@@ -22,68 +23,20 @@ export class CompletionProvider implements InlineCompletionItemProvider {
         position: Position,
         context: InlineCompletionContext,
         token: CancellationToken
-    ): Promise<InlineCompletionList | null> {
+    ): Promise<InlineCompletionList | null | undefined> {
         const settings = workspace.getConfiguration('oroasisSettings');
         const roleAgent = settings.get<string>('templatePromptAutoComplete');
         const model = settings.get<string>('modelCompletionDefault');
         const languageId = document.languageId;
 
 
-     
-			// console.log('provideInlineCompletionItems triggered');
-			// const regexp = /\/\/ \[(.+?),(.+?)\)(.*?):(.*)/;
-			// if (position.line <= 0) {
-			// 	return;
-			// }
+        if (token.isCancellationRequested) {
+            return null;
+        }
 
-			// const result: vscode.InlineCompletionList = {
-			// 	items: [],
-			// 	commands: [],
-			// };
-
-			// let offset = 1;
-			// while (offset > 0) {
-			// 	if (position.line - offset < 0) {
-			// 		break;
-			// 	}
-
-			// 	const lineBefore = document.lineAt(position.line - offset).text;
-			// 	const matches = lineBefore.match(regexp);
-			// 	if (!matches) {
-			// 		break;
-			// 	}
-			// 	offset++;
-
-			// 	const start = matches[1];
-			// 	const startInt = parseInt(start, 10);
-			// 	const end = matches[2];
-			// 	const endInt =
-			// 		end === '*'
-			// 			? document.lineAt(position.line).text.length
-			// 			: parseInt(end, 10);
-			// 	const flags = matches[3];
-			// 	const completeBracketPairs = flags.includes('b');
-			// 	const isSnippet = flags.includes('s');
-			// 	const text = matches[4].replace(/\\n/g, '\n');
-
-			// 	result.items.push({
-			// 		insertText: isSnippet ? new vscode.SnippetString(text) : text,
-			// 		range: new Range(position.line, startInt, position.line, endInt),
-			// 		completeBracketPairs,
-			// 	});
-			// }
-
-			// if (result.items.length > 0) {
-			// 	result.commands!.push({
-			// 		command: 'demo-ext.command1',
-			// 		title: 'My Inline Completion Demo Command',
-			// 		arguments: [1, 2],
-			// 	});
-			// }
-			// return result;
-
-
-
+        const result: InlineCompletionList = {
+            items: [],
+        };
 
         if (document.uri.scheme === "vscode-scm") {
             return null;
@@ -98,42 +51,48 @@ export class CompletionProvider implements InlineCompletionItemProvider {
             return null;
         }
 
-        const result: InlineCompletionList = { items: [] };
+        const startLine = Math.max(0, position.line - 10);
+        const codeContext = document.getText(new Range(startLine, 0, position.line, position.character));
 
-        const lineBefore = document.lineAt(position.line - 1).text;
-        const request = `You are an AI code completion engine. 
-Continue writing the following code in ${languageId}. 
-Do not explain, do not add comments, only return valid ${languageId} code. 
-Here is the context:
-
-${lineBefore}
-
-Continue from here:`;
+        const request = `${roleAgent}, only return valid ${languageId} code. Here is the context:${codeContext} Continue from here:`;
 
         try {
-
             const response = await this.ollamaService.generate({
                 model: model as string,
                 prompt: request,
-                options: { temperature: 0.0 }
+                options: { temperature: 0.2, top_p: 0.9, num_predict: 100, }
             });
             let accumulated = '';
             for await (const chunk of response) {
-                console.log(chunk);
-                accumulated += chunk;
+                console.info(chunk);
+                accumulated += chunk.response;
             }
 
-            return {
-                items: [
-                    {
-                        insertText: new SnippetString(accumulated),
-                        range: new Range(position.line, 0, position.line, 0)
-                    }
-                ]
-            };
+            if (token.isCancellationRequested) {
+                return null;
+            }
+
+            accumulated = this.cleanResponse(accumulated).trim();
+
+            result.items.push(
+                {
+                    insertText: accumulated,
+                    range: new Range(position.line, position.character, position.line, position.character)
+                }
+            );
+
+            return result;
+
         } catch (error) {
             console.error("CompletionProvider error:", error);
             return null;
         }
+    }
+
+    cleanResponse(text: string): string {
+        return text
+            .replace(/```[a-zA-Z]*\n?/g, "")
+            .replace(/```/g, "")
+            .trim();
     }
 }
