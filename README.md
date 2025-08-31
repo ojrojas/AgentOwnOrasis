@@ -14,7 +14,7 @@ It includes **context persistence**, **state management with NgRx-Signals**, **w
 | ✅ Angular 20 UI | Chat interface built with Angular and **NgRx-Signals** for reactive state. |
 | ✅ VS Code WebView | Loads the Angular app inside VS Code. |
 | ✅ Ollama Integration | Host connects with Ollama via `generate` (fast + context) and `chat` (agents/tools). |
-| ✅ Context Persistence | SQLite (better-sqlite3) stores conversation history and context. |
+| ✅ Context Persistence | Memento Workspaces vscode, stores conversation history and context. |
 | ✅ Streaming Responses | Word-by-word streaming from host to WebView. |
 | ✅ Multi-model Support | Example: **llama3** for coding, **llava** for vision. |
 | ✅ File Mentions | Autocomplete files with `@filename` from workspace. |
@@ -30,7 +30,7 @@ It includes **context persistence**, **state management with NgRx-Signals**, **w
 - **Responsibilities:**  
   - Communicate with Ollama (`generate`, `chat`)  
   - Manage context and migrate from messages  
-  - Persist chat and context in **SQLite**  
+  - Persist chat and context in **vscode.Memento**  
   - Provide APIs to WebView (`getModels`, `listFiles`, `sendChat`, etc.)  
 
 ### **WebView (Frontend - Angular)**  
@@ -53,7 +53,7 @@ It includes **context persistence**, **state management with NgRx-Signals**, **w
    - **Agent/tools mode:** `ollama.chat` with messages  
 4. Host streams partial responses back to WebView.  
 5. WebView updates the last assistant message in real time.  
-6. Context is saved in SQLite.  
+6. Context is saved in vscode.Memento.  
 
 ---
 

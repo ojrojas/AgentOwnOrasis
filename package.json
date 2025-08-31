@@ -266,7 +266,8 @@
     "lint": "eslint src",
     "pretest": "npm run compile && npm run lint",
     "test": "vscode-test",
-    "postinstall": "cd oroasis && npm install && cd ../webview-chat && npm install && cd .."
+    "postinstall": "cd oroasis && npm install && cd ../webview-chat && npm install && cd ..",
+    "clean": "rm -rf node_modules oroasis/out oroasis/node_modules oroasis/tsconfig.tsbuildinfo webview-chat/dist webview-chat/node_modules package-lock.json"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
