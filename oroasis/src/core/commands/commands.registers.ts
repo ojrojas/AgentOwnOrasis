@@ -6,5 +6,6 @@ export const createCommand = (commandName: string, callback: (parameter: any) =>
 
 // Examples
 export const helloWorldCommand = (outputChannel: OutputChannel) => {
+    outputChannel.appendLine('Hello World from Orasis!');
     window.showInformationMessage('Hello World from Orasis!');
 };

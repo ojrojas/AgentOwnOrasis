@@ -44,9 +44,8 @@ export class WebviewProvider implements WebviewViewProvider {
   }
 
   async dispose() {
-    // ✅ Solo cerramos manualmente si es WebviewPanel
-    if (this.view instanceof WebviewView) {
-      this.view.dispose();
+    if (this.view) {
+      (this.view as WebviewPanel).dispose();
     }
 
     // Limpieza de disposables
@@ -59,7 +58,7 @@ export class WebviewProvider implements WebviewViewProvider {
 
   static getActiveInstance() {
     return [...this.activeInstances].find(
-      i => i.view && i.view instanceof WebviewPanel && i.view.active
+      i => i.view && i.view as WebviewPanel && (i.view as WebviewPanel).active
     );
   }
 
@@ -92,11 +91,11 @@ export class WebviewProvider implements WebviewViewProvider {
     );
 
     // Comandos (solo si es WebviewPanel, porque View no los necesita)
-    if (view instanceof WebviewPanel) {
-      registerWorkspaceCommands(this.context, view, this.outputChannel);
+    if (view) {
+      registerWorkspaceCommands(this.context, view as WebviewPanel, this.outputChannel);
       registerChatCommands(
         this.context,
-        view,
+        view as WebviewPanel,
         this.ollamaService,
         this.chatRepository,
         this.outputChannel

@@ -7,10 +7,9 @@ import {
     Position,
     ProviderResult,
     Range,
-    SnippetString,
     TextDocument,
     window,
-    workspace
+    workspace,
 } from 'vscode';
 import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
 
@@ -18,70 +17,82 @@ export class CompletionProvider implements InlineCompletionItemProvider {
 
     constructor(private ollamaService: IOllamaApiService) {
     }
-    provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionItem[] | InlineCompletionList> {
+
+    async provideInlineCompletionItems(
+        document: TextDocument,
+        position: Position,
+        context: InlineCompletionContext,
+        token: CancellationToken
+    ): Promise<InlineCompletionList | null | undefined> {
         const settings = workspace.getConfiguration('oroasisSettings');
         const roleAgent = settings.get<string>('templatePromptAutoComplete');
         const model = settings.get<string>('modelCompletionDefault');
+        const languageId = document.languageId;
 
-        if (document.uri.scheme === "vscode-scm") {
+
+        if (token.isCancellationRequested) {
             return null;
-        }
-
-        const editor = window.activeTextEditor;
-        if (editor && editor.selections.length > 1 || editor === undefined) {
-            return null;
-        }
-
-        if (position.line <= 0) {
-            return;
         }
 
         const result: InlineCompletionList = {
             items: [],
         };
 
-        const lineBefore = document.lineAt(position.line - 1).text;
+        if (document.uri.scheme === "vscode-scm") {
+            return null;
+        }
 
-        const documentEditor = editor.document;
-        const selection = editor.selection;
+        const editor = window.activeTextEditor;
+        if (!editor || editor.selections.length > 1) {
+            return null;
+        }
 
-        // Get the word within the selection
-        const word = document.getText(selection);
+        if (position.line <= 0) {
+            return null;
+        }
 
-        let request = roleAgent as string;
-        request = request.concat("\n", lineBefore).trim();
+        const startLine = Math.max(0, position.line - 10);
+        const codeContext = document.getText(new Range(startLine, 0, position.line, position.character));
 
+        const request = `${roleAgent}, only return valid ${languageId} code. Here is the context:${codeContext} Continue from here:`;
 
         try {
-            const response = this.ollamaService.generate({
+            const response = await this.ollamaService.generate({
                 model: model as string,
                 prompt: request,
-                options: {
-                    temperature: 0.0,
-                   presence_penalty: 1,
-                   top_p: 0.2
+                options: { temperature: 0.2, top_p: 0.9, num_predict: 100, }
+            });
+            let accumulated = '';
+            for await (const chunk of response) {
+                console.info(chunk);
+                accumulated += chunk.response;
+            }
+
+            if (token.isCancellationRequested) {
+                return null;
+            }
+
+            accumulated = this.cleanResponse(accumulated).trim();
+
+            result.items.push(
+                {
+                    insertText: accumulated,
+                    range: new Range(position.line, position.character, position.line, position.character)
                 }
-            });
+            );
 
-            console.log("response", response);
-
-            response.then(res => {
-                console.log("response generate: ", res);
-                result.items.push({
-                    insertText: new SnippetString("res"),
-                    range: new Range(position.line, 0, position.line, 0)
-                });
-            });
-            response.catch((error) => {
-                console.error(error);
-            });
+            return result;
 
         } catch (error) {
-            console.log("error", error);
+            console.error("CompletionProvider error:", error);
+            return null;
         }
     }
-    
-    // handleDidShowCompletionItem(_completionItem: InlineCompletionItem): void {
-    // 		console.log('handleDidShowCompletionItem');
-    // 	};
+
+    cleanResponse(text: string): string {
+        return text
+            .replace(/```[a-zA-Z]*\n?/g, "")
+            .replace(/```/g, "")
+            .trim();
+    }
 }

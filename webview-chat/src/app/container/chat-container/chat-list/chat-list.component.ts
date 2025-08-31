@@ -1,7 +1,7 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
-import { ChatStore } from '../../../store/chat-store';
+import { ChatStore } from '../../../store/chat/chat.store';
 import { IChat } from '../../../core/types/chat.type';
 import { MatCardModule } from "@angular/material/card";
 

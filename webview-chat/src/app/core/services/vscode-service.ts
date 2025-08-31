@@ -34,39 +34,17 @@ export class VscodeService {
     });
   }
 
-  requestStream<T = any>(type: string, payload?: any): Observable<T> {
-    const requestId = uuidv4();
-    this.vscode.postMessage({ type: `${type}:request`, requestId, payload });
-
-    return new Observable<T>((observer) => {
-      const listener = (event: MessageEvent) => {
-        const msg = event.data;
-        if (!msg?.type?.startsWith(type) || msg.requestId !== requestId) return;
-
-        if (msg.type.endsWith(':chunk')) {
-          observer.next(msg.payload);
-        } else if (msg.type.endsWith(':done')) {
-          observer.complete();
-          window.removeEventListener('message', listener);
-        }
-      };
-
-      window.addEventListener('message', listener);
-    });
+  sendMessage(type: string, payload?: any): void {
+    this.vscode.postMessage({ type: `${type}:request`, payload });
   }
 
-  sendMessage(type: string, payload?: any): void {
-  this.vscode.postMessage({ type: `${type}:request`, payload });
-}
-
-onMessage<T>(type: string, handler: (payload: T) => void) {
-  window.addEventListener('message', (event) => {
-    if (event.data?.type === type) {
-      handler(event.data.payload);
-    }
-  });
-}
-
+  onMessage<T>(type: string, handler: (payload: T) => void) {
+    window.addEventListener('message', (event) => {
+      if (event.data?.type === type) {
+        handler(event.data.payload);
+      }
+    });
+  }
 
   public send(type: string, payload?: any) {
     this.vscode.postMessage({ type, payload });

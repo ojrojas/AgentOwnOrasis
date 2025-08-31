@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, effect } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
@@ -10,10 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
-import { ChatStore } from '../../../store/chat-store';
+import { ChatStore } from '../../../store/chat/chat.store';
 import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
-import { IChat } from '../../../core/types/chat.type';
 
 @Component({
   selector: 'app-message-input',
@@ -38,6 +37,7 @@ export class MessageInputComponent {
   readonly chatStore = inject(ChatStore);
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
+
   @Output() messageSent = new EventEmitter<IMessage>();
   modelText: string = '';
   typeMessage: string = 'Ask';
@@ -65,6 +65,14 @@ export class MessageInputComponent {
     console.log("micro is :", this.isActiveMicrophone);
   }
 
+  get isSendDisabled(): boolean {
+    return !this.messageText.trim() || this.isLoading || !this.modelText?.trim();
+  }
+
+  get isMicDisabled(): boolean {
+    return this.isLoading || !this.modelText?.trim();
+  }
+
   onEnterPressed(event: any): void {
     if (event.key === 'Enter' && !event.shiftKey && this.modelText.length !== 0) {
       event.preventDefault();
@@ -81,7 +89,7 @@ export class MessageInputComponent {
         id: uuidv4(),
         timestamp: new Date(),
         model: this.modelText,
-        type : this.typeMessage,
+        type: this.typeMessage,
         files: filesToSend
       });
       this.messageText = '';
@@ -89,12 +97,14 @@ export class MessageInputComponent {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key !== '@') { return; }
+    if (event.key !== '@') {
+      return;
+    }
 
     console.log("KeyPress:", event.key);
     event.preventDefault();
 
-   const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
+    const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
     if (!dropdown) { return; }
 
     dropdown.innerHTML = '';
@@ -118,9 +128,8 @@ export class MessageInputComponent {
       dropdown.appendChild(ul);
     });
 
-    if(this.chatStore.files().length > 0)
-    {
+    if (this.chatStore.files().length > 0) {
       dropdown.classList.add('show');
-    }   
+    }
   }
 }

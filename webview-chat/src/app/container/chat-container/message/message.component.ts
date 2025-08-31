@@ -8,7 +8,6 @@ import json from 'highlight.js/lib/languages/json';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IMessage } from '../../../core/types/message.type';
 
-// Registra solo los lenguajes necesarios
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('json', json);
@@ -45,13 +44,10 @@ export class MessageComponent implements OnInit {
       return `<pre class="hljs"><code class="language-${language}">${highlighted}</code></pre>`;
     });
 
-    // Código inline
     processedContent = processedContent.replace(/`([^`]+)`/g, `<code class="inline-code">$1</code>`);
 
-    // Negrita
     processedContent = processedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-    // Párrafos
     const paragraphs = processedContent.split('\n\n');
     if (paragraphs.length > 1) {
       processedContent = paragraphs.map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
