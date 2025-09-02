@@ -5,7 +5,6 @@ import {
     CodeActionKind,
     CodeActionProvider,
     Command,
-    InlineCompletionList,
     Range,
     Selection,
     TextDocument,
@@ -71,6 +70,7 @@ export class RefactorProvider implements CodeActionProvider {
             action.edit.replace(document.uri, range, accumulated);
 
             return [action];
+            
         } catch (error) {
             console.error("Error generating refactor code, ", error);
         }
