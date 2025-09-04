@@ -5,6 +5,7 @@ import {
     CodeActionKind,
     CodeActionProvider,
     Command,
+    OutputChannel,
     Range,
     Selection,
     TextDocument,
@@ -16,7 +17,7 @@ import { IOllamaApiService } from '../../core/interfaces/ollama.interface.servic
 
 export class RefactorProvider implements CodeActionProvider {
 
-    constructor(private ollamaService: IOllamaApiService) { }
+    constructor(private ollamaService: IOllamaApiService,private outputChannel: OutputChannel) { }
     async provideCodeActions(
         document: TextDocument,
         range: Range | Selection,
@@ -24,8 +25,13 @@ export class RefactorProvider implements CodeActionProvider {
         token: CancellationToken): Promise<(CodeAction | Command)[] | null | undefined> {
         const settings = workspace.getConfiguration('oroasisSettings');
         const roleAgent = settings.get<string>('templatePromptRefactor');
-        const model = settings.get<string>('modelCompletionDefault');
+        const model = settings.get<string>('modelDefault');
         const languageId = document.languageId;
+
+        if(!roleAgent || !model) {
+            this.outputChannel.appendLine("There are no saved settings for Oroasis extension -> extensions -> oroasis settings");
+            return null;
+        }
 
         if (token.isCancellationRequested) {
             return null;

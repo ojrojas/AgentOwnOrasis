@@ -15,7 +15,6 @@
   ],
   "main": "./oroasis/out/extension.js",
   "contributes": {
-    
     "viewsContainers": {
       "activitybar": [
         {
@@ -137,19 +136,25 @@
           "description": "List of models from Ollama"
         },
         "oroasisSettings.modelDefault": {
-          "type": "string",
-          "default": "qwen2.5-coder:3b",
+          "type": [
+            "string",
+            null
+          ],
+          "default": null,
+          "description": "Model asigned to request to ollama, the model can be for chat or code."
+        },
+        "oroasisSettings.modelCompletionDefault": {
+          "type": [
+            "string",
+            null
+          ],
+          "default": null,
           "description": "Model asigned to request to ollama"
         },
         "oroasisSettings.modelTemperature": {
           "type": "number",
           "default": ".3",
           "description": "Model temperature asigned to request to ollama"
-        },
-        "oroasisSettings.modelCompletionDefault": {
-          "type": "string",
-          "default": "qwen2.5-coder:1.5b",
-          "description": "Model asigned to request to ollama"
         },
         "oroasisSettings.roleAgentDefault": {
           "type": "string",

@@ -9,8 +9,8 @@
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,
 			"dependsOn": [
+				"start:webview",
 				"compile",
-				"start:webview"
 			],
 			"presentation": {
 				"reveal": "never"

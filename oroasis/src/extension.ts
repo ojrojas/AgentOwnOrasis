@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
 
 	const completionsProvider = new CompletionProvider(ollamaService);
-	const refactorProvider = new RefactorProvider(ollamaService);
+	const refactorProvider = new RefactorProvider(ollamaService, outputChannel);
 	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
 	
 	// providers
