@@ -1,0 +1,62 @@
+.container-settings {
+  padding: 5px 5px 5px 5px;
+}
+
+.chat-settings {
+  border-top: 1px solid #0084ff;
+  background-color: #2d2d2d;
+  color: var(--vscode-editor-foreground);
+  padding: 1rem;
+}
+
+.chat-settings-form {
+  min-width: 360px;
+  width: 100%;
+  display: grid;
+  gap: .8rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  label {
+    color: var(--vscode-editor-foreground);
+  }
+
+  select {
+    background-color: #2d2d2d;
+    color: var(--vscode-editor-foreground);
+    border: 1px solid var(--vscode-editorWidget-border);
+    border-radius: 6px;
+    padding: 0.1rem;
+    outline: none;
+    width: 300px;
+
+    &:focus {
+      border-color: var(--vscode-focusBorder);
+      box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+    }
+
+    option {
+      background-color: var(--vscode-editor-background);
+      color: var(--vscode-editor-foreground);
+    }
+  }
+}
+
+.chat-settings-save {
+  width: 100px;
+  padding: 0.3rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+
+  &:hover {
+    background-color: var(--vscode-button-hoverBackground);
+  }
+}

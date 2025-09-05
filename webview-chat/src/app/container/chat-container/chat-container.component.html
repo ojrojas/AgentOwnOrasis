@@ -1,8 +1,12 @@
 <div class="chat-container">
-  <app-chat-header class="chat-container-header"
-   (onHistory)="chatStore.backToChatList()"  
-  ></app-chat-header>
-  
+  <!-- <app-chat-header class="chat-container-header"
+   (onHistory)="chatStore.backToChatList()"
+  ></app-chat-header> -->
+
+<app-chat-settings class="chat-container-settings">
+
+</app-chat-settings>
+
   <app-chat-list class="chat-container-list-chat"
    *ngIf="!chatStore.selectedChatId()"
     (chatSelected)="chatStore.selectChat($event)">

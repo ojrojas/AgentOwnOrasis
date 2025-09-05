@@ -16,6 +16,7 @@
   "main": "./oroasis/out/extension.js",
   "contributes": {
     "viewsContainers": {
+     
       "activitybar": [
         {
           "id": "orasis-aii",
@@ -115,11 +116,6 @@
         "command": "oroasis.settingsChatsButton",
         "title": "Settings Chat",
         "icon": "$(settings)"
-      },
-      {
-        "command": "oroasis.closeChatsButton",
-        "title": "Close Chat",
-        "icon": "$(close)"
       }
     ],
     "configuration": {
@@ -196,11 +192,6 @@
         {
           "command": "oroasis.settingsChatsButton",
           "group": "navigation@3",
-          "when": "view == oroasis.primary-sidebar-provider"
-        },
-        {
-          "command": "oroasis.closeChatsButton",
-          "group": "navigation@4",
           "when": "view == oroasis.primary-sidebar-provider"
         }
       ],

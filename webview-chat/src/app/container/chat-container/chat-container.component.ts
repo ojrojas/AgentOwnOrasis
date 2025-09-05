@@ -1,29 +1,32 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatHeaderComponent } from './chat-header/chat-header.component';
 import { MessageInputComponent } from './message-input/message-input.component';
 import { MessageListComponent } from './message-list/message-list.component';
 import { ChatListComponent } from './chat-list/chat-list.component';
 import { ChatStore } from '../../store/chat/chat.store';
 import { IMessage } from '../../core/types/message.type';
 import { IChat } from '../../core/types/chat.type';
+import { VscodeService } from '../../core/services/vscode-service';
+import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
 
 @Component({
   selector: 'app-chat-container',
   standalone: true,
   imports: [
-    ChatHeaderComponent,
+    // ChatHeaderComponent,
     MessageListComponent,
     MessageInputComponent,
     ChatListComponent,
-    CommonModule
-  ],
+    CommonModule,
+    ChatSettingsComponent
+],
   templateUrl: 'chat-container.component.html',
   styleUrl: 'chat-container.component.scss'
 })
 export class ChatContainerComponent {
   readonly chatStore = inject(ChatStore);
+  readonly vscode = inject(VscodeService);
 
   constructor() {
     effect(() => {
@@ -32,6 +35,21 @@ export class ChatContainerComponent {
       this.chatStore.getPreferredModel();
       this.chatStore.loadWorkSpaceFolders();
     });
+
+    this.vscode.onMessage("headerMessage", (payload) => { this.onHandlerHeader(payload); });
+  }
+
+  onHandlerHeader(payload: any) {
+    switch (payload.type) {
+      case 'new':
+      case 'history':
+        this.chatStore.backToChatList();
+        break;
+      case 'settings':
+        console.log("Settings");
+        break;
+    }
+
   }
 
   onChatSelected(chatId: string) {

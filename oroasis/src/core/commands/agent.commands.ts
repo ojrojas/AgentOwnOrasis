@@ -3,7 +3,7 @@ import { IOllamaApiService } from "../interfaces/ollama.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
 import { Message } from "ollama";
 import { CommentComponent } from "../../providers/comments/comment.provider";
-import { editCommentCommand } from "./commands.comment";
+import { editCommentCommand } from "./comment.commands";
 
 // Agent IA
 export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {

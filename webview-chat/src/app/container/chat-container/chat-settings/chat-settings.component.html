@@ -1,0 +1,27 @@
+<div class="container-settings">
+  <mat-card class="chat-settings">
+    <h3>Settings</h3>
+    <form class="chat-settings-form">
+      <div class="form-group">
+        <label for="modelRefactors">Select model refactor</label>
+        <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
+          @for (model of chatStore.models()?.models; track model) {
+            <option [ngValue]="model.model">{{ model.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="modelCompletions">Select model completion</label>
+        <select [(ngModel)]="modelCompletions" name="modelCompletions" id="modelCompletions">
+          @for (model of chatStore.models()?.models; track model) {
+            <option [ngValue]="model.model">{{ model.name }}</option>
+          }
+        </select>
+      </div>
+
+      <button type="button" class="chat-settings-save">Save</button>
+    </form>
+  </mat-card>
+
+</div>

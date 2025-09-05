@@ -76,7 +76,7 @@ export const ChatStore = signalStore(
     sendChat(message: IMessage) {
       patchState(store, setPending());
       const chatId = store.selectedChatId();
-      if (!chatId) return;
+      if (!chatId) {return;}
 
       const state = getState(store);
       const chat = this.getSelectedChat(state);

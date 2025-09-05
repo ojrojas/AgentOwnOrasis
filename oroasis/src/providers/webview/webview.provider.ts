@@ -12,8 +12,8 @@ import { getNonce } from "../../shared/generics/nonce";
 import { IOllamaApiService } from "../../core/interfaces/ollama.interface.service";
 import { IChatMessage } from "../../core/types/chat-message.type";
 import { IWorkspaceStateRepository } from "../../core/interfaces/workspace-repository-state.interface.service";
-import { registerWorkspaceCommands } from "../../core/commands/commnads.webview.workspace";
-import { registerChatCommands } from "../../core/commands/commands.webview.chat";
+import { registerWorkspaceCommands } from "../../core/commands/webview.workspace.commnads";
+import { registerChatCommands } from "../../core/commands/webview.commands.chat";
 import { WebviewHtmlBuilder } from "../../core/webview/webviewhtml.builder";
 import { WebviewListeners } from "../../core/webview/webview.listener";
 
