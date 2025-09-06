@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import { OllamaApiService } from './core/services/ollama.service';
-import { IOllamaApiService } from './core/interfaces/provider.interface.service';
 import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
 import { IWorkspaceStateRepository } from './core/interfaces/workspace-repository-state.interface.service';
 import { IChatMessage } from './core/types/chat-message.type';
@@ -32,23 +30,36 @@ import {
 } from './core/commands/headers.commands';
 import { registerCommands, registerProvidersAndControllers } from './shared/utils/register.utils';
 import { helloWorldCommand } from './core/commands/examples.commands';
+import { IProviderFactory } from './core/services/provider.factory.service';
+import { providers } from './assets/providers.collection';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: vscode.Disposable[] = [];
-const ollamaService: IOllamaApiService = new OllamaApiService();
-ollamaService.udpdateListModels();
+
+//const ollamaService: IProviderApiService = new OllamaApiService();
+//ollamaService.udpdateListModels();
 
 function addSubscriber(item: vscode.Disposable) {
 	disposables.push(item);
 }
 
 export function activate(context: vscode.ExtensionContext) {
+
+	const settings = vscode.workspace.getConfiguration("oroasisSettings");
+	const providerName = settings.get<string>('providerDefault') || 'ollama';
+
+	if(providerName === 'ollama')
+	{
+		providers.ollama.baseUrl = settings.get<string>('baseUrlProvider') ?? providers.ollama.baseUrl;
+	}
+
+	
 	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> =
 		new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
 
-	const completionsProvider = new CompletionProvider(ollamaService);
-	const refactorProvider = new RefactorProvider(ollamaService, outputChannel);
-	const sideBarWebView = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
+	const completionsProvider = new CompletionProvider(providers);
+	const refactorProvider = new RefactorProvider(providers, outputChannel);
+	const sideBarWebView = new WebviewProvider(context, outputChannel, providers, chatMessageRepository);
 
 	registerProvidersAndControllers(
 		[
@@ -79,20 +90,43 @@ export function activate(context: vscode.ExtensionContext) {
 			{ id: 'oroasis.deleteComment', handler: (c: CommentComponent) => deleteCommentCommand(c) },
 			{ id: 'oroasis.deleteAllComments', handler: (t: vscode.CommentThread) => deleteAllCommentsCommand(t) },
 
+
 			// Agents
 			{
 				id: 'oroasis.openChatAgent',
-				handler: () => openPanelCommand(context, outputChannel, ollamaService, chatMessageRepository),
+				handler: () => openPanelCommand(
+					context,
+					outputChannel,
+					providers,
+					chatMessageRepository
+				),
 			},
 			{
 				id: 'oroasis.askAgent',
-				handler: (c: vscode.CommentReply) => askAgentCommand(c, ollamaService, outputChannel),
+				handler: (c: vscode.CommentReply) => askAgentCommand(
+					c,
+					providers,
+					providerName, // adaptador según proveedor
+					outputChannel
+				),
 			},
 			{
 				id: 'oroasis.editAgent',
-				handler: (c: CommentComponent) => editAgentCommand(c, ollamaService, outputChannel),
+				handler: (c: CommentComponent) => editAgentCommand(
+					c,
+					providers,
+					providerName,
+					outputChannel
+				),
 			},
-			{ id: 'oroasis.updateModels', handler: () => updateModelsCommand(outputChannel, ollamaService) },
+			{
+				id: 'oroasis.updateModels',
+				handler: () => updateModelsCommand(
+					outputChannel,
+					providers,
+					providerName
+				),
+			},
 
 			// Chats
 			{ id: 'oroasis.cleanChats', handler: () => chatMessageRepository.clear() },

@@ -1,75 +1,75 @@
 import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
-import { IOllamaApiService } from "../interfaces/provider.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
-import { Message } from "ollama";
 import { CommentComponent } from "../../providers/comments/comment.provider";
 import { editCommentCommand } from "./comment.commands";
+import { IChatRequest, IMessage } from "../types/chat-message.type";
+import { IProviderFactory } from "../services/provider.factory.service";
+import { ProvidersMap } from "../types/provider.type";
 
-// Agent IA
-export const updateModelsCommand = (outputChannel: OutputChannel, ollamaService: IOllamaApiService) => {
-    outputChannel.appendLine("Updating models from ollama");
-    ollamaService.udpdateListModels();
-    outputChannel.appendLine("Models updated");
+export const updateModelsCommand = (outputChannel: OutputChannel, providersMap: ProvidersMap, providerName: string) => {
+    outputChannel.appendLine(`Updating models from provider: ${providerName}`);
+    const factory = new IProviderFactory(providersMap);
+    const adapter = factory.getAdapter(providerName);
+    adapter.listModels().then(models => outputChannel.appendLine(`Models updated: ${models.models.join(', ')}`));
 };
 
-export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
+export const askAgentCommand = (commentReply: CommentReply, providersMap: ProvidersMap, providerName: string, outputChannel: OutputChannel) => {
     window.withProgress({
         location: ProgressLocation.Window,
         title: "Agent Response",
         cancellable: true
     }, async () => {
         const settings = workspace.getConfiguration('oroasisSettings');
-        const model = settings.get('modelDefault');
-        const role = settings.get('roleAgentDefault');
-        if (model === undefined || role === undefined) {
-            window.showInformationMessage("Failed to request ollama, no model IA selected");
+        const model = settings.get<string>('modelDefault');
+        const roleAgent = settings.get('templatePromptGenerate') as string;
+
+        if (!model) {
+            window.showInformationMessage("Failed to request agent, no model selected");
             return;
         }
-        outputChannel.appendLine("create comment to request");
-        const roleAgent = settings.get('templatePromptGenerate');
 
-        const messages: Message[] = [];
-
-        if (commentReply.thread.comments.length === 0) {
-            messages.push({
-                role: 'system',
-                content: roleAgent as string
-            });
-        }
+        outputChannel.appendLine("Create comment request");
 
         const textHighlighted = await getTextCurrentDocument(commentReply.thread);
         commentReply.text += textHighlighted;
-
         createComment(commentReply.text, 'User', commentReply.thread, 'RequestChat');
-        outputChannel.appendLine("send comment request");
 
-        commentReply.thread.comments.map(comment => {
+        // Construir mensajes
+        const messages: IMessage[] = [];
+        if (commentReply.thread.comments.length === 0) {
             messages.push({
-                role: comment.author.name,
-                content: (comment.body as MarkdownString).value
+                id: crypto.randomUUID(),
+                role: 'system',
+                content: roleAgent,
+                timestamp: new Date(),
+                model: model 
+            });
+        }
+
+        commentReply.thread.comments.forEach(comment => {
+            messages.push({
+                id: crypto.randomUUID(),
+                role: 'user',
+                content: (comment.body as MarkdownString).value,
+                timestamp: new Date(),
+                model
             });
         });
 
-        const response = await ollamaService.chat({
-            model: model as string,
-            messages: messages,
-            options: {
-                temperature: 0.3,
-                presence_penalty: 1,
-                top_p: .3
-            }
-        });
+        const factory = new IProviderFactory(providersMap);
+        const adapter = factory.getAdapter(providerName);
 
         try {
             let accumulated = '';
             createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
-            for await (const chunk of response) {
-                if (chunk.done) {
-                    break;
+
+            // Stream del chat
+            const chatStream = adapter.chatStream?.({ model, messages } as IChatRequest);
+            if (chatStream) {
+                for await (const chunk of chatStream) {
+                    accumulated += chunk.content;
+                    createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
                 }
-                const token = chunk.message.content || '';
-                accumulated += token;
-                createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
             }
 
         } catch (error) {
@@ -80,71 +80,61 @@ export const askAgentCommand = (commentReply: CommentReply, ollamaService: IOlla
     });
 };
 
-export const editAgentCommand = (commentReply: CommentComponent, ollamaService: IOllamaApiService, outputChannel: OutputChannel) => {
+// Comando para editar comentario y re-enviar al agente
+export const editAgentCommand = (commentReply: CommentComponent, providersMap: ProvidersMap, providerName: string, outputChannel: OutputChannel) => {
     window.withProgress({
         location: ProgressLocation.Window,
         title: "Agent Response",
         cancellable: true
     }, async () => {
         const settings = workspace.getConfiguration('oroasisSettings');
-        const model = settings.get('modelDefault');
-        const role = settings.get('roleAgentDefault');
-        if (model === undefined || role === undefined) {
-            window.showInformationMessage("Failed to request ollama, no model IA selected");
+        const model = settings.get<string>('modelDefault');
+        const roleAgent = settings.get('templatePromptGenerate') as string;
+
+        if (!model) {
+            window.showInformationMessage("Failed to request agent, no model selected");
             return;
         }
+
         outputChannel.appendLine("Edit to request comment");
         editCommentCommand(commentReply);
 
-        const roleAgent = settings.get('templatePromptGenerate');
-        outputChannel.appendLine("send edited comment request");
-
-        const messages: Message[] = [];
-
+        const messages: IMessage[] = [];
         if (commentReply.thread.comments.length === 0) {
             messages.push({
+                id: crypto.randomUUID(),
                 role: 'system',
-                content: roleAgent as string
+                content: roleAgent,
+                timestamp: new Date(),
+                model
             });
         }
 
-        commentReply.thread.comments.map(comment => {
+        commentReply.thread.comments.forEach(comment => {
             messages.push({
-                role: comment.author.name,
-                content: (comment.body as MarkdownString).value
+                id: crypto.randomUUID(),
+                role: 'user',
+                content: (comment.body as MarkdownString).value,
+                timestamp: new Date(),
+                model
             });
         });
 
-        messages.forEach(message => outputChannel.appendLine(message.content));
-        const m = (commentReply.body as MarkdownString);
-        console.log("esto es m: ", m.value);
-
-        const response = await ollamaService.chat({
-            model: model as string,
-            messages: [
-                {
-                    role: 'user',
-                    content: (commentReply.body as MarkdownString).value,
-                }
-            ],
-            options: {
-                temperature: 0,
-                presence_penalty: 1,
-                top_p: .3
-            }
-        });
+        const factory = new IProviderFactory(providersMap);
+        const adapter = factory.getAdapter(providerName);
 
         try {
             let accumulated = '';
             createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
-            for await (const chunk of response) {
-                if (chunk.done) {
-                    break;
+
+            const chatStream = adapter.chatStream?.({ model, messages } as IChatRequest);
+            if (chatStream) {
+                for await (const chunk of chatStream) {
+                    accumulated += chunk.content;
+                    createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
                 }
-                const token = chunk.message.content || '';
-                accumulated += token;
-                createComment(accumulated, 'Assistant', commentReply.thread, 'ResponseChat', true);
             }
+
         } catch (error) {
             console.error(error);
         }
@@ -153,7 +143,6 @@ export const editAgentCommand = (commentReply: CommentComponent, ollamaService: 
     });
 };
 
-// Auxiliar functions
 export const getTextCurrentDocument = async (commentThread: CommentThread) => {
     const document = await workspace.openTextDocument(commentThread.uri);
     let spaceWhite: string = ": ";

@@ -9,13 +9,14 @@ import {
   workspace
 } from "vscode";
 import { getNonce } from "../../shared/generics/nonce";
-import { IOllamaApiService } from "../../core/interfaces/provider.interface.service";
 import { IChatMessage } from "../../core/types/chat-message.type";
 import { IWorkspaceStateRepository } from "../../core/interfaces/workspace-repository-state.interface.service";
 import { registerWorkspaceCommands } from "../../core/commands/webview.workspace.commnads";
 import { registerChatCommands } from "../../core/commands/webview.commands.chat";
 import { WebviewHtmlBuilder } from "../../core/webview/webviewhtml.builder";
 import { WebviewListeners } from "../../core/webview/webview.listener";
+import { ProvidersMap } from "../../core/types/provider.type";
+import { IProviderFactory } from "../../core/services/provider.factory.service";
 
 export class WebviewProvider implements WebviewViewProvider {
   static readonly PrimarySidebar = "oroasis.primary-sidebar-provider";
@@ -34,11 +35,10 @@ export class WebviewProvider implements WebviewViewProvider {
   constructor(
     readonly context: ExtensionContext,
     private readonly outputChannel: OutputChannel,
-    private readonly ollamaService: IOllamaApiService,
+    private readonly providersMap: ProvidersMap,
     private readonly chatRepository: IWorkspaceStateRepository<IChatMessage>
   ) {
     WebviewProvider.activeInstances.add(this);
-
     const settings = workspace.getConfiguration("oroasisSettings");
     this.model = settings.get("modelDefault");
   }
@@ -48,7 +48,6 @@ export class WebviewProvider implements WebviewViewProvider {
       (this.view as WebviewPanel).dispose();
     }
 
-    // Limpieza de disposables
     while (this.disposables.length) {
       this.disposables.pop()?.dispose();
     }
@@ -58,7 +57,7 @@ export class WebviewProvider implements WebviewViewProvider {
 
   static getActiveInstance() {
     return [...this.activeInstances].find(
-      i => i.view && i.view as WebviewPanel && (i.view as WebviewPanel).active
+      i => i.view && (i.view as WebviewPanel).active
     );
   }
 
@@ -84,25 +83,27 @@ export class WebviewProvider implements WebviewViewProvider {
           )
         : builder.buildProdHtml(webview, nonce);
 
-    // Listeners comunes
     WebviewListeners.attachMessageListener(webview, this.disposables);
     WebviewListeners.attachVisibility(view, this.disposables, () =>
       WebviewListeners.attachMessageListener(webview, this.disposables)
     );
 
-    // Comandos (solo si es WebviewPanel, porque View no los necesita)
     if (view) {
+      const settings = workspace.getConfiguration("oroasisSettings");
+      const defaultProvider = settings.get<string>('providerDefault') || 'ollama';
+      const factory = new IProviderFactory(this.providersMap);
+
       registerWorkspaceCommands(this.context, view as WebviewPanel, this.outputChannel);
       registerChatCommands(
         this.context,
         view as WebviewPanel,
-        this.ollamaService,
+        factory,
+        defaultProvider,
         this.chatRepository,
         this.outputChannel
       );
     }
 
-    // Eventos
     view.onDidDispose(() => this.dispose(), null, this.disposables);
     workspace.onDidChangeConfiguration(
       () => WebviewListeners.attachMessageListener(webview, this.disposables),

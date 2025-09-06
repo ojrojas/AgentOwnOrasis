@@ -3,7 +3,7 @@ import { HttpService } from "../services/http.service";
 import { IGenerateRequest, IGenerateMessage, IChatRequest, IChatMessage, IMessage } from "../types/chat-message.type";
 import { IProviderConfig } from "../types/provider.type";
 
-export class AnthropicAdapter implements IProviderApiService {
+export class GoogleAdapter implements IProviderApiService {
     private http = new HttpService();
     constructor(private config: IProviderConfig) { }
 
@@ -11,48 +11,43 @@ export class AnthropicAdapter implements IProviderApiService {
 
     };
 
-    private headers() { return { 'X-API-Key': this.config.apiKey!, 'Content-Type': 'application/json' }; }
+    private headers() { return { Authorization: `Bearer ${this.config.apiKey}`, 'Content-Type': 'application/json' }; }
 
     async listModels(): Promise<{ models: string[] }> {
-        return await this.http.get<{ models: string[] }>(`${this.config.baseUrl}/v1/models`, undefined, this.headers());
+        return await this.http.get<{ models: string[] }>(`${this.config.baseUrl}/v1/models`, this.headers());
     }
 
     async generate(req: IGenerateRequest): Promise<IGenerateMessage> {
-        const data = await this.http.post<IGenerateRequest, any>(`${this.config.baseUrl}/v1/complete`, req, this.headers());
-        return { id: data.id || crypto.randomUUID(), role: 'assistant', content: data.completion || '', timestamp: new Date(), model: req.model };
+        const data = await this.http.post<IGenerateRequest, any>(`${this.config.baseUrl}/v1/generate`, req, this.headers());
+        return { id: data.id || crypto.randomUUID(), role: 'assistant', content: data.output_text || '', timestamp: new Date(), model: req.model };
     }
 
     async chat(req: IChatRequest): Promise<IChatMessage> {
-        const data = await this.http.post<IChatRequest, any>(`${this.config.baseUrl}/v1/chat/completions`, req, this.headers());
+        const data = await this.http.post<IChatRequest, any>(`${this.config.baseUrl}/v1/chat`, req, this.headers());
         return {
             id: data.id || crypto.randomUUID(),
-            messages: (data.choices || []).map((c: any) => ({
-                id: c.id || crypto.randomUUID(),
-                role: 'assistant',
-                content: c.message?.content || '',
-                timestamp: new Date(),
+            messages: (data.messages || []).map((m: any) => ({
+                id: m.id || crypto.randomUUID(),
+                role: m.role,
+                content: m.content,
+                timestamp: new Date(m.timestamp || Date.now()),
                 model: req.model,
-                tool_calls: c.message?.tool_calls,
-                images: c.message?.images
+                tool_calls: m.tool_calls,
+                images: m.images
             }))
         };
     }
 
     async *chatStream(req: IChatRequest): AsyncGenerator<IMessage> {
-        const res = await fetch(`${this.config.baseUrl}/v1/chat/completions?stream=true`, {
+        const res = await fetch(`${this.config.baseUrl}/v1/chat?stream=true`, {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify(req)
         });
-
-        if (!res.body) {
-            return;
-        }
-
+        if (!res.body) { return; }
         const reader = res.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let buffer = '';
-
         while (true) {
             const { done, value } = await reader.read();
             if (done) {
@@ -63,17 +58,17 @@ export class AnthropicAdapter implements IProviderApiService {
             const lines = buffer.split('\n');
             buffer = lines.pop()!;
             for (const line of lines) {
-                if (!line.trim()) { 
-                    continue; 
+                if (!line.trim()) {
+                    continue;
                 }
-                
+
                 const data = JSON.parse(line);
-                yield { id: data.id || crypto.randomUUID(), role: 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, done: false };
+                yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, done: false };
             }
         }
         if (buffer.trim()) {
             const data = JSON.parse(buffer);
-            yield { id: data.id || crypto.randomUUID(), role: 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, done: true };
+            yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, done: true };
         }
     }
 }

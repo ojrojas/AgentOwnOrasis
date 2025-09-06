@@ -8,20 +8,24 @@ import {
 } from 'vscode';
 import { WebviewProvider } from '../../providers/webview/webview.provider';
 import path from 'path';
-import { IOllamaApiService } from '../interfaces/provider.interface.service';
 import { IChatMessage } from '../types/chat-message.type';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
+import { ProvidersMap } from '../types/provider.type';
 
-
-// Webviews
 export const openPanelCommand = async (
     context: ExtensionContext,
     outputChannel: OutputChannel,
-    ollamaService: IOllamaApiService,
-    chatMessageRepository: IWorkspaceStateRepository<IChatMessage>) => {
-    const tabWebview = new WebviewProvider(context, outputChannel, ollamaService, chatMessageRepository);
-    const lastCol = Math.max(...window.visibleTextEditors.map((editor) => editor.viewColumn || 0));
+    providerMap: ProvidersMap,
+    chatMessageRepository: IWorkspaceStateRepository<IChatMessage>
+) => {
+    const tabWebview = new WebviewProvider(
+        context,
+        outputChannel,
+        providerMap,
+        chatMessageRepository
+    );
 
+    const lastCol = Math.max(...window.visibleTextEditors.map((editor) => editor.viewColumn || 0));
     const hasVisibleEditors = window.visibleTextEditors.length > 0;
     if (!hasVisibleEditors) {
         await commands.executeCommand("workbench.action.newGroupRight");
@@ -33,13 +37,13 @@ export const openPanelCommand = async (
         retainContextWhenHidden: true,
         localResourceRoots: [Uri.file(path.join(context.extensionPath, "webview-chat/dist"))],
     });
-  
+
     panel.iconPath = {
         light: Uri.joinPath(context.extensionUri, "resources", "chatbot_icon.png"),
         dark: Uri.joinPath(context.extensionUri, "resources", "chatbot_icon.png"),
     };
+
     tabWebview.resolveWebviewView(panel);
 
     await commands.executeCommand("workbench.action.lockEditorGroup");
 };
-
