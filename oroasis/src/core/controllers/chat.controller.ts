@@ -1,4 +1,4 @@
-import { IOllamaApiService } from '../interfaces/ollama.interface.service';
+import { IOllamaApiService } from '../interfaces/provider.interface.service';
 import { AbortableAsyncIterator, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse } from 'ollama';
 
 export class ChatController {

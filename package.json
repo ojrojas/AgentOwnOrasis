@@ -122,7 +122,7 @@
       "title": "Oroasis Settings",
       "type": "object",
       "properties": {
-        "oroasisSettings.ollamaBaseUrl": {
+        "oroasisSettings.baseUrlProvider": {
           "type": "string",
           "default": "http://127.0.0.1:11434",
           "description": "Write the 'Ollama' base url"

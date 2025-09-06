@@ -1,5 +1,5 @@
 import { CommentReply, CommentThread, MarkdownString, OutputChannel, ProgressLocation, window, workspace } from "vscode";
-import { IOllamaApiService } from "../interfaces/ollama.interface.service";
+import { IOllamaApiService } from "../interfaces/provider.interface.service";
 import { createComment } from "../../providers/comments/create.comment";
 import { Message } from "ollama";
 import { CommentComponent } from "../../providers/comments/comment.provider";

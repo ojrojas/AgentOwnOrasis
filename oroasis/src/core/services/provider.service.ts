@@ -1,14 +1,14 @@
 import { AbortableAsyncIterator, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, ListResponse, Message, Ollama } from 'ollama';
 import { workspace, WorkspaceConfiguration } from 'vscode';
-import { IOllamaApiService } from '../interfaces/ollama.interface.service';
+import { IProviderApiService } from '../interfaces/provider.interface.service';
 
-export class OllamaApiService implements IOllamaApiService {
-    readonly ollama: Ollama;
+export class ProviderApiService implements IProviderApiService {
+    readonly baseUrl: string;
     templateGenerate: string | undefined;
     settings: WorkspaceConfiguration;
     constructor() {
         this.settings = workspace.getConfiguration("oroasisSettings");
-        this.ollama = new Ollama({ host: this.settings.get('ollamaBaseUrl') });
+        this.baseUrl = this.settings.get<string>("baseUrlProvider") || '';
     }
     pullModel =  (nameModel: string) => {
         this.ollama.pull({
@@ -16,8 +16,8 @@ export class OllamaApiService implements IOllamaApiService {
         });
     };
 
-    listModels = (): Promise<ListResponse> => {
-        return this.ollama.list();
+    listModels = async (): Promise<{models: string[]}> => {
+        return await fetch(this.baseUrl);
     };
 
     generate = (request: GenerateRequest): Promise<AbortableAsyncIterator<GenerateResponse>> => {

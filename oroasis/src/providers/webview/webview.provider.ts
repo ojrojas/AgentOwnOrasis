@@ -9,7 +9,7 @@ import {
   workspace
 } from "vscode";
 import { getNonce } from "../../shared/generics/nonce";
-import { IOllamaApiService } from "../../core/interfaces/ollama.interface.service";
+import { IOllamaApiService } from "../../core/interfaces/provider.interface.service";
 import { IChatMessage } from "../../core/types/chat-message.type";
 import { IWorkspaceStateRepository } from "../../core/interfaces/workspace-repository-state.interface.service";
 import { registerWorkspaceCommands } from "../../core/commands/webview.workspace.commnads";

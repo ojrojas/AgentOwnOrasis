@@ -8,7 +8,7 @@ import {
 } from 'vscode';
 import { WebviewProvider } from '../../providers/webview/webview.provider';
 import path from 'path';
-import { IOllamaApiService } from '../interfaces/ollama.interface.service';
+import { IOllamaApiService } from '../interfaces/provider.interface.service';
 import { IChatMessage } from '../types/chat-message.type';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 

@@ -9,7 +9,7 @@ import {
     window,
     workspace,
 } from 'vscode';
-import { IOllamaApiService } from '../../core/interfaces/ollama.interface.service';
+import { IOllamaApiService } from '../../core/interfaces/provider.interface.service';
 
 export class CompletionProvider implements InlineCompletionItemProvider {
 

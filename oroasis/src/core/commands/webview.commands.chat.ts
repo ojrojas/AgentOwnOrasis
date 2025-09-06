@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IOllamaApiService } from '../interfaces/ollama.interface.service';
+import { IOllamaApiService } from '../interfaces/provider.interface.service';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 import { IChatMessage } from '../types/chat-message.type';
 import { createChatHandlers } from '../handlers/chat.handler';
