@@ -34,7 +34,6 @@ export const askAgentCommand = (commentReply: CommentReply, providersMap: Provid
         commentReply.text += textHighlighted;
         createComment(commentReply.text, 'User', commentReply.thread, 'RequestChat');
 
-        // Construir mensajes
         const messages: IMessage[] = [];
         if (commentReply.thread.comments.length === 0) {
             messages.push({
@@ -63,7 +62,6 @@ export const askAgentCommand = (commentReply: CommentReply, providersMap: Provid
             let accumulated = '';
             createComment('', 'Assistant', commentReply.thread, 'ResponseChat', false);
 
-            // Stream del chat
             const chatStream = adapter.chatStream?.({ model, messages } as IChatRequest);
             if (chatStream) {
                 for await (const chunk of chatStream) {
@@ -80,7 +78,6 @@ export const askAgentCommand = (commentReply: CommentReply, providersMap: Provid
     });
 };
 
-// Comando para editar comentario y re-enviar al agente
 export const editAgentCommand = (commentReply: CommentComponent, providersMap: ProvidersMap, providerName: string, outputChannel: OutputChannel) => {
     window.withProgress({
         location: ProgressLocation.Window,

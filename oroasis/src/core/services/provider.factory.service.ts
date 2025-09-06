@@ -1,5 +1,3 @@
-// services/ai.factory.ts
-
 import { OllamaAdapter } from "../adapters/ollama.adapters";
 import { OpenAIAdapter } from "../adapters/openai.adapter";
 import { IProviderApiService } from "../interfaces/provider.interface.service";
