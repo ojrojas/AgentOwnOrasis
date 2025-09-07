@@ -1,8 +1,10 @@
 interface IModels {
-  name: string,
-  model: string;
+  created: Date,
+  id: string;
+  object: string;
+  owned_by: string;
 }
 
 export interface IListModelsResponse {
-    models: IModels[];
+  data: IModels[];
 }

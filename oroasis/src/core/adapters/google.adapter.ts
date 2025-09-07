@@ -7,10 +7,6 @@ export class GoogleAdapter implements IProviderApiService {
     private http = new HttpService();
     constructor(private config: IProviderConfig) { }
 
-    pullModel = (nameModel: string) => {
-
-    };
-
     private headers() { return { Authorization: `Bearer ${this.config.apiKey}`, 'Content-Type': 'application/json' }; }
 
     async listModels(): Promise<{ models: string[] }> {

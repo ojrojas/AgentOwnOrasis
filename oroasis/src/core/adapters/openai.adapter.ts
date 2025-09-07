@@ -8,13 +8,8 @@ export class OpenAIAdapter implements IProviderApiService {
     constructor(private config: IProviderConfig) { }
     private headers() { return { Authorization: `Bearer ${this.config.apiKey}`, 'Content-Type': 'application/json' }; }
 
-    pullModel = (nameModel: string) => {
-
-    };
-
-
     async listModels(): Promise<{ models: string[] }> {
-        return await this.http.get<{ models: string[] }>(`https://api.openai.com/v1/models`, undefined, this.headers());
+        return await this.http.get<{ models: string[] }>(`https://api.openai.com/v1/models`, this.headers());
     }
 
     async generate(req: IGenerateRequest): Promise<IGenerateMessage> {
@@ -36,7 +31,7 @@ export class OpenAIAdapter implements IProviderApiService {
         if (!res.body) {
             return;
         }
-        
+
         const reader = res.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let buffer = '';
@@ -45,7 +40,7 @@ export class OpenAIAdapter implements IProviderApiService {
             if (done) {
                 break;
             }
-            
+
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n').filter(l => l.trim());
             buffer = '';

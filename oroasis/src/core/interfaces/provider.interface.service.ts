@@ -8,5 +8,5 @@ export interface IProviderApiService {
   generateStream?(request: IGenerateRequest): AsyncGenerator<IMessage>;
   chatStream?(request: IChatRequest): AsyncGenerator<IMessage>;
 
-  pullModel: (nameModel: string) => void;
+  pullModel?: (nameModel: string) => void;
 }

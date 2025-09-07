@@ -111,8 +111,8 @@ export function createChatHandlers(
 
                     if (generateStream) {
                         generateStream = asAsyncGenerator(generateStream);
-                        for await (const chunk of generateStream) {
-                            try {
+                        try {
+                            for await (const chunk of generateStream) {
                                 accumulated += chunk.content ?? '';
                                 contextAccumulated = chunk.context || contextAccumulated;
                                 try {
@@ -126,9 +126,9 @@ export function createChatHandlers(
                                 } catch (webviewError) {
                                     outputChannel.appendLine(`Webview send error: ${webviewError}`);
                                 }
-                            } catch (chunkError) {
-                                outputChannel.appendLine(`Chunk processing error: ${chunkError}`);
                             }
+                        } catch (chunkError) {
+                            outputChannel.appendLine(`Chunk processing error: ${chunkError}`);
                         }
                     }
                 }

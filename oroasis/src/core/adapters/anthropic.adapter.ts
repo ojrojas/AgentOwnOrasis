@@ -7,14 +7,10 @@ export class AnthropicAdapter implements IProviderApiService {
     private http = new HttpService();
     constructor(private config: IProviderConfig) { }
 
-    pullModel = (nameModel: string) => {
-
-    };
-
     private headers() { return { 'X-API-Key': this.config.apiKey!, 'Content-Type': 'application/json' }; }
 
     async listModels(): Promise<{ models: string[] }> {
-        return await this.http.get<{ models: string[] }>(`${this.config.baseUrl}/v1/models`, undefined, this.headers());
+        return await this.http.get<{ models: string[] }>(`${this.config.baseUrl}/v1/models`, this.headers());
     }
 
     async generate(req: IGenerateRequest): Promise<IGenerateMessage> {
@@ -63,10 +59,10 @@ export class AnthropicAdapter implements IProviderApiService {
             const lines = buffer.split('\n');
             buffer = lines.pop()!;
             for (const line of lines) {
-                if (!line.trim()) { 
-                    continue; 
+                if (!line.trim()) {
+                    continue;
                 }
-                
+
                 const data = JSON.parse(line);
                 yield { id: data.id || crypto.randomUUID(), role: 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, done: false };
             }
