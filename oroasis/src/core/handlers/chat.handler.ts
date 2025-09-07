@@ -169,6 +169,10 @@ export function createChatHandlers(
                     outputChannel.appendLine(`Webview done error after catch: ${webviewError}`);
                 }
             }
+        },
+
+        "setConfiguration" : async(requestId: string, payload: any) => {
+            
         }
     };
 }

@@ -39,7 +39,6 @@
   0% {
     background-position: 0% 50%;
   }
-
   100% {
     background-position: 100% 50%;
   }
@@ -79,12 +78,10 @@ mat-card-actions {
   justify-content: space-between;
 }
 
-
 .send-button.is-active {
   background-color: var(--mat-primary);
   color: azure;
 }
-
 
 .send-button:disabled {
   background-color: var(--mat-primary);
@@ -99,7 +96,6 @@ mat-card-actions {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -137,7 +133,8 @@ textarea:focus {
 }
 
 textarea::placeholder {
-  color: var(--vscode-editor-foreground);
+  color: var(--mat-sys-outline);
+  font-size: 12px;
 }
 
 #fileDropdown {
