@@ -45,7 +45,7 @@ export class MessageInputComponent {
 
   constructor() {
     effect(() => {
-      const list = this.chatStore.models()?.data ?? [];
+      const list = this.chatStore.models()?.models ?? [];
       if (list.length) {
         this.chatStore.getPreferredModel().then(pref => {
           this.modelText = this.chatStore.preferredModel() ?? '';

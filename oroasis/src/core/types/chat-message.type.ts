@@ -31,6 +31,7 @@ export type IGenerateRequest = {
   keep_alive?: boolean;
   raw?: boolean;
   suffix?: string;
+  stream?: boolean;
 }
 
 export type IChatRequest = {

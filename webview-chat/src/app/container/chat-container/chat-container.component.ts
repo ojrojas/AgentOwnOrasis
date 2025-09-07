@@ -14,7 +14,6 @@ import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
   selector: 'app-chat-container',
   standalone: true,
   imports: [
-    // ChatHeaderComponent,
     MessageListComponent,
     MessageInputComponent,
     ChatListComponent,

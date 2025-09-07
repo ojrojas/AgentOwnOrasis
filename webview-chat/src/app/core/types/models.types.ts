@@ -2,9 +2,10 @@ interface IModels {
   name: string;
   model: string;
   modified_at: Date;
-  size: number,
+  size: number;
+  digest: string;
 }
 
 export interface IListModelsResponse {
-  data: IModels[];
+  models: IModels[];
 }

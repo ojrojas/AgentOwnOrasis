@@ -5,7 +5,7 @@
       <div class="form-group">
         <label for="modelRefactors">Select model refactor</label>
         <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
-          @for (model of chatStore.models()?.data; track model) {
+          @for (model of chatStore.models()?.models; track model) {
           <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>
@@ -14,7 +14,7 @@
       <div class="form-group">
         <label for="modelCompletions">Select model completion</label>
         <select [(ngModel)]="modelCompletions" name="modelCompletions" id="modelCompletions">
-          @for (model of chatStore.models()?.data; track model) {
+          @for (model of chatStore.models()?.models; track model) {
           <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>

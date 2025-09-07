@@ -77,7 +77,13 @@ export function createChatHandlers(
                 let contextAccumulated: number[] = [];
 
                 if (payload.type === 'chat') {
-                    let chatStream = adapter.chatStream?.({ model: payload.model, messages: chat.messages, options: { temperature } } as IChatRequest);
+                    let chatStream = adapter.chatStream?.({
+                        model: payload.model,
+                        messages: chat.messages,
+                        options: { temperature },
+                        stream: true
+                    } as IChatRequest);
+
                     if (chatStream) {
                         chatStream = asAsyncGenerator(chatStream);
                         for await (const chunk of chatStream) {
@@ -106,7 +112,8 @@ export function createChatHandlers(
                         prompt: payload.content,
                         system: promptDefault,
                         context: payload.context,
-                        options: { temperature: 0.3 }
+                        options: { temperature: 0.3 },
+                        stream: true
                     } as IGenerateRequest);
 
                     if (generateStream) {

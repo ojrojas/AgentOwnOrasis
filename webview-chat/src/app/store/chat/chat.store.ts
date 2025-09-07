@@ -119,7 +119,9 @@ export const ChatStore = signalStore(
 
     async loadModels() {
       patchState(store, setPending());
+      debugger;
       const response = await vscodeService.request<IListModelsResponse>("getModels");
+      debugger;
       patchState(store, { models: response }, setFulfilled());
     },
 
