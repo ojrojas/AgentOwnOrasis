@@ -53,3 +53,14 @@ export type IToolCall = {
     };
   };
 }
+
+export type IModel = {
+  name: string;
+  model: string;
+  modified_at: Date;
+  size: number,
+}
+
+export type IModelList = {
+  models: IModel[];
+}

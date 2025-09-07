@@ -4,7 +4,7 @@ export const providers: ProvidersMap = {
   ollama: {
     type: 'ollama',
     baseUrl: 'http://localhost:11434',
-    version: 'v1',
+    version: '',
     apiKey: '',
   },
   openai: {

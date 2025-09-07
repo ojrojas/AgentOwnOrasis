@@ -3,14 +3,8 @@
 
     <div class="input-wrapper">
       <div class="message-field">
-        <textarea
-          matInput
-          [(ngModel)]="messageText"
-          [placeholder]="placeholder"
-          [disabled]="isLoading"
-          (keydown.enter)="onEnterPressed($event)"
-          (keydown)="onKeyDown($event)"
-          rows="3">
+        <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
+          (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3">
         </textarea>
         <div id="fileDropdown" class="dropdown"></div>
       </div>
@@ -20,7 +14,7 @@
       <div class="actions-selects">
         <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
           @for (model of chatStore.models()?.data; track model) {
-            <option [ngValue]="model.id">{{ model.id }}</option>
+          <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>
 
@@ -32,29 +26,19 @@
       </div>
 
       <div class="actions-buttons">
-        <button
-          mat-icon-button
-          class="microphone-button"
-          [class.is-active]="isActiveMicrophone"
-          (click)="activeMicrophone()"
-          [disabled]="isMicDisabled"
-          aria-label="Activate microphone">
+        <button mat-icon-button class="microphone-button" [class.is-active]="isActiveMicrophone"
+          (click)="activeMicrophone()" [disabled]="isMicDisabled" aria-label="Activate microphone">
           <ng-icon name="matMicOutline" />
         </button>
 
-        <button
-          mat-icon-button
-          class="send-button"
-          [class.is-active]="!isSendDisabled"
-          (click)="sendMessage()"
-          [disabled]="isSendDisabled"
-          aria-label="Send message">
+        <button mat-icon-button class="send-button" [class.is-active]="!isSendDisabled" (click)="sendMessage()"
+          [disabled]="isSendDisabled" aria-label="Send message">
 
           @if (!isLoading) {
-            <ng-icon name="matSendOutline" />
+          <ng-icon name="matSendOutline" />
           }
           @if (isLoading) {
-            <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
+          <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
           }
         </button>
       </div>

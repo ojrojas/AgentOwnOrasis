@@ -1,7 +1,7 @@
-import { IChatMessage, IChatRequest, IGenerateRequest, IMessage } from "../types/chat-message.type";
+import { IChatMessage, IChatRequest, IGenerateRequest, IMessage, IModelList } from "../types/chat-message.type";
 
 export interface IProviderApiService {
-  listModels: () => Promise<{ models: string[] }>;
+  listModels: () => Promise<IModelList>;
   generate: (request: IGenerateRequest) => Promise<IMessage>;
   chat: (request: IChatRequest) => Promise<IChatMessage>;
 

@@ -6,7 +6,7 @@
         <label for="modelRefactors">Select model refactor</label>
         <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
           @for (model of chatStore.models()?.data; track model) {
-            <option [ngValue]="model.id">{{ model.id }}</option>
+          <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>
       </div>
@@ -15,7 +15,7 @@
         <label for="modelCompletions">Select model completion</label>
         <select [(ngModel)]="modelCompletions" name="modelCompletions" id="modelCompletions">
           @for (model of chatStore.models()?.data; track model) {
-            <option [ngValue]="model.id">{{ model.id }}</option>
+          <option [ngValue]="model.model">{{ model.name }}</option>
           }
         </select>
       </div>

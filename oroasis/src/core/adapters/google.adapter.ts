@@ -1,6 +1,6 @@
 import { IProviderApiService } from "../interfaces/provider.interface.service";
 import { HttpService } from "../services/http.service";
-import { IGenerateRequest, IGenerateMessage, IChatRequest, IChatMessage, IMessage } from "../types/chat-message.type";
+import { IGenerateRequest, IGenerateMessage, IChatRequest, IChatMessage, IMessage, IModelList } from "../types/chat-message.type";
 import { IProviderConfig } from "../types/provider.type";
 
 export class GoogleAdapter implements IProviderApiService {
@@ -9,8 +9,8 @@ export class GoogleAdapter implements IProviderApiService {
 
     private headers() { return { Authorization: `Bearer ${this.config.apiKey}`, 'Content-Type': 'application/json' }; }
 
-    async listModels(): Promise<{ models: string[] }> {
-        return await this.http.get<{ models: string[] }>(`${this.config.baseUrl}/v1/models`, this.headers());
+    async listModels(): Promise<IModelList> {
+        return await this.http.get<IModelList>(`${this.config.baseUrl}/v1/models`, this.headers());
     }
 
     async generate(req: IGenerateRequest): Promise<IGenerateMessage> {
