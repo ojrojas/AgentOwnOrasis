@@ -3,6 +3,11 @@
     <h3>Settings</h3>
     <form class="chat-settings-form">
       <div class="form-group">
+        <label for="baseUrl">Base url provider</label>
+        <input matInput [(ngModel)]="baseUrl" name="baseUrl" id="baseUrl"
+          placeholder="http://localhost:11434 for ollama">
+      </div>
+      <div class="form-group">
         <label for="modelRefactors">Select model refactor</label>
         <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
           @for (model of chatStore.models()?.models; track model) {
