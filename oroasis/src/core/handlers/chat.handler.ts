@@ -81,7 +81,6 @@ export function createChatHandlers(
                         model: payload.model,
                         messages: chat.messages,
                         options: { temperature },
-                        stream: true
                     } as IChatRequest);
 
                     if (chatStream) {
@@ -113,7 +112,6 @@ export function createChatHandlers(
                         system: promptDefault,
                         context: payload.context,
                         options: { temperature: 0.3 },
-                        stream: true
                     } as IGenerateRequest);
 
                     if (generateStream) {
@@ -169,10 +167,6 @@ export function createChatHandlers(
                     outputChannel.appendLine(`Webview done error after catch: ${webviewError}`);
                 }
             }
-        },
-
-        "setConfiguration" : async(requestId: string, payload: any) => {
-            
         }
     };
 }

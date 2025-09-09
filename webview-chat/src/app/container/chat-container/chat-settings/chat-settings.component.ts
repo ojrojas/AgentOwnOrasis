@@ -21,4 +21,10 @@ export class ChatSettingsComponent {
   modelCompletions: string = '';
   modelRefactors: string = '';
   baseUrl: string = '';
+  provider: string = '';
+
+
+  onChangeProvider = (proderId: string) => {
+    return '';
+  };
 }

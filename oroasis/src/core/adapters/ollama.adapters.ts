@@ -50,13 +50,13 @@ export class OllamaAdapter implements IProviderApiService {
         }
 
         const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, done: false };
+        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: req.model, done: false };
       }
     }
 
     if (buffer.trim()) {
       const data = JSON.parse(buffer);
-      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, done: true };
+      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: req.model, done: true, context: data.context };
     }
   }
 
@@ -83,12 +83,12 @@ export class OllamaAdapter implements IProviderApiService {
           continue;
         }
         const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: false };
+        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: false };
       }
     }
     if (buffer.trim()) {
       const data = JSON.parse(buffer);
-      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.text || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: true };
+      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: true };
     }
   }
 

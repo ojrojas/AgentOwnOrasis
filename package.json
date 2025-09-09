@@ -16,7 +16,6 @@
   "main": "./oroasis/out/extension.js",
   "contributes": {
     "viewsContainers": {
-     
       "activitybar": [
         {
           "id": "orasis-aii",
@@ -101,6 +100,10 @@
       {
         "command": "oroasis.cleanChats",
         "title": "Cleaning chats"
+      },
+      {
+        "command": "oroasis.cleanConfig",
+        "title": "Cleaning configuration"
       },
       {
         "command": "oroasis.addNewChatButton",

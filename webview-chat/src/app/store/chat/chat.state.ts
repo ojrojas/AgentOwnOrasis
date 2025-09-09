@@ -4,6 +4,7 @@ import { IListModelsResponse } from "../../core/types/models.types";
 export type ChatState = {
   isLoading: boolean;
   error: string | undefined;
+  providers: string[] | undefined;
   models: IListModelsResponse | undefined;
   preferredModel: string | undefined;
   files: string[];
@@ -17,6 +18,7 @@ export const initialState: ChatState = {
   error: undefined,
   isLoading: false,
   models: undefined,
+  providers: undefined,
   preferredModel: undefined,
   files: [],
   typeMessage: 'Ask',

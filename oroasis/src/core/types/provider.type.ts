@@ -1,5 +1,6 @@
 export type IProviderConfig = {
-  type: 'ollama' | 'openai' | 'anthropic' | 'google';
+  id: string;
+  // type: 'ollama' | 'openai' | 'anthropic' | 'google';
   baseUrl?: string;
   apiKey?: string;
   version?: string;

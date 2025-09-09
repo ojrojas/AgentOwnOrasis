@@ -6,23 +6,25 @@ import {
     ViewColumn,
     window
 } from 'vscode';
-import { WebviewProvider } from '../../providers/webview/webview.provider';
+import { WebviewProvider } from "../../providers/webview/WebviewProvider";
 import path from 'path';
 import { IChatMessage } from '../types/chat-message.type';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
-import { ProvidersMap } from '../types/provider.type';
+import { IProviderConfig, ProvidersMap } from '../types/provider.type';
 
 export const openPanelCommand = async (
     context: ExtensionContext,
     outputChannel: OutputChannel,
     providerMap: ProvidersMap,
-    chatMessageRepository: IWorkspaceStateRepository<IChatMessage>
+    chatMessageRepository: IWorkspaceStateRepository<IChatMessage>,
+    providerRepository: IWorkspaceStateRepository<IProviderConfig>
 ) => {
     const tabWebview = new WebviewProvider(
         context,
         outputChannel,
         providerMap,
-        chatMessageRepository
+        chatMessageRepository,
+        providerRepository
     );
 
     const lastCol = Math.max(...window.visibleTextEditors.map((editor) => editor.viewColumn || 0));
