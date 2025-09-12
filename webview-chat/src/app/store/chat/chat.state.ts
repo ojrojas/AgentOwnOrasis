@@ -14,7 +14,7 @@ export type ChatState = {
   selectedChatId: string | null;
 };
 
-export const initialState: ChatState = {
+export const initialStateStore: ChatState = {
   error: undefined,
   isLoading: false,
   models: undefined,

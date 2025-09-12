@@ -2,21 +2,23 @@
   <mat-card class="chat-settings">
     <h3>Settings</h3>
 
-    <div class="form-group">
-      <label for="provider">Select provider</label>
-      <select [(ngModel)]="provider" name="provider" id="provider">
-        @for (model of chatStore.models()?.models; track model) {
-        <option [ngValue]="model.model">{{ model.name }}</option>
-        }
-      </select>
-    </div>
-
     <form class="chat-settings-form">
+      <div class="form-group">
+        <label for="provider">Select provider</label>
+        <select [(ngModel)]="provider" name="provider" id="provider">
+          @for (provider of settingsStore.providers(); track provider) {
+          <option [ngValue]="provider.id">{{ provider.id }}</option>
+          }
+        </select>
+      </div>
+      @if(provider === 'ollama')
+      {
       <div class="form-group">
         <label for="baseUrl">Base url provider</label>
         <input matInput [(ngModel)]="baseUrl" name="baseUrl" id="baseUrl"
           placeholder="http://localhost:11434 for ollama">
       </div>
+      }
       <div class="form-group">
         <label for="modelRefactors">Select model refactor</label>
         <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
@@ -35,7 +37,7 @@
         </select>
       </div>
 
-      <button type="button" class="chat-settings-save">Save</button>
+      <button type="button" class="chat-settings-save" (click)="onSave">Save</button>
     </form>
   </mat-card>
 

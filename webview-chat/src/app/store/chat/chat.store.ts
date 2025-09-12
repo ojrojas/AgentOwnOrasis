@@ -1,6 +1,6 @@
 import { getState, patchState, signalState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 import { computed, inject } from "@angular/core";
-import { ChatState, initialState } from "./chat.state";
+import { ChatState, initialStateStore } from "./chat.state";
 import { VscodeService } from "../../core/services/vscode-service";
 import { extractMentions, updateChatById } from "./chat.helpers";
 import { IChat } from "../../core/types/chat.type";
@@ -9,7 +9,7 @@ import { IMessage } from "../../core/types/message.type";
 import { IListModelsResponse } from "../../core/types/models.types";
 import { setFulfilled, setPending, withRequestStatus } from "../request.status";
 
-const chatState = signalState<ChatState>(initialState);
+const chatState = signalState<ChatState>(initialStateStore);
 
 export const ChatStore = signalStore(
   { providedIn: 'root' },
@@ -76,7 +76,7 @@ export const ChatStore = signalStore(
     sendChat(message: IMessage) {
       patchState(store, setPending());
       const chatId = store.selectedChatId();
-      if (!chatId) {return;}
+      if (!chatId) { return; }
 
       const state = getState(store);
       const chat = this.getSelectedChat(state);
@@ -147,7 +147,7 @@ export const ChatStore = signalStore(
 
     /** -------------------- Utils -------------------- **/
     clearState() {
-      patchState(store, initialState, setFulfilled());
+      patchState(store, initialStateStore, setFulfilled());
     }
   }))
 );

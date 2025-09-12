@@ -9,6 +9,7 @@ import { IMessage } from '../../core/types/message.type';
 import { IChat } from '../../core/types/chat.type';
 import { VscodeService } from '../../core/services/vscode-service';
 import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
+import { SettginsStore } from '../../store/settings/settings.store';
 
 @Component({
   selector: 'app-chat-container',
@@ -19,16 +20,18 @@ import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
     ChatListComponent,
     CommonModule,
     ChatSettingsComponent
-],
+  ],
   templateUrl: 'chat-container.component.html',
   styleUrl: 'chat-container.component.scss'
 })
 export class ChatContainerComponent {
   readonly chatStore = inject(ChatStore);
   readonly vscode = inject(VscodeService);
+  readonly settingsStore = inject(SettginsStore);
 
   constructor() {
     effect(() => {
+      this.settingsStore.getConfiguration();
       this.chatStore.loadModels();
       this.chatStore.loadMessages();
       this.chatStore.getPreferredModel();

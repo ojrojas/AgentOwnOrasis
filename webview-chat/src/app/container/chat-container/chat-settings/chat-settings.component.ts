@@ -4,6 +4,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ChatStore } from '../../../store/chat/chat.store';
 import { FormsModule } from '@angular/forms';
 import { MatCard } from "@angular/material/card";
+import { SettginsStore } from '../../../store/settings/settings.store';
 
 @Component({
   selector: 'app-chat-settings',
@@ -17,14 +18,31 @@ import { MatCard } from "@angular/material/card";
   styleUrl: './chat-settings.component.scss'
 })
 export class ChatSettingsComponent {
+  readonly settingsStore = inject(SettginsStore);
   readonly chatStore = inject(ChatStore);
   modelCompletions: string = '';
   modelRefactors: string = '';
   baseUrl: string = '';
   provider: string = '';
+  apiKey: string = '';
 
+  async onSave() {
+    const providers = this.settingsStore.providers()!;
+    const updatedProviders = providers.map(provider => {
+      if (provider.id === this.provider) {
+        return {
+          ...provider, ...{
+            id: this.provider,
+            apiKey: this.apiKey,
+            baseUrl: this.baseUrl,
+            extraOptions: [],
+          }
+        };
+      }
+      return provider;
+    });
 
-  onChangeProvider = (proderId: string) => {
-    return '';
-  };
+    ///this.settingsStore.setConfiguration(updatedProviders);
+  }
+
 }

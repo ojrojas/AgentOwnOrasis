@@ -30,7 +30,6 @@ import {
 } from './core/commands/headers.commands';
 import { registerCommands, registerProvidersAndControllers } from './shared/utils/register.utils';
 import { helloWorldCommand } from './core/commands/examples.commands';
-import { IProviderFactory } from './core/services/provider.factory.service';
 import { providers } from './assets/providers.collection';
 import { IProviderConfig } from './core/types/provider.type';
 
@@ -44,7 +43,7 @@ function addSubscriber(item: vscode.Disposable) {
 	disposables.push(item);
 }
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	const settings = vscode.workspace.getConfiguration("oroasisSettings");
 	const providerName = settings.get<string>('providerDefault') || 'ollama';
@@ -59,8 +58,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const providerRepository: IWorkspaceStateRepository<IProviderConfig> =
 		new WorkspaceStateRepository<IProviderConfig>('prodivers', context.workspaceState);
-
-	if (!providerRepository.findAllSync()) {
+	const providersExist = providerRepository.findAllSync();
+	if (providersExist.length === 0) {
 		providerRepository.insertMany([providers.ollama, providers.openai]);
 	}
 

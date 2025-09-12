@@ -130,26 +130,6 @@
           "default": "http://127.0.0.1:11434",
           "description": "Write the 'Ollama' base url"
         },
-        "oroasisSettings.ollamaListModels": {
-          "type": "array",
-          "description": "List of models from Ollama"
-        },
-        "oroasisSettings.modelDefault": {
-          "type": [
-            "string",
-            null
-          ],
-          "default": null,
-          "description": "Model asigned to request to ollama, the model can be for chat or code."
-        },
-        "oroasisSettings.modelCompletionDefault": {
-          "type": [
-            "string",
-            null
-          ],
-          "default": null,
-          "description": "Model asigned to request to ollama"
-        },
         "oroasisSettings.modelTemperature": {
           "type": "number",
           "default": ".3",
