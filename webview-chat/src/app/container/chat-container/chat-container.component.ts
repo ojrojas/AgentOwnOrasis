@@ -48,10 +48,9 @@ export class ChatContainerComponent {
         this.chatStore.backToChatList();
         break;
       case 'settings':
-        console.log("Settings");
+        this.settingsStore.setConfigVisible(!this.settingsStore.isConfigureVisible());
         break;
     }
-
   }
 
   onChatSelected(chatId: string) {

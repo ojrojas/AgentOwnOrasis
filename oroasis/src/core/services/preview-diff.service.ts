@@ -17,7 +17,6 @@ export class PreviewDiffService implements IPreviewDiffService {
         return confirmed;
     }
 
-
     async showDiffPreview(filePath: string, newContent: string): Promise<boolean> {
         const originalUri = Uri.file(filePath);
         const tempUri = Uri.parse(`untitled:${filePath}.proposed`);

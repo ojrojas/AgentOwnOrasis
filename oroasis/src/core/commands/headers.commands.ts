@@ -7,11 +7,11 @@ export const newHeaderButtonCommand = (panel: WebviewPanel) => {
 };
 
 export const historyHeaderButtonCommand = (panel: WebviewPanel) => {
-    sendToWebview(panel, "headerMessage", uuidv4(), { type: 'new' });
+    sendToWebview(panel, "headerMessage", uuidv4(), { type: 'history' });
 };
 
 export const settingsHeaderButtonCommand = (panel: WebviewPanel) => {
-    sendToWebview(panel, "headerMessage", uuidv4(), { type: 'new' });
+    sendToWebview(panel, "headerMessage", uuidv4(), { type: 'settings' });
 };
 
 export const closeHeaderButtonCommand = (panel: WebviewPanel) => {

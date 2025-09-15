@@ -3,5 +3,7 @@ export type IProviderConfig = {
   baseUrl?: string;
   apiKey?: string;
   version?: string;
+  refactorModel?: string;
+  completionModel?: string;
   extraOptions?: Record<string, any>;
 };

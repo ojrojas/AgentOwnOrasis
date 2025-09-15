@@ -1,25 +1,18 @@
 <div class="chat-container">
-  <!-- <app-chat-header class="chat-container-header"
-   (onHistory)="chatStore.backToChatList()"
-  ></app-chat-header> -->
+  <app-chat-settings class="chat-container-settings" *ngIf="!settingsStore.isConfigureVisible()">
+  </app-chat-settings>
 
-<app-chat-settings class="chat-container-settings">
-
-</app-chat-settings>
-
-  <app-chat-list class="chat-container-list-chat"
-   *ngIf="!chatStore.selectedChatId()"
+  <app-chat-list class="chat-container-list-chat" *ngIf="!chatStore.selectedChatId()"
     (chatSelected)="chatStore.selectChat($event)">
   </app-chat-list>
 
   <ng-container *ngIf="chatStore.selectedChatId()">
-<app-message-list
-  *ngIf="chatStore.selectedChatId()"
-  [messages]="chatStore.currentMessages()"
-  [isTyping]="chatStore.requestStatus() === 'pending'">
-</app-message-list>
-    </ng-container>
+    <app-message-list *ngIf="chatStore.selectedChatId()" [messages]="chatStore.currentMessages()"
+      [isTyping]="chatStore.requestStatus() === 'pending'">
+    </app-message-list>
+  </ng-container>
 
-  <app-message-input class="chat-container-message-input" [isLoading]="this.chatStore.requestStatus() === 'pending'" (messageSent)="onMessageSent($event)">
+  <app-message-input class="chat-container-message-input" [isLoading]="this.chatStore.requestStatus() === 'pending'"
+    (messageSent)="onMessageSent($event)">
   </app-message-input>
 </div>

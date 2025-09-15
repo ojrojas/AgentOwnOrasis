@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatInputModule, MatInput } from "@angular/material/input";
 import { MatSelectModule } from '@angular/material/select';
 import { ChatStore } from '../../../store/chat/chat.store';
@@ -26,15 +26,24 @@ export class ChatSettingsComponent {
   provider: string = '';
   apiKey: string = '';
 
+  constructor() {
+    debugger;
+    const result = this.settingsStore.isConfigureVisible();
+    console.log("result hasConfigure", result);
+  }
+
   async onSave() {
     const providers = this.settingsStore.providers()!;
     const updatedProviders = providers.map(provider => {
       if (provider.id === this.provider) {
+        debugger;
         return {
           ...provider, ...{
             id: this.provider,
             apiKey: this.apiKey,
             baseUrl: this.baseUrl,
+            refactorModel: this.modelRefactors,
+            completionModel: this.modelCompletions,
             extraOptions: [],
           }
         };
@@ -42,7 +51,10 @@ export class ChatSettingsComponent {
       return provider;
     });
 
-    ///this.settingsStore.setConfiguration(updatedProviders);
+    this.settingsStore.saveConfiguration(updatedProviders);
   }
 
+  currentConfiguration = computed(() => {
+    const existConfiguration = this.settingsStore.providers();
+  });
 }

@@ -11,10 +11,6 @@ export function createConfigandlers(
     outputChannel: vscode.OutputChannel
 ) {
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
-    const preferredModel = settings.get('modelDefault');
-    const temperature = parseFloat(settings.get('modelTemperature') as string) || 0.1;
-    const promptDefault = settings.get('templatePromptGenerate') as string;
-
     return {
         "getConfiguration:request": async (requestId: string) => {
             const providers = providerRepository.findAllSync();
@@ -23,8 +19,9 @@ export function createConfigandlers(
 
         "saveConfiguration:request": async (requestId: string, payload: any) => {
             try {
-                await providerRepository.insert(payload);
-
+                await providerRepository.clear();
+                await providerRepository.insertMany(payload);
+                settings.update('modelTemperature', payload?.extraOptions?.temperature || 0.1);
                 sendToWebview(panel, "saveConfiguration:response", requestId, { message: 'Configuration saved success' });
             } catch (error) {
                 handleError(error, outputChannel, 'Error save configuration');

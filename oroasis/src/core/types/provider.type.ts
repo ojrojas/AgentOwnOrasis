@@ -5,7 +5,8 @@ export type IProviderConfig = {
   baseUrl?: string;
   apiKey?: string;
   version?: string;
-  listModels?: IModel[];
+  refactorModel?: string;
+  completionModel?: string;
   extraOptions?: Record<string, any>;
 };
 

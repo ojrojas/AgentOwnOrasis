@@ -1,8 +1,8 @@
-import { patchState, signalState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { patchState, signalState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 import { initialStateSettings, SettingsState } from "./settings.state";
 import { setFulfilled, setPending, withRequestStatus } from "../request.status";
 import { withLogger } from "../logger.state";
-import { inject } from "@angular/core";
+import { computed, inject } from "@angular/core";
 import { VscodeService } from "../../core/services/vscode-service";
 import { IProviderConfig } from "../../core/types/provider.type";
 
@@ -12,14 +12,31 @@ export const SettginsStore = signalStore(
   { providedIn: 'root' },
   withState(settingsState),
   withRequestStatus(),
-  withLogger("Oroasis"),
+  withLogger("Oroasis-Settings"),
+  withComputed((state) => ({
+    hasResponse: computed(() => state.isLoading),
+    hasConfiguration: computed(() => {
+      const configuration = state.providers()?.find(s => s.refactorModel !== '' && s.completionModel !== '');
+      return configuration !== undefined;
+    })
+  })),
   withMethods((store, vscodeService = inject(VscodeService)) => ({
     async getConfiguration() {
       patchState(store, setPending());
       const providers = await vscodeService.request<IProviderConfig[]>('getConfiguration');
       patchState(store, { providers: providers }, setFulfilled());
+    },
+
+    async saveConfiguration(providers: IProviderConfig[]) {
+      patchState(store, setPending());
+      const saveOnSave = await vscodeService.request<IProviderConfig[]>('saveConfiguration', providers);
+      patchState(store, setFulfilled());
+      this.setConfigVisible(false);
+    },
+
+    setConfigVisible(visible: boolean) {
+      patchState(store, setPending());
+      patchState(store, { isConfigureVisible: visible }, setFulfilled());
     }
   })),
-
-
 );

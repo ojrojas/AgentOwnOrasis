@@ -6,9 +6,10 @@ export const providers: ProvidersMap = {
     baseUrl: 'http://localhost:11434',
     version: '',
     apiKey: '',
-    listModels: [],
+    refactorModel: '',
+    completionModel: '',
     extraOptions: {
-      preferredModel: '',
+      temperature: .3,
     }
   },
   openai: {
@@ -16,9 +17,10 @@ export const providers: ProvidersMap = {
     baseUrl: 'https://api.openai.com',
     apiKey: process.env.OPENAI_API_KEY,
     version: 'v1',
-    listModels: [],
+    refactorModel: '',
+    completionModel: '',
     extraOptions: {
-      preferredModel: '',
+      temperature: .3,
     }
   },
   // anthropic: {
@@ -26,9 +28,10 @@ export const providers: ProvidersMap = {
   //   baseUrl: 'https://api.anthropic.com',
   //   apiKey: process.env.ANTHROPIC_API_KEY,
   //   version: 'v1',
-  // listModels: [],
+  // refactorModel: '',
+  // completionModel: '',
   //   extraOptions: {
-  //     preferredModel: '',
+  //      temperature: .3,
   //   }
   // },
   // google: {
@@ -36,9 +39,10 @@ export const providers: ProvidersMap = {
   //   baseUrl: 'https://generativelanguage.googleapis.com',
   //   apiKey: process.env.GOOGLE_API_KEY,
   //   version: 'v1',
-  // listModels: [],
+  // refactorModel: '',
+  // completionModel: '',
   //   extraOptions: {
-  //     preferredModel: '',
+  //     temperature: .3,
   //   }
   // }
 };

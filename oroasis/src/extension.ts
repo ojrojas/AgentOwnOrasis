@@ -113,7 +113,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				handler: (c: vscode.CommentReply) => askAgentCommand(
 					c,
 					providers,
-					providerName, // adaptador según proveedor
+					providerName,
 					outputChannel
 				),
 			},
