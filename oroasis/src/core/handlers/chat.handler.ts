@@ -84,7 +84,7 @@ export function createChatHandlers(
                     } as IChatRequest);
 
                     if (chatStream) {
-                        chatStream = asAsyncGenerator(chatStream);
+                        chatStream = await asAsyncGenerator(chatStream);
                         for await (const chunk of chatStream) {
                             try {
                                 accumulated += chunk.content ?? '';
@@ -115,7 +115,7 @@ export function createChatHandlers(
                     } as IGenerateRequest);
 
                     if (generateStream) {
-                        generateStream = asAsyncGenerator(generateStream);
+                        generateStream = await asAsyncGenerator(generateStream);
                         try {
                             for await (const chunk of generateStream) {
                                 accumulated += chunk.content ?? '';
