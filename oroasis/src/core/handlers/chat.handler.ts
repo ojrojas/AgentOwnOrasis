@@ -62,7 +62,8 @@ export function createChatHandlers(
                 model: payload.model,
                 role: payload.role,
                 timestamp: payload.timestamp,
-                context: payload.context
+                context: payload.context,
+                done: true
             });
 
             try {
@@ -144,7 +145,8 @@ export function createChatHandlers(
                     role: "assistant",
                     model: payload.model,
                     timestamp: new Date(),
-                    context: contextAccumulated
+                    context: contextAccumulated,
+                    done: true
                 });
 
                 try {

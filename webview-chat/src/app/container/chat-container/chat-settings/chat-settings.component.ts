@@ -27,7 +27,6 @@ export class ChatSettingsComponent {
   apiKey: string = '';
 
   constructor() {
-    debugger;
     const result = this.settingsStore.isConfigureVisible();
     console.log("result hasConfigure", result);
   }
@@ -36,7 +35,6 @@ export class ChatSettingsComponent {
     const providers = this.settingsStore.providers()!;
     const updatedProviders = providers.map(provider => {
       if (provider.id === this.provider) {
-        debugger;
         return {
           ...provider, ...{
             id: this.provider,
