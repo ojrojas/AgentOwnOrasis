@@ -154,7 +154,13 @@ export function createChatHandlers(
                 }
 
                 try {
-                    sendToWebview(panel, "sendChat:response:done");
+                    sendToWebview(panel, "sendChat:response:done", requestId, {
+                        content: accumulated,
+                        role: "assistant",
+                        done: true,
+                        id: uuidv4(),
+                        context: contextAccumulated
+                    });
                 } catch (webviewError) {
                     outputChannel.appendLine(`Webview final done error: ${webviewError}`);
                 }

@@ -89,22 +89,18 @@ export const ChatStore = signalStore(
         messages: [...(chat?.messages ?? []), message].map(m => ({ role: m.role, content: m.content }))
       });
 
-      let comePartialResponse = false;
       vscodeService.onMessage<IMessage>('sendChat:response', (partialResponse) => {
         patchState(store, state =>
           updateChatById(state, chatId, chat => {
             const idx = chat.messages.findIndex(m => m.role === 'assistant' && !m.done);
-            debugger;
             if (idx !== -1) {
               const updated = [...chat.messages];
               updated[idx] = { ...updated[idx], ...partialResponse };
               return { ...chat, messages: updated, context: partialResponse.context ?? chat.context };
             }
-            if (!comePartialResponse) {
-              comePartialResponse = true;
+            else {
               return { ...chat, messages: [...chat.messages, partialResponse], context: partialResponse.context };
             }
-            return chat;
           })
         );
       });
