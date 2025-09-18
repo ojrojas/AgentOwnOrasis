@@ -90,7 +90,8 @@ export class MessageInputComponent {
         timestamp: new Date(),
         model: this.modelText,
         type: this.typeMessage,
-        files: filesToSend
+        files: filesToSend,
+        done: true
       });
       this.messageText = '';
     }

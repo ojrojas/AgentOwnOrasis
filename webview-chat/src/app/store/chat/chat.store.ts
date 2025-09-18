@@ -69,7 +69,7 @@ export const ChatStore = signalStore(
       return {
         ...message,
         model: message.model,
-        type: message.type !== 'Agent' ? 'generated' : 'chat',
+        type: message.type !== 'Agent' ? 'generated' : 'chat'
       };
     },
 
@@ -94,6 +94,7 @@ export const ChatStore = signalStore(
         patchState(store, state =>
           updateChatById(state, chatId, chat => {
             const idx = chat.messages.findIndex(m => m.role === 'assistant' && !m.done);
+            debugger;
             if (idx !== -1) {
               const updated = [...chat.messages];
               updated[idx] = { ...updated[idx], ...partialResponse };

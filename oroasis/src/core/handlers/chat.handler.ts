@@ -62,8 +62,7 @@ export function createChatHandlers(
                 model: payload.model,
                 role: payload.role,
                 timestamp: payload.timestamp,
-                context: payload.context,
-                done: true
+                context: payload.context
             });
 
             try {
@@ -85,7 +84,7 @@ export function createChatHandlers(
                     } as IChatRequest);
 
                     if (chatStream) {
-                        chatStream = await asAsyncGenerator(chatStream);
+                        chatStream = asAsyncGenerator(chatStream);
                         for await (const chunk of chatStream) {
                             try {
                                 accumulated += chunk.content ?? '';
@@ -94,7 +93,7 @@ export function createChatHandlers(
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
-                                        done: chunk.done,
+                                        done: chunk.done ?? false,
                                         id: uuidv4(),
                                         context: contextAccumulated || undefined
                                     });
@@ -116,7 +115,7 @@ export function createChatHandlers(
                     } as IGenerateRequest);
 
                     if (generateStream) {
-                        generateStream = await asAsyncGenerator(generateStream);
+                        generateStream = asAsyncGenerator(generateStream);
                         try {
                             for await (const chunk of generateStream) {
                                 accumulated += chunk.content ?? '';
@@ -125,7 +124,7 @@ export function createChatHandlers(
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
-                                        done: chunk.done,
+                                        done: chunk.done ?? false,
                                         id: uuidv4(),
                                         context: contextAccumulated || undefined
                                     });
