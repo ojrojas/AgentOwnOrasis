@@ -88,14 +88,14 @@ export function createChatHandlers(
                         for await (const chunk of chatStream) {
                             try {
                                 accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context || contextAccumulated;
+                                contextAccumulated = chunk.context ?? contextAccumulated;
                                 try {
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
-                                        done: chunk.done ?? false,
+                                        done: chunk.done,
                                         id: uuidv4(),
-                                        context: contextAccumulated || undefined
+                                        context: contextAccumulated
                                     });
                                 } catch (webviewError) {
                                     outputChannel.appendLine(`Webview send error: ${webviewError}`);
@@ -119,14 +119,14 @@ export function createChatHandlers(
                         try {
                             for await (const chunk of generateStream) {
                                 accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context || contextAccumulated;
+                                contextAccumulated = chunk.context ?? contextAccumulated;
                                 try {
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
-                                        done: chunk.done ?? false,
+                                        done: chunk.done,
                                         id: uuidv4(),
-                                        context: contextAccumulated || undefined
+                                        context: contextAccumulated
                                     });
                                 } catch (webviewError) {
                                     outputChannel.appendLine(`Webview send error: ${webviewError}`);
@@ -145,7 +145,6 @@ export function createChatHandlers(
                     model: payload.model,
                     timestamp: new Date(),
                     context: contextAccumulated,
-                    done: true
                 });
 
                 try {
