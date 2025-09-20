@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { IWorkspaceRepositoryService } from '../interfaces/workspace-repository-files.interface.service';
+import { IWorkspaceFilesRepositoryService } from '../interfaces/workspace-repository-files.interface.service';
 
-export class WorkspaceRepositoryService implements IWorkspaceRepositoryService {
-  
+export class WorkspaceFilesRepositoryService implements IWorkspaceFilesRepositoryService {
+
   async getWorkspaceFiles(
-    pattern = '**/*', 
+    pattern = '**/*',
     exclude = `{**/node_modules/**,**/dist/**,**/build/**,**/out/**,**/.git/**,**/.angular/**,**/.svn/**,**/.hg/**,**/.vs/**,**/bin/**,**/obj/**,**/coverage/**,**/tmp/**,**/temp/**,**/*.exe,**/*.dll,**/*.pdb,**/*.so,**/*.o,**/*.a,**/*.jar,**/*.class,**/*.zip,**/*.tar,**/*.gz,**/*.7z,**/*.rar,**/*.iso,**/*.db}`): Promise<string[]> {
     if (!vscode.workspace.workspaceFolders) {
       return [];

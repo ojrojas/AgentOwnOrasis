@@ -1,4 +1,4 @@
-import { Webview, WebviewPanel } from "vscode";
+import { WebviewPanel } from "vscode";
 import { sendToWebview } from "../../shared/utils/chat.utils";
 import { v4 as uuidv4 } from 'uuid';
 

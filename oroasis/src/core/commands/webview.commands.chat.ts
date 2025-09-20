@@ -1,11 +1,10 @@
 import * as vscode from 'vscode';
-import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
-import { IChatMessage } from '../types/chat-message.type';
 import { createChatHandlers } from '../handlers/chat.handler';
 import { IProviderFactory } from '../services/provider.factory.service';
+import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
+import { IChatMessage } from '../types/chat-message.type';
 
 export function registerChatCommands(
-    context: vscode.ExtensionContext,
     panel: vscode.WebviewPanel,
     providersFactory: IProviderFactory,
     defaultProvider: string,

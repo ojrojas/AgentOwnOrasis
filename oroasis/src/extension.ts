@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { WorkspaceStateRepository } from './core/services/workspace-repository.service';
 import { IWorkspaceStateRepository } from './core/interfaces/workspace-repository-state.interface.service';
 import { IChatMessage } from './core/types/chat-message.type';
 import { CompletionProvider } from './providers/completions/completion.provider';
@@ -32,18 +31,21 @@ import { registerCommands, registerProvidersAndControllers } from './shared/util
 import { helloWorldCommand } from './core/commands/examples.commands';
 import { providers } from './assets/providers.collection';
 import { IProviderConfig } from './core/types/provider.type';
+import { RepositoryFactory } from './core/factories/repository-factory';
+import { IGlobalStateRepository } from './core/interfaces/global-workspace-repository-state.interface.service';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: vscode.Disposable[] = [];
-
-//const ollamaService: IProviderApiService = new OllamaApiService();
-//ollamaService.udpdateListModels();
 
 function addSubscriber(item: vscode.Disposable) {
 	disposables.push(item);
 }
 
 export async function activate(context: vscode.ExtensionContext) {
+
+	const repositoryFactory = new RepositoryFactory(context);
+	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = repositoryFactory.createWorkspaceRepository('chats-repository');
+	const providerRepository: IGlobalStateRepository<IProviderConfig> = repositoryFactory.createGlobalRepository('oroasis-provider-repository');
 
 	const settings = vscode.workspace.getConfiguration("oroasisSettings");
 	const providerName = settings.get<string>('providerDefault') || 'ollama';
@@ -52,12 +54,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		providers.ollama.baseUrl = settings.get<string>('baseUrlProvider') ?? providers.ollama.baseUrl;
 	}
 
-
-	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> =
-		new WorkspaceStateRepository<IChatMessage>('chatMessages', context.workspaceState);
-
-	const providerRepository: IWorkspaceStateRepository<IProviderConfig> =
-		new WorkspaceStateRepository<IProviderConfig>('prodivers', context.workspaceState);
 	const providersExist = providerRepository.findAllSync();
 	if (providersExist.length === 0) {
 		providerRepository.insertMany([providers.ollama, providers.openai]);
@@ -65,7 +61,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const completionsProvider = new CompletionProvider(providers);
 	const refactorProvider = new RefactorProvider(providers, outputChannel);
-	const sideBarWebView = new WebviewProvider(context, outputChannel, providers, chatMessageRepository, providerRepository);
+	const sideBarWebView = new WebviewProvider(
+		{
+			context,
+			outputChannel,
+			providersMap: providers,
+			chatRepository: chatMessageRepository,
+			providerRepository,
+		});
 
 	registerProvidersAndControllers(
 		[
@@ -100,12 +103,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			// Agents
 			{
 				id: 'oroasis.openChatAgent',
-				handler: () => openPanelCommand(
+				handler: () => openPanelCommand({
 					context,
 					outputChannel,
-					providers,
-					chatMessageRepository,
-					providerRepository
+					providersMap: providers,
+					chatRepository: chatMessageRepository,
+					providerRepository,
+				}
 				),
 			},
 			{

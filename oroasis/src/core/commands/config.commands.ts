@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
-import { IProviderConfig } from '../types/provider.type';
 import { createConfigandlers } from '../handlers/config.handler';
+import { IGlobalStateRepository } from '../interfaces/global-workspace-repository-state.interface.service';
+import { IProviderConfig } from '../types/provider.type';
 
 export function registerConfigCommands(
-    context: vscode.ExtensionContext,
     panel: vscode.WebviewPanel,
-    providerRepository: IWorkspaceStateRepository<IProviderConfig>,
+    providerRepository: IGlobalStateRepository<IProviderConfig>,
     outputChannel: vscode.OutputChannel) {
 
     const handlers = createConfigandlers(panel, providerRepository, outputChannel);

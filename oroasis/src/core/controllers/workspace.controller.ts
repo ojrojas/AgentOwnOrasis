@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { WorkspaceRepositoryService } from '../services/workspace-repository-files.service';
 import { IPreviewDiffService } from '../interfaces/preview-diff.interface.service';
 import { PreviewDiffService } from '../services/preview-diff.service';
 import { IFileChange } from '../types/file-change.type';
+import { IWorkspaceFilesRepositoryService } from '../interfaces/workspace-repository-files.interface.service';
 
 export class WorkspaceController {
   readonly previewDiffService: IPreviewDiffService = new PreviewDiffService();
-  constructor(private workspaceService: WorkspaceRepositoryService) { }
+  constructor(private workspaceService: IWorkspaceFilesRepositoryService) { }
 
   async previewAndSave(filePath: string, newContent: string) {
     const confirm = await this.previewDiffService.showDiffPreview(filePath, newContent);

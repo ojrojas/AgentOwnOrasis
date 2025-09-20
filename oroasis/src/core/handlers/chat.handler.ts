@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 import { IChatMessage, IGenerateRequest, IChatRequest } from '../types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { handleError } from '../../shared/generics/errors';
 import { sendToWebview } from '../../shared/utils/chat.utils';
 import { IProviderFactory } from '../services/provider.factory.service';
 import { asAsyncGenerator } from '../../shared/generics/asasyncgenerator';
+import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 
 export function createChatHandlers(
     panel: vscode.WebviewPanel,
@@ -14,7 +14,6 @@ export function createChatHandlers(
     chatRepository: IWorkspaceStateRepository<IChatMessage>,
     outputChannel: vscode.OutputChannel
 ) {
-
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
     const preferredModel = settings.get('modelDefault');
     const temperature = parseFloat(settings.get('modelTemperature') as string) || 0.1;

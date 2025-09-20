@@ -4,7 +4,7 @@ import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-st
 export class WorkspaceStateRepository<T extends { id: string }> implements IWorkspaceStateRepository<T> {
   constructor(
     private storageKey: string,
-    private workspaceState: vscode.Memento
+    private workspaceState: vscode.Memento,
   ) { }
 
   async insert(entity: T): Promise<void> {

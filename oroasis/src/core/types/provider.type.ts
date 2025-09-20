@@ -1,5 +1,3 @@
-import { IModel } from "./chat-message.type";
-
 export type IProviderConfig = {
   id: string;
   baseUrl?: string;

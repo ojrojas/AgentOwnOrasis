@@ -1,14 +1,13 @@
 import { WebviewViewProvider, WebviewView, WebviewPanel, Disposable, ExtensionContext, OutputChannel, workspace, ExtensionMode } from "vscode";
 import { registerChatCommands } from "../../core/commands/webview.commands.chat";
 import { registerWorkspaceCommands } from "../../core/commands/webview.workspace.commnads";
-import { IWorkspaceStateRepository } from "../../core/interfaces/workspace-repository-state.interface.service";
 import { IProviderFactory } from "../../core/services/provider.factory.service";
-import { IChatMessage } from "../../core/types/chat-message.type";
-import { ProvidersMap, IProviderConfig } from "../../core/types/provider.type";
+import { ProvidersMap } from "../../core/types/provider.type";
 import { WebviewListeners } from "../../core/webview/webview.listener";
 import { WebviewHtmlBuilder } from "../../core/webview/webviewhtml.builder";
 import { getNonce } from "../../shared/generics/nonce";
 import { registerConfigCommands } from "../../core/commands/config.commands";
+import { IWebviewConfiguration } from "../../core/types/webview-configuration.type";
 
 
 export class WebviewProvider implements WebviewViewProvider {
@@ -26,11 +25,7 @@ export class WebviewProvider implements WebviewViewProvider {
     model?: string;
 
     constructor(
-        readonly context: ExtensionContext,
-        private readonly outputChannel: OutputChannel,
-        private readonly providersMap: ProvidersMap,
-        private readonly chatRepository: IWorkspaceStateRepository<IChatMessage>,
-        private readonly providerRepository: IWorkspaceStateRepository<IProviderConfig>
+        readonly props: IWebviewConfiguration
     ) {
         WebviewProvider.activeInstances.add(this);
         const settings = workspace.getConfiguration("oroasisSettings");
@@ -61,14 +56,14 @@ export class WebviewProvider implements WebviewViewProvider {
 
         webview.options = {
             enableScripts: true,
-            localResourceRoots: [this.context.extensionUri]
+            localResourceRoots: [this.props.context.extensionUri]
         };
 
-        const builder = new WebviewHtmlBuilder(this.context);
+        const builder = new WebviewHtmlBuilder(this.props.context);
         const nonce = getNonce();
 
         webview.html =
-            this.context.extensionMode === ExtensionMode.Development
+            this.props.context.extensionMode === ExtensionMode.Development
                 ? builder.buildDevHtml(
                     webview,
                     nonce,
@@ -78,17 +73,16 @@ export class WebviewProvider implements WebviewViewProvider {
                 : builder.buildProdHtml(webview, nonce);
 
         WebviewListeners.attachMessageListener(webview, this.disposables);
-        WebviewListeners.attachVisibility(view, this.disposables, () => WebviewListeners.attachMessageListener(webview, this.disposables)
-        );
+        WebviewListeners.attachVisibility(view, this.disposables, () => WebviewListeners.attachMessageListener(webview, this.disposables));
 
         if (view) {
             const settings = workspace.getConfiguration("oroasisSettings");
             const defaultProvider = settings.get<string>('providerDefault') || 'ollama';
-            const factory = new IProviderFactory(this.providersMap);
+            const factory = new IProviderFactory(this.props.providersMap);
 
-            registerWorkspaceCommands(this.context, view as WebviewPanel, this.outputChannel);
-            registerChatCommands(this.context, view as WebviewPanel, factory, defaultProvider, this.chatRepository, this.outputChannel);
-            registerConfigCommands(this.context, view as WebviewPanel, this.providerRepository, this.outputChannel);
+            registerWorkspaceCommands(view as WebviewPanel, this.props.outputChannel);
+            registerChatCommands(view as WebviewPanel, factory, defaultProvider, this.props.chatRepository, this.props.outputChannel);
+            registerConfigCommands(view as WebviewPanel, this.props.providerRepository, this.props.outputChannel);
         }
 
         view.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -98,6 +92,6 @@ export class WebviewProvider implements WebviewViewProvider {
             this.disposables
         );
 
-        this.outputChannel.appendLine("Webview resolved");
+        this.props.outputChannel.appendLine("Webview resolved");
     }
 }
