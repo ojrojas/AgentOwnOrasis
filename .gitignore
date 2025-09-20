@@ -10,3 +10,4 @@ media
 DS_Store
 oroasis/tsconfig.tsbuildinfo
 package-lock.json
+pnpm-lock.yaml
