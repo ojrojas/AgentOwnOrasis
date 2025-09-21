@@ -21,7 +21,7 @@ export function createConfigandlers(
                 await providerGlobalStateRepository.clear();
                 await providerGlobalStateRepository.insertMany(payload);
                 settings.update('modelTemperature', payload?.extraOptions?.temperature || 0.1);
-                sendToWebview(panel, "saveConfiguration:response", requestId, { message: 'Configuration saved success' });
+                sendToWebview(panel, "saveConfiguration:response", requestId, payload);
             } catch (error) {
                 handleError(error, outputChannel, 'Error save configuration');
                 sendToWebview(panel, "saveConfiguration:response", requestId, { message: 'Error save configuration' });

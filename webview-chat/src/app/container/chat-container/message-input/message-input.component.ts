@@ -70,9 +70,8 @@ export class MessageInputComponent {
   async onChangeSelected(event: Event) {
     event.preventDefault();
     const model = (event.target as HTMLSelectElement).value;
-    debugger;
     this.modelSelected = await this.chatStore.getInfoModel(model);
-    debugger;
+    console.log("model-selected", this.modelSelected);
   }
 
   get isSendDisabled(): boolean {

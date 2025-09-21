@@ -30,7 +30,7 @@ export const SettginsStore = signalStore(
     async saveConfiguration(providers: IProviderConfig[]) {
       patchState(store, setPending());
       const saveOnSave = await vscodeService.request<IProviderConfig[]>('saveConfiguration', providers);
-      patchState(store, setFulfilled());
+      patchState(store, { providers: saveOnSave }, setFulfilled());
       this.setConfigVisible(false);
     },
 

@@ -11,8 +11,8 @@ export interface IListModelsResponse {
 }
 
 export type IModelInfo = {
-  model_info: {
-    ctx_context: number;
-  };
   capabilities: string[];
+  model_info: {
+    ctx_number: number;
+  };
 }

@@ -38,6 +38,7 @@ export class ChatSettingsComponent {
         return {
           ...provider, ...{
             id: this.provider,
+            isSelected: true,
             apiKey: this.apiKey,
             baseUrl: this.baseUrl,
             refactorModel: this.modelRefactors,

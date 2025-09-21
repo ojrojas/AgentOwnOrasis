@@ -1,5 +1,6 @@
 export type IProviderConfig = {
   id: string;
+  isSelected: boolean;
   baseUrl?: string;
   apiKey?: string;
   version?: string;

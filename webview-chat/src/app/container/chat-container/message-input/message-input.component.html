@@ -44,15 +44,15 @@
         </button>
       </div>
     </mat-card-actions>
-    <!-- @if (modelSelected !== undefined) {
-      <div class="model-details">
-        <div><b>num_ctx:</b> {{ modelSelected.num_ctx }}</div>
-        <div *ngIf="modelSelected.tools?.length">
-          <b>tools:</b> {{ modelSelected.tools.join(', ') }}
-        </div>
-        <div *ngIf="modelSelected.vision"><b>vision:</b> ✅</div>
-        <div *ngIf="modelSelected.think"><b>think:</b> ✅</div>
+    @if (modelSelected !== undefined) {
+    <div class="model-details">
+      <div><b>num_ctx:</b> {{ modelSelected.model_info.ctx_number }}</div>
+      <div *ngIf="modelSelected.capabilities?.length">
+        <b>tools:</b> {{ modelSelected.capabilities.join(', ') }}
       </div>
-    } -->
+      <div *ngIf="modelSelected.capabilities.includes('vision')"><b>vision:</b> ✅</div>
+      <div *ngIf="modelSelected.capabilities.includes('thinking')"><b>think:</b> ✅</div>
+    </div>
+    }
   </mat-card>
 </div>
