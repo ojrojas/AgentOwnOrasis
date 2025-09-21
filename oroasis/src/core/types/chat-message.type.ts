@@ -62,6 +62,11 @@ export type IModel = {
   size: number,
 }
 
+export type IModelInfo = {
+  model_info: any;
+  capabilities: string[];
+}
+
 export type IModelList = {
   models: IModel[];
 }

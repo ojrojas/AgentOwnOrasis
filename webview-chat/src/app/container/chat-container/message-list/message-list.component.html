@@ -1,13 +1,13 @@
 <div class="message-list-container" #messageContainer>
   <div class="messages">
-    @for (message of messages; track message.id) {
-      <app-message [message]="message"></app-message>
+    @for (message of messages; track message.timestamp) {
+    <app-message [message]="message"></app-message>
     }
 
     @if (isTyping) {
-      <div class="typing-indicator">
-        <mat-progress-bar style="width: 40px;" mode="buffer"></mat-progress-bar>
-      </div>
+    <div class="typing-indicator">
+      <mat-progress-bar style="width: 40px;" mode="buffer"></mat-progress-bar>
+    </div>
     }
   </div>
 </div>

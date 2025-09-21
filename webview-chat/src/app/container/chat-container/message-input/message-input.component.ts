@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { ChatStore } from '../../../store/chat/chat.store';
 import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
+import { IModelInfo } from '../../../core/types/models.types';
 
 @Component({
   selector: 'app-message-input',
@@ -42,15 +43,16 @@ export class MessageInputComponent {
   modelText: string = '';
   typeMessage: string = 'Ask';
   messageText: string = '';
+  modelSelected?: IModelInfo;
 
   constructor() {
     effect(() => {
       const list = this.chatStore.models()?.models ?? [];
-      if (list.length) {
-        this.chatStore.getPreferredModel().then(pref => {
-          this.modelText = this.chatStore.preferredModel() ?? '';
-        });
-      }
+      // if (list.length) {
+      //   this.chatStore.getPreferredModel().then(pref => {
+      //     this.modelText = this.chatStore.preferredModel() ?? '';
+      //   });
+      // }
     });
   }
 
@@ -63,6 +65,14 @@ export class MessageInputComponent {
   activeMicrophone() {
     this.isActiveMicrophone = !this.isActiveMicrophone;
     console.log("micro is :", this.isActiveMicrophone);
+  }
+
+  async onChangeSelected(event: Event) {
+    event.preventDefault();
+    const model = (event.target as HTMLSelectElement).value;
+    debugger;
+    this.modelSelected = await this.chatStore.getInfoModel(model);
+    debugger;
   }
 
   get isSendDisabled(): boolean {

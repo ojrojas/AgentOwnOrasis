@@ -1,8 +1,22 @@
 import { buildProviderUrl } from '../../shared/utils/builderParams.utils';
 import { IProviderApiService } from '../interfaces/provider.interface.service';
 import { HttpService } from '../services/http.service';
-import { IChatMessage, IChatRequest, IGenerateMessage, IGenerateRequest, IMessage, IModelList } from '../types/chat-message.type';
+import { IChatMessage, IChatRequest, IGenerateMessage, IGenerateRequest, IMessage, IModelInfo, IModelList } from '../types/chat-message.type';
 import { IProviderConfig } from '../types/provider.type';
+
+function extractContextLength(modelInfo: any): number | null {
+  if (!modelInfo || !modelInfo["model_info"]) { return null; }
+
+  const info = modelInfo["model_info"];
+  for (const key of Object.keys(info)) {
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes("context_length") || lowerKey.includes("context_lenght")) {
+      return Number(info[key]);
+    }
+  }
+
+  return null;
+}
 
 export class OllamaAdapter implements IProviderApiService {
   private http = new HttpService();
@@ -50,13 +64,13 @@ export class OllamaAdapter implements IProviderApiService {
         }
 
         const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: req.model, done: false };
+        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data.done, context: data.context };
       }
     }
 
     if (buffer.trim()) {
       const data = JSON.parse(buffer);
-      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: req.model, done: true, context: data.context };
+      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data, context: data.context };
     }
   }
 
@@ -83,17 +97,28 @@ export class OllamaAdapter implements IProviderApiService {
           continue;
         }
         const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: false };
+        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: data.model, tool_calls: data.tool_calls, images: data.images, done: data.done };
       }
     }
     if (buffer.trim()) {
       const data = JSON.parse(buffer);
-      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: req.model, tool_calls: data.tool_calls, images: data.images, done: true };
+      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: data.model, tool_calls: data.tool_calls, images: data.images, done: data.done };
     }
   }
 
   async pullModel(modelName: string) {
     const url = buildProviderUrl(this.config, 'pull');
     await this.http.post<{ model: string }, any>(url, { model: modelName });
+  }
+
+  async show(modelName: string): Promise<IModelInfo> {
+    const url = buildProviderUrl(this.config, '/api/show');
+    const result = await this.http.post<{ model: string }, IModelInfo>(url, { model: modelName });
+    return {
+      model_info: {
+        'ctx_number': extractContextLength(result),
+      }, capabilities: result.capabilities
+    };
+
   }
 }

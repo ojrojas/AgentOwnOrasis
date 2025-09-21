@@ -15,9 +15,9 @@ export function createChatHandlers(
     outputChannel: vscode.OutputChannel
 ) {
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
-    const preferredModel = settings.get('modelDefault');
-    const temperature = parseFloat(settings.get('modelTemperature') as string) || 0.1;
-    const promptDefault = settings.get('templatePromptGenerate') as string;
+    const temperature = parseFloat(settings.get<string>('modelTemperature') ?? '0.1');
+    const promptDefault = settings.get<string>('templatePromptGenerate');
+    const rolAgent = settings.get<string>('roleAgentDefault');
 
     return {
         "emitStatusAppChat:request": async (requestId: string) => {
@@ -35,12 +35,18 @@ export function createChatHandlers(
             }
         },
 
-        "getPreferredModel:request": async (requestId: string) => {
-            sendToWebview(panel, "getPreferredModel:response", requestId, preferredModel);
-        },
+        // "getPreferredModel:request": async (requestId: string) => {
+        //     sendToWebview(panel, "getPreferredModel:response", requestId, preferredModel);
+        // },
 
         "getAllMessages:request": async (requestId: string) => {
             sendToWebview(panel, "getAllMessages:response", requestId, chatRepository.findAllSync());
+        },
+
+        "getInfoModel:request": async (requestId: string, payload: any) => {
+            const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
+            const infoModel = await adapter.show?.(payload.model);
+            sendToWebview(panel, "getInfoModel:response", requestId, infoModel);
         },
 
         "sendChat:request": async (requestId: string, payload: any) => {
@@ -71,9 +77,10 @@ export function createChatHandlers(
             }
 
             try {
+                const messageId = uuidv4();
                 const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
                 let accumulated = '';
-                let contextAccumulated: number[] = [];
+                let contextAccumulated: number[] | undefined;
 
                 if (payload.type === 'chat') {
                     let chatStream = adapter.chatStream?.({
@@ -87,14 +94,16 @@ export function createChatHandlers(
                         for await (const chunk of chatStream) {
                             try {
                                 accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context ?? contextAccumulated;
+                                contextAccumulated = chunk.context;
                                 try {
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
                                         done: chunk.done,
-                                        id: uuidv4(),
-                                        context: contextAccumulated
+                                        id: messageId,
+                                        context: contextAccumulated,
+                                        timestamp: new Date(),
+                                        model: payload.model
                                     });
                                 } catch (webviewError) {
                                     outputChannel.appendLine(`Webview send error: ${webviewError}`);
@@ -118,14 +127,16 @@ export function createChatHandlers(
                         try {
                             for await (const chunk of generateStream) {
                                 accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context ?? contextAccumulated;
+                                contextAccumulated = chunk.context;
                                 try {
                                     sendToWebview(panel, "sendChat:response", requestId, {
                                         content: accumulated,
                                         role: "assistant",
                                         done: chunk.done,
-                                        id: uuidv4(),
-                                        context: contextAccumulated
+                                        id: messageId,
+                                        context: contextAccumulated,
+                                        timestamp: new Date(),
+                                        model: payload.model,
                                     });
                                 } catch (webviewError) {
                                     outputChannel.appendLine(`Webview send error: ${webviewError}`);
@@ -139,11 +150,12 @@ export function createChatHandlers(
 
                 chat.messages.push({
                     content: accumulated,
-                    id: uuidv4(),
                     role: "assistant",
-                    model: payload.model,
-                    timestamp: new Date(),
+                    done: true,
+                    id: messageId,
                     context: contextAccumulated,
+                    timestamp: new Date(),
+                    model: payload.model
                 });
 
                 try {
@@ -157,8 +169,9 @@ export function createChatHandlers(
                         content: accumulated,
                         role: "assistant",
                         done: true,
-                        id: uuidv4(),
-                        context: contextAccumulated
+                        id: messageId,
+                        context: contextAccumulated,
+                        timestamp: new Date()
                     });
                 } catch (webviewError) {
                     outputChannel.appendLine(`Webview final done error: ${webviewError}`);

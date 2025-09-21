@@ -6,7 +6,7 @@ import { extractMentions, updateChatById } from "./chat.helpers";
 import { IChat } from "../../core/types/chat.type";
 import { withLogger } from "../logger.state";
 import { IMessage } from "../../core/types/message.type";
-import { IListModelsResponse } from "../../core/types/models.types";
+import { IListModelsResponse, IModelInfo } from "../../core/types/models.types";
 import { setFulfilled, setPending, withRequestStatus } from "../request.status";
 
 const chatState = signalState<ChatState>(initialStateStore);
@@ -92,10 +92,11 @@ export const ChatStore = signalStore(
       vscodeService.onMessage<IMessage>('sendChat:response', (partialResponse) => {
         patchState(store, state =>
           updateChatById(state, chatId, chat => {
-            const idx = chat.messages.findIndex(m => m.role === 'assistant' && !m.done);
+            const idx = chat.messages.findIndex(m => m.id === partialResponse.id);
+
             if (idx !== -1) {
               const updated = [...chat.messages];
-              updated[idx] = { ...updated[idx], ...partialResponse };
+              updated[idx] = { ...updated[idx], ...partialResponse, done: partialResponse.done };
               return { ...chat, messages: updated, context: partialResponse.context ?? chat.context };
             }
             else {
@@ -120,15 +121,24 @@ export const ChatStore = signalStore(
       patchState(store, { models: response }, setFulfilled());
     },
 
-    async getPreferredModel() {
+    // async getPreferredModel() {
+    //   patchState(store, setPending());
+    //   const response = await vscodeService.request<string>("getPreferredModel");
+    //   patchState(store, { preferredModel: response }, setFulfilled());
+    // },
+
+    async getInfoModel(modelName: string) {
       patchState(store, setPending());
-      const response = await vscodeService.request<string>("getPreferredModel");
-      patchState(store, { preferredModel: response }, setFulfilled());
+      const response = await vscodeService.request<IModelInfo>("getInfoModel", { model: modelName });
+      patchState(store, setFulfilled());
+      return response;
     },
 
     async loadWorkSpaceFolders() {
       patchState(store, setPending());
       const response = await vscodeService.request<string[]>("listFiles");
+      debugger;
+      console.log("ModelInfo => ", response);
       patchState(store, { files: response }, setFulfilled());
     },
 

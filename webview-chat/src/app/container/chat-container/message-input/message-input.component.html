@@ -12,16 +12,17 @@
 
     <mat-card-actions class="actions-container">
       <div class="actions-selects">
-        <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
+        <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading"
+          (change)="onChangeSelected($event)">
           @for (model of chatStore.models()?.models; track model) {
-          <option [ngValue]="model.model">{{ model.name }}</option>
+          <option [value]="model.model">{{ model.name }}</option>
           }
         </select>
 
         <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
-          <option ngValue="Ask">Ask</option>
-          <option ngValue="Edit">Edit</option>
-          <option ngValue="Agent">Agent</option>
+          <option value="Ask">Ask</option>
+          <option value="Edit">Edit</option>
+          <option value="Agent">Agent</option>
         </select>
       </div>
 
@@ -43,5 +44,15 @@
         </button>
       </div>
     </mat-card-actions>
+    <!-- @if (modelSelected !== undefined) {
+      <div class="model-details">
+        <div><b>num_ctx:</b> {{ modelSelected.num_ctx }}</div>
+        <div *ngIf="modelSelected.tools?.length">
+          <b>tools:</b> {{ modelSelected.tools.join(', ') }}
+        </div>
+        <div *ngIf="modelSelected.vision"><b>vision:</b> ✅</div>
+        <div *ngIf="modelSelected.think"><b>think:</b> ✅</div>
+      </div>
+    } -->
   </mat-card>
 </div>

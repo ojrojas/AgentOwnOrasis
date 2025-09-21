@@ -34,7 +34,7 @@ export class ChatContainerComponent {
       this.settingsStore.getConfiguration();
       this.chatStore.loadModels();
       this.chatStore.loadMessages();
-      this.chatStore.getPreferredModel();
+      // this.chatStore.getPreferredModel();
       this.chatStore.loadWorkSpaceFolders();
     });
 
