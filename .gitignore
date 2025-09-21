@@ -11,3 +11,4 @@ DS_Store
 oroasis/tsconfig.tsbuildinfo
 package-lock.jsonpnpm-lock.yaml
 oroasis/pnpm-lock.yaml
+webview-chat/pnpm-lock.yaml
