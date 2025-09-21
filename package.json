@@ -239,15 +239,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "start:webview": "cd webview-chat && npm run start",
-    "build:webview": "cd webview-chat && npm run build",
+    "vscode:prepublish": "pnpm run compile",
+    "start:webview": "cd webview-chat && pnpm run start",
+    "build:webview": "cd webview-chat && pnpm run build",
     "compile": "tsc -b ./",
     "watch": "tsc -b --watch ./",
     "lint": "eslint src",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "pnpm run compile && pnpm run lint",
     "test": "vscode-test",
-    "postinstall": "cd oroasis && npm install && cd ../webview-chat && npm install && cd ..",
+    "postinstall": "cd oroasis && pnpm install && cd ../webview-chat && pnpm install && cd ..",
     "clean": "rm -rf node_modules oroasis/out oroasis/node_modules oroasis/tsconfig.tsbuildinfo webview-chat/dist webview-chat/node_modules package-lock.json"
   },
   "devDependencies": {
