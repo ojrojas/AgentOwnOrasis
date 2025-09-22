@@ -9,7 +9,7 @@ import { IMessage } from '../../core/types/message.type';
 import { IChat } from '../../core/types/chat.type';
 import { VscodeService } from '../../core/services/vscode-service';
 import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
-import { SettginsStore } from '../../store/settings/settings.store';
+import { SettingsStore } from '../../store/settings/settings.store';
 
 @Component({
   selector: 'app-chat-container',
@@ -27,14 +27,13 @@ import { SettginsStore } from '../../store/settings/settings.store';
 export class ChatContainerComponent {
   readonly chatStore = inject(ChatStore);
   readonly vscode = inject(VscodeService);
-  readonly settingsStore = inject(SettginsStore);
+  readonly settingsStore = inject(SettingsStore);
 
   constructor() {
     effect(() => {
       this.settingsStore.getConfiguration();
       this.chatStore.loadModels();
       this.chatStore.loadMessages();
-      // this.chatStore.getPreferredModel();
       this.chatStore.loadWorkSpaceFolders();
     });
 
@@ -63,17 +62,20 @@ export class ChatContainerComponent {
 
   private ensureChatAndSend(message: IMessage): void {
     let chatId = this.chatStore.selectedChatId();
-
+    debugger;
+    message.type = message.type !== 'Agent' ? 'generated' : 'chat';
     if (!chatId) {
-      const newChat: IChat = { id: uuidv4(), messages: [] };
+      const newChat: IChat = { id: uuidv4(), messages: [message] };
       this.chatStore.createChat(newChat);
       this.chatStore.selectChat(newChat.id);
       chatId = newChat.id;
     }
+    else {
+      message.chatId = chatId;
+      this.chatStore.addMessages(message);
+    }
 
-    message.chatId = chatId;
-    const messageToSend = this.chatStore.postMessage(message);
-    this.chatStore.sendChat(messageToSend);
+    this.chatStore.sendChat(message);
   }
 
   currentMessages = computed(() => {

@@ -44,7 +44,7 @@ function addSubscriber(item: vscode.Disposable) {
 export async function activate(context: vscode.ExtensionContext) {
 
 	const repositoryFactory = new RepositoryFactory(context);
-	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = repositoryFactory.createWorkspaceRepository('chats-repository');
+	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = repositoryFactory.createWorkspaceRepository('oroasis-chats-repository');
 	const providerRepository: IGlobalStateRepository<IProviderConfig> = repositoryFactory.createGlobalRepository('oroasis-provider-repository');
 
 	const settings = vscode.workspace.getConfiguration("oroasisSettings");

@@ -57,20 +57,13 @@ export const ChatStore = signalStore(
     },
 
     /** -------------------- Messages -------------------- **/
-    postMessage(message: IMessage) {
+    addMessages(message: IMessage) {
       patchState(store, setPending());
       patchState(store, state =>
         updateChatById(state, message.chatId!, chat => ({
           ...chat,
           messages: [...chat.messages, message],
-        }))
-        , setFulfilled());
-
-      return {
-        ...message,
-        model: message.model,
-        type: message.type !== 'Agent' ? 'generated' : 'chat'
-      };
+        })), setFulfilled());
     },
 
     sendChat(message: IMessage) {
@@ -82,11 +75,11 @@ export const ChatStore = signalStore(
       const chat = this.getSelectedChat(state);
       const context = chat?.context;
 
+      debugger;
       vscodeService.sendMessage('sendChat', {
         ...message,
         chatId,
         context,
-        messages: [...(chat?.messages ?? []), message].map(m => ({ role: m.role, content: m.content }))
       });
 
       vscodeService.onMessage<IMessage>('sendChat:response', (partialResponse) => {

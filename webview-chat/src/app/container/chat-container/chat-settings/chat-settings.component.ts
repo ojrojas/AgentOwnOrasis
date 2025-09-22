@@ -4,8 +4,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ChatStore } from '../../../store/chat/chat.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCard } from "@angular/material/card";
-import { SettginsStore } from '../../../store/settings/settings.store';
-import { IProviderConfig } from '../../../core/types/provider.type';
+import { SettingsStore } from '../../../store/settings/settings.store';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -23,7 +22,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ChatSettingsComponent {
   private formbuilder = inject(FormBuilder);
-  readonly settingsStore = inject(SettginsStore);
+  readonly settingsStore = inject(SettingsStore);
   readonly chatStore = inject(ChatStore);
   emptyString = '';
 
@@ -35,16 +34,14 @@ export class ChatSettingsComponent {
     modelCompletions: ['', Validators.required]
   });
 
-
   constructor() {
     const result = this.settingsStore.isConfigureVisible();
-    console.log("result hasConfigure", result);
+    console.log("hasConfigure", result);
 
     effect(() => {
       const providers = this.settingsStore.providers();
       const selected = providers?.find(p => p.isSelected);
 
-      debugger;
       if (selected) {
         this.providerSettings.patchValue(
           {
@@ -76,7 +73,6 @@ export class ChatSettingsComponent {
     });
 
     this.settingsStore.saveConfiguration(updatedProviders);
-    debugger;
     this.settingsStore.setConfigVisible(false);
   }
 

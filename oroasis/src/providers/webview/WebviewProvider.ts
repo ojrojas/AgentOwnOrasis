@@ -2,7 +2,6 @@ import { WebviewViewProvider, WebviewView, WebviewPanel, Disposable, ExtensionCo
 import { registerChatCommands } from "../../core/commands/webview.commands.chat";
 import { registerWorkspaceCommands } from "../../core/commands/webview.workspace.commnads";
 import { IProviderFactory } from "../../core/services/provider.factory.service";
-import { ProvidersMap } from "../../core/types/provider.type";
 import { WebviewListeners } from "../../core/webview/webview.listener";
 import { WebviewHtmlBuilder } from "../../core/webview/webviewhtml.builder";
 import { getNonce } from "../../shared/generics/nonce";

@@ -27,7 +27,7 @@
       </div>
       }
       <div class="form-group">
-        <label for="modelRefactors">Select model refactor</label>
+        <label for="modelRefactors">Select model refactor/agent</label>
         <select formControlName="modelRefactors" name="modelRefactors" id="modelRefactors">
           @for (model of chatStore.models()?.models; track model) {
           <option [value]="model.model">{{ model.name }}</option>

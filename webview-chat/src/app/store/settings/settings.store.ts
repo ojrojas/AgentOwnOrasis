@@ -8,7 +8,7 @@ import { IProviderConfig } from "../../core/types/provider.type";
 
 const settingsState = signalState<SettingsState>(initialStateSettings);
 
-export const SettginsStore = signalStore(
+export const SettingsStore = signalStore(
   { providedIn: 'root' },
   withState(settingsState),
   withRequestStatus(),

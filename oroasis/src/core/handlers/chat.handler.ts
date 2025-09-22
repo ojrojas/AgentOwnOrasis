@@ -40,7 +40,8 @@ export function createChatHandlers(
         // },
 
         "getAllMessages:request": async (requestId: string) => {
-            sendToWebview(panel, "getAllMessages:response", requestId, chatRepository.findAllSync());
+            const chats = chatRepository.findAllSync();
+            sendToWebview(panel, "getAllMessages:response", requestId, chats);
         },
 
         "getInfoModel:request": async (requestId: string, payload: any) => {
@@ -55,23 +56,38 @@ export function createChatHandlers(
                 return;
             }
 
-            let chat = chatRepository.findById(payload.chatId) ?? {
-                id: payload.chatId,
-                messages: payload.messages ?? [],
-                context: payload.context ?? []
-            };
-
-            chat.messages.push({
-                id: payload.id,
-                content: payload.content,
-                model: payload.model,
-                role: payload.role,
-                timestamp: payload.timestamp,
-                context: payload.context
-            });
-
+            let chat = chatRepository.findById(payload.chatId);
             try {
-                await chatRepository.updateById(payload.chatId, chat);
+
+                if (chat === undefined) {
+                    chat = {
+                        id: payload.chatId,
+                        messages: [{
+                            content: payload.content,
+                            id: uuidv4(),
+                            model: payload.model,
+                            role: payload.role,
+                            timestamp: new Date(),
+                            chatId: payload.chatId,
+                            done: true,
+                        }],
+                        context: payload.context ?? [],
+                        done: true
+                    };
+                    await chatRepository.insert(chat);
+                } else {
+                    chat.messages.push({
+                        id: uuidv4(),
+                        content: payload.content,
+                        model: payload.model,
+                        role: payload.role,
+                        timestamp: payload.timestamp,
+                        context: payload.context,
+                        done: true,
+                        chatId: payload.id
+                    });
+                    await chatRepository.updateById(payload.chatId, chat);
+                }
             } catch (repoError) {
                 outputChannel.appendLine(`Warning: Failed to update chat repository at start: ${repoError}`);
             }
@@ -85,7 +101,7 @@ export function createChatHandlers(
                 if (payload.type === 'chat') {
                     let chatStream = adapter.chatStream?.({
                         model: payload.model,
-                        messages: chat.messages,
+                        messages: payload.messages,
                         options: { temperature },
                     } as IChatRequest);
 
@@ -148,7 +164,7 @@ export function createChatHandlers(
                     }
                 }
 
-                chat.messages.push({
+                chat!.messages.push({
                     content: accumulated,
                     role: "assistant",
                     done: true,
@@ -159,7 +175,7 @@ export function createChatHandlers(
                 });
 
                 try {
-                    await chatRepository.updateById(payload.chatId, chat);
+                    await chatRepository.updateById(payload.chatId, chat!);
                 } catch (repoError) {
                     outputChannel.appendLine(`Warning: Failed to update chat repository at end: ${repoError}`);
                 }

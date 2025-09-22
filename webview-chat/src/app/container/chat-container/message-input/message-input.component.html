@@ -12,12 +12,12 @@
 
     <mat-card-actions class="actions-container">
       <div class="actions-selects">
-        <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading"
+        <!-- <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading"
           (change)="onChangeSelected($event)">
           @for (model of chatStore.models()?.models; track model) {
           <option [value]="model.model">{{ model.name }}</option>
           }
-        </select>
+        </select> -->
 
         <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
           <option value="Ask">Ask</option>

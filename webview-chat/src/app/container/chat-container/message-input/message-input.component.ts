@@ -14,6 +14,7 @@ import { ChatStore } from '../../../store/chat/chat.store';
 import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { IModelInfo } from '../../../core/types/models.types';
+import { SettingsStore } from '../../../store/settings/settings.store';
 
 @Component({
   selector: 'app-message-input',
@@ -36,6 +37,7 @@ import { IModelInfo } from '../../../core/types/models.types';
 export class MessageInputComponent {
 
   readonly chatStore = inject(ChatStore);
+  readonly settingsStore = inject(SettingsStore);
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
 
@@ -47,12 +49,12 @@ export class MessageInputComponent {
 
   constructor() {
     effect(() => {
-      const list = this.chatStore.models()?.models ?? [];
-      // if (list.length) {
-      //   this.chatStore.getPreferredModel().then(pref => {
-      //     this.modelText = this.chatStore.preferredModel() ?? '';
-      //   });
-      // }
+      const providers = this.settingsStore.providers();
+      const selected = providers?.find(p => p.isSelected);
+
+      if (selected) {
+        this.modelText = selected.refactorModel ?? '';
+      }
     });
   }
 
@@ -111,6 +113,7 @@ export class MessageInputComponent {
       return;
     }
 
+    debugger;
     console.log("KeyPress:", event.key);
     event.preventDefault();
 
