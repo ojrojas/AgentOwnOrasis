@@ -1,5 +1,5 @@
 <div class="chat-container">
-  <app-chat-settings class="chat-container-settings" *ngIf="!settingsStore.isConfigureVisible()">
+  <app-chat-settings class="chat-container-settings" *ngIf="settingsStore.isConfigureVisible()">
   </app-chat-settings>
 
   <app-chat-list class="chat-container-list-chat" *ngIf="!chatStore.selectedChatId()"

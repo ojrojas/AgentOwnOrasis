@@ -1,49 +1,74 @@
-import { Component, computed, inject } from '@angular/core';
-import { MatInputModule, MatInput } from "@angular/material/input";
+import { Component, computed, effect, inject } from '@angular/core';
+import { MatInput } from "@angular/material/input";
 import { MatSelectModule } from '@angular/material/select';
 import { ChatStore } from '../../../store/chat/chat.store';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCard } from "@angular/material/card";
 import { SettginsStore } from '../../../store/settings/settings.store';
+import { IProviderConfig } from '../../../core/types/provider.type';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chat-settings',
   imports: [
+    CommonModule,
     FormsModule,
     MatSelectModule,
     MatCard,
-    MatInput
+    MatInput,
+    ReactiveFormsModule
   ],
   templateUrl: './chat-settings.component.html',
   styleUrl: './chat-settings.component.scss'
 })
 export class ChatSettingsComponent {
+  private formbuilder = inject(FormBuilder);
   readonly settingsStore = inject(SettginsStore);
   readonly chatStore = inject(ChatStore);
-  modelCompletions: string = '';
-  modelRefactors: string = '';
-  baseUrl: string = '';
-  provider: string = '';
-  apiKey: string = '';
+  emptyString = '';
+
+  providerSettings = this.formbuilder.group({
+    provider: ['', Validators.required],
+    baseUrl: ['', Validators.nullValidator],
+    apiKey: ['', Validators.nullValidator],
+    modelRefactors: ['', Validators.required],
+    modelCompletions: ['', Validators.required]
+  });
+
 
   constructor() {
     const result = this.settingsStore.isConfigureVisible();
     console.log("result hasConfigure", result);
+
+    effect(() => {
+      const providers = this.settingsStore.providers();
+      const selected = providers?.find(p => p.isSelected);
+
+      debugger;
+      if (selected) {
+        this.providerSettings.patchValue(
+          {
+            ...selected,
+            provider: selected.id,
+            modelCompletions: selected.completionModel,
+            modelRefactors: selected.refactorModel,
+          }, { emitEvent: false });
+      }
+    });
   }
 
   async onSave() {
     const providers = this.settingsStore.providers()!;
     const updatedProviders = providers.map(provider => {
-      if (provider.id === this.provider) {
+      if (provider.id === this.providerSettings.value.provider) {
         return {
           ...provider, ...{
-            id: this.provider,
+            id: this.providerSettings.value.provider ?? this.emptyString,
             isSelected: true,
-            apiKey: this.apiKey,
-            baseUrl: this.baseUrl,
-            refactorModel: this.modelRefactors,
-            completionModel: this.modelCompletions,
-            extraOptions: [],
+            apiKey: this.providerSettings.value.apiKey ?? this.emptyString,
+            baseUrl: this.providerSettings.value.baseUrl ?? this.emptyString,
+            refactorModel: this.providerSettings.value.modelRefactors ?? this.emptyString,
+            completionModel: this.providerSettings.value.modelCompletions ?? this.emptyString,
           }
         };
       }
@@ -51,6 +76,8 @@ export class ChatSettingsComponent {
     });
 
     this.settingsStore.saveConfiguration(updatedProviders);
+    debugger;
+    this.settingsStore.setConfigVisible(false);
   }
 
   currentConfiguration = computed(() => {

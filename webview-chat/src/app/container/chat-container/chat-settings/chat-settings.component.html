@@ -1,40 +1,55 @@
 <div class="container-settings">
   <mat-card class="chat-settings">
     <h3>Settings</h3>
-
-    <form class="chat-settings-form">
+    <form class="chat-settings-form" [formGroup]="providerSettings">
       <div class="form-group">
         <label for="provider">Select provider</label>
-        <select [(ngModel)]="provider" name="provider" id="provider">
+        <select formControlName="provider" name="provider" id="provider">
           @for (provider of settingsStore.providers(); track provider) {
           <option [value]="provider.id">{{ provider.id }}</option>
           }
         </select>
+        <div class="error"
+          *ngIf="providerSettings.get('provider')?.touched && providerSettings.get('provider')?.hasError('required')">
+          Provider is required
+        </div>
       </div>
-      @if(provider === 'ollama')
+      @if(this.providerSettings.value.provider === 'ollama')
       {
       <div class="form-group">
         <label for="baseUrl">Base url provider</label>
-        <input matInput [(ngModel)]="baseUrl" name="baseUrl" id="baseUrl"
+        <input matInput formControlName="baseUrl" name="baseUrl" id="baseUrl"
           placeholder="http://localhost:11434 for ollama">
+        <div class="error"
+          *ngIf="providerSettings.get('baseUrl')?.touched && providerSettings.get('baseUrl')?.hasError('required')">
+          Base URL is required
+        </div>
       </div>
       }
       <div class="form-group">
         <label for="modelRefactors">Select model refactor</label>
-        <select [(ngModel)]="modelRefactors" name="modelRefactors" id="modelRefactors">
+        <select formControlName="modelRefactors" name="modelRefactors" id="modelRefactors">
           @for (model of chatStore.models()?.models; track model) {
           <option [value]="model.model">{{ model.name }}</option>
           }
         </select>
+        <div class="error"
+          *ngIf="providerSettings.get('modelRefactors')?.touched && providerSettings.get('modelRefactors')?.hasError('required')">
+          Refactor model is required
+        </div>
       </div>
 
       <div class="form-group">
         <label for="modelCompletions">Select model completion</label>
-        <select [(ngModel)]="modelCompletions" name="modelCompletions" id="modelCompletions">
+        <select formControlName="modelCompletions" name="modelCompletions" id="modelCompletions">
           @for (model of chatStore.models()?.models; track model) {
           <option [value]="model.model">{{ model.name }}</option>
           }
         </select>
+        <div class="error"
+          *ngIf="providerSettings.get('modelCompletions')?.touched && providerSettings.get('modelCompletions')?.hasError('required')">
+          Completion model is required
+        </div>
       </div>
 
       <button type="button" class="chat-settings-save" (click)="onSave()">Save</button>
