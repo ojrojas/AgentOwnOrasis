@@ -1,11 +1,18 @@
-import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef, signal, computed } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { matSendOutline, matHourglassEmptyOutline, matMicOutline } from '@ng-icons/material-icons/outline';
+import {
+  iconoirSend,
+  iconoirHourglass,
+  iconoirMicrophone,
+  iconoirEye,
+  iconoirSparks,
+  iconoirPlugTypeA
+} from '@ng-icons/iconoir';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from '@angular/material/select';
@@ -15,6 +22,7 @@ import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { IModelInfo } from '../../../core/types/models.types';
 import { SettingsStore } from '../../../store/settings/settings.store';
+import { formatContextUsage } from '../../../core/utils/context.utils';
 
 @Component({
   selector: 'app-message-input',
@@ -32,28 +40,43 @@ import { SettingsStore } from '../../../store/settings/settings.store';
   ],
   templateUrl: `message-input.component.html`,
   styleUrl: `message-input.component.scss`,
-  viewProviders: [provideIcons({ matSendOutline, matHourglassEmptyOutline, matMicOutline })]
+  viewProviders: [
+    provideIcons({
+      iconoirSend,
+      iconoirHourglass,
+      iconoirMicrophone,
+      iconoirEye,
+      iconoirSparks,
+      iconoirPlugTypeA
+    })]
 })
 export class MessageInputComponent {
 
   readonly chatStore = inject(ChatStore);
   readonly settingsStore = inject(SettingsStore);
+
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
 
   @Output() messageSent = new EventEmitter<IMessage>();
+
   modelText: string = '';
   typeMessage: string = 'Ask';
   messageText: string = '';
   modelSelected?: IModelInfo;
 
+  usageTypeCount = signal(0);
+  private modelSelectedTrigger = signal(0);
+
+
   constructor() {
-    effect(() => {
+    effect(async () => {
       const providers = this.settingsStore.providers();
       const selected = providers?.find(p => p.isSelected);
 
       if (selected) {
         this.modelText = selected.refactorModel ?? '';
+        this.modelSelected = await this.chatStore.getInfoModel(this.modelText);
       }
     });
   }
@@ -67,13 +90,6 @@ export class MessageInputComponent {
   activeMicrophone() {
     this.isActiveMicrophone = !this.isActiveMicrophone;
     console.log("micro is :", this.isActiveMicrophone);
-  }
-
-  async onChangeSelected(event: Event) {
-    event.preventDefault();
-    const model = (event.target as HTMLSelectElement).value;
-    this.modelSelected = await this.chatStore.getInfoModel(model);
-    console.log("model-selected", this.modelSelected);
   }
 
   get isSendDisabled(): boolean {
@@ -105,44 +121,56 @@ export class MessageInputComponent {
         done: true
       });
       this.messageText = '';
+      this.usageTypeCount.set(0);
     }
   }
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key !== '@') {
+      if (this.modelSelected?.model_info.ctx_number === undefined) {
+        return;
+      }
+
+      this.usageTypeCount.update((v) => v + (event.currentTarget as HTMLTextAreaElement).textLength);
+      this.usageTextContext();
       return;
     }
+    else {
+      console.log("KeyPress:", event.key);
+      event.preventDefault();
 
-    debugger;
-    console.log("KeyPress:", event.key);
-    event.preventDefault();
+      const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
+      if (!dropdown) { return; }
 
-    const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
-    if (!dropdown) { return; }
+      dropdown.innerHTML = '';
 
-    dropdown.innerHTML = '';
+      this.chatStore.files().forEach(filePath => {
+        const fileName = filePath.split(/[/\\]/).pop() || '';
 
-    this.chatStore.files().forEach(filePath => {
-      const fileName = filePath.split(/[/\\]/).pop() || '';
+        const ul = document.createElement('ul');
+        ul.classList.add("list-append-file");
+        const li = document.createElement('li');
+        li.textContent = fileName;
+        li.tabIndex = 0;
 
-      const ul = document.createElement('ul');
-      ul.classList.add("list-append-file");
-      const li = document.createElement('li');
-      li.textContent = fileName;
-      li.tabIndex = 0;
+        li.addEventListener('click', () => {
+          this.messageText += `@${fileName} `;
+          dropdown.classList.remove('show');
+        });
 
-      li.addEventListener('click', () => {
-        this.messageText += `@${fileName} `;
-        dropdown.classList.remove('show');
+        ul.appendChild(li);
+
+        dropdown.appendChild(ul);
       });
 
-      ul.appendChild(li);
-
-      dropdown.appendChild(ul);
-    });
-
-    if (this.chatStore.files().length > 0) {
-      dropdown.classList.add('show');
+      if (this.chatStore.files().length > 0) {
+        dropdown.classList.add('show');
+      }
     }
   }
+
+  usageTextContext = computed(() => {
+    if (!this.modelSelected?.model_info.ctx_number) { return ''; }
+    return formatContextUsage(this.usageTypeCount(), this.modelSelected.model_info.ctx_number);
+  });
 }

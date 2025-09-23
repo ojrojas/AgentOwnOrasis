@@ -24,35 +24,35 @@
           <option value="Edit">Edit</option>
           <option value="Agent">Agent</option>
         </select>
+        @if (modelSelected !== undefined) {
+        <div class="tools-container">
+          <div><b>tokens:</b> {{ usageTextContext() }}</div>
+          <span> - </span>
+          <div *ngIf="modelSelected.capabilities.includes('vision')"><ng-icon name="iconoirEye" /> </div>
+          <div *ngIf="modelSelected.capabilities.includes('thinking')"><ng-icon name="iconoirSparks" />
+          </div>
+          <div *ngIf="modelSelected.capabilities.includes('completion')"><ng-icon name="iconoirPlugTypeA" /> </div>
+        </div>
+        }
       </div>
 
       <div class="actions-buttons">
         <button mat-icon-button class="microphone-button" [class.is-active]="isActiveMicrophone"
           (click)="activeMicrophone()" [disabled]="isMicDisabled" aria-label="Activate microphone">
-          <ng-icon name="matMicOutline" />
+          <ng-icon name="iconoirMicrophone" />
         </button>
 
         <button mat-icon-button class="send-button" [class.is-active]="!isSendDisabled" (click)="sendMessage()"
           [disabled]="isSendDisabled" aria-label="Send message">
 
           @if (!isLoading) {
-          <ng-icon name="matSendOutline" />
+          <ng-icon name="iconoirSend" />
           }
           @if (isLoading) {
-          <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
+          <ng-icon class="loading-icon" name="iconoirHourglass" />
           }
         </button>
       </div>
     </mat-card-actions>
-    @if (modelSelected !== undefined) {
-    <div class="model-details">
-      <div><b>num_ctx:</b> {{ modelSelected.model_info.ctx_number }}</div>
-      <div *ngIf="modelSelected.capabilities?.length">
-        <b>tools:</b> {{ modelSelected.capabilities.join(', ') }}
-      </div>
-      <div *ngIf="modelSelected.capabilities.includes('vision')"><b>vision:</b> ✅</div>
-      <div *ngIf="modelSelected.capabilities.includes('thinking')"><b>think:</b> ✅</div>
-    </div>
-    }
   </mat-card>
 </div>

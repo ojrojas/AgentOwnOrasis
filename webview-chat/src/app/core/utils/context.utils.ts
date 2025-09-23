@@ -14,7 +14,7 @@ export function ToHumanReadable(ctx_number: number): string {
   }
 }
 
-function formatContextUsage(typed: number, total: number): string {
+export function formatContextUsage(typed: number, total: number): string {
   const remaining = Math.max(total - typed, 0);
   return `${ToHumanReadable(remaining)}/${ToHumanReadable(total)}`;
 }

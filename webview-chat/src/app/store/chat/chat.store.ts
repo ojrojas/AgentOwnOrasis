@@ -75,7 +75,6 @@ export const ChatStore = signalStore(
       const chat = this.getSelectedChat(state);
       const context = chat?.context;
 
-      debugger;
       vscodeService.sendMessage('sendChat', {
         ...message,
         chatId,
