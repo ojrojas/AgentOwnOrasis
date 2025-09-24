@@ -22,7 +22,9 @@ import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { IModelInfo } from '../../../core/types/models.types';
 import { SettingsStore } from '../../../store/settings/settings.store';
-import { formatContextUsage } from '../../../core/utils/context.utils';
+import { ToHumanReadable } from '../../../core/utils/context.utils';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 @Component({
   selector: 'app-message-input',
@@ -37,6 +39,7 @@ import { formatContextUsage } from '../../../core/utils/context.utils';
     MatIconModule,
     MatCardModule,
     MatSelectModule,
+    MatTooltipModule
   ],
   templateUrl: `message-input.component.html`,
   styleUrl: `message-input.component.scss`,
@@ -64,10 +67,6 @@ export class MessageInputComponent {
   typeMessage: string = 'Ask';
   messageText: string = '';
   modelSelected?: IModelInfo;
-
-  usageTypeCount = signal(0);
-  private modelSelectedTrigger = signal(0);
-
 
   constructor() {
     effect(async () => {
@@ -121,18 +120,11 @@ export class MessageInputComponent {
         done: true
       });
       this.messageText = '';
-      this.usageTypeCount.set(0);
     }
   }
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key !== '@') {
-      if (this.modelSelected?.model_info.ctx_number === undefined) {
-        return;
-      }
-
-      this.usageTypeCount.update((v) => v + (event.currentTarget as HTMLTextAreaElement).textLength);
-      this.usageTextContext();
       return;
     }
     else {
@@ -169,8 +161,8 @@ export class MessageInputComponent {
     }
   }
 
-  usageTextContext = computed(() => {
-    if (!this.modelSelected?.model_info.ctx_number) { return ''; }
-    return formatContextUsage(this.usageTypeCount(), this.modelSelected.model_info.ctx_number);
-  });
+  renderTokens() {
+    if (this.modelSelected?.model_info.ctx_number) { return ToHumanReadable(this.modelSelected?.model_info.ctx_number); }
+    else { return ''; }
+  }
 }

@@ -12,13 +12,6 @@
 
     <mat-card-actions class="actions-container">
       <div class="actions-selects">
-        <!-- <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading"
-          (change)="onChangeSelected($event)">
-          @for (model of chatStore.models()?.models; track model) {
-          <option [value]="model.model">{{ model.name }}</option>
-          }
-        </select> -->
-
         <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
           <option value="Ask">Ask</option>
           <option value="Edit">Edit</option>
@@ -26,12 +19,15 @@
         </select>
         @if (modelSelected !== undefined) {
         <div class="tools-container">
-          <div><b>tokens:</b> {{ usageTextContext() }}</div>
-          <span> - </span>
-          <div *ngIf="modelSelected.capabilities.includes('vision')"><ng-icon name="iconoirEye" /> </div>
-          <div *ngIf="modelSelected.capabilities.includes('thinking')"><ng-icon name="iconoirSparks" />
+          <span>tk: {{ renderTokens() }}</span>
+          <div matTooltip="Vision capability" *ngIf="modelSelected.capabilities.includes('vision')"><ng-icon
+              name="iconoirEye" />
           </div>
-          <div *ngIf="modelSelected.capabilities.includes('completion')"><ng-icon name="iconoirPlugTypeA" /> </div>
+          <div matTooltip="Thinking capability" *ngIf="modelSelected.capabilities.includes('thinking')"><ng-icon
+              name="iconoirSparks" />
+          </div>
+          <div matTooltip="Completion capability" *ngIf="modelSelected.capabilities.includes('completion')"><ng-icon
+              name="iconoirPlugTypeA" /> </div>
         </div>
         }
       </div>

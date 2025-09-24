@@ -1,6 +1,16 @@
 <div class="message-container" [class.user-message]="message.role === 'user'"
   [class.bot-message]="message.role === 'assistant'">
+
   <div class="message-content">
-    <div [innerHTML]="processedContent"></div>
+    <ng-container *ngFor="let block of blocks">
+      <div *ngIf="block.type === 'content'" [innerHTML]="block.html"></div>
+
+      <mat-expansion-panel *ngIf="block.type === 'thinking'" class="thinking-panel">
+        <mat-expansion-panel-header>
+          <span>🧠 Thinking ...</span>
+        </mat-expansion-panel-header>
+        <div [innerHTML]="block.html"></div>
+      </mat-expansion-panel>
+    </ng-container>
   </div>
 </div>
