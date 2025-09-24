@@ -1,16 +1,10 @@
 <div class="container-input">
   <mat-card class="message-input-container" [class.border-animated]="isLoading">
-    
+
     <div class="input-wrapper">
       <div class="message-field">
-        <textarea
-          matInput
-          [(ngModel)]="messageText"
-          [placeholder]="placeholder"
-          [disabled]="isLoading"
-          (keydown.enter)="onEnterPressed($event)"
-          (keydown)="onKeyDown($event)"
-          rows="3">
+        <textarea matInput [(ngModel)]="messageText" [placeholder]="placeholder" [disabled]="isLoading"
+          (keydown.enter)="onEnterPressed($event)" (keydown)="onKeyDown($event)" rows="3">
         </textarea>
         <div id="fileDropdown" class="dropdown"></div>
       </div>
@@ -18,43 +12,40 @@
 
     <mat-card-actions class="actions-container">
       <div class="actions-selects">
-        <select [(ngModel)]="modelText" class="select-models-field" [disabled]="isLoading">
-          @for (model of chatStore.models()?.models; track model) {
-            <option [ngValue]="model.model">{{ model.name }}</option>
-          }
-        </select>
-
         <select [(ngModel)]="typeMessage" class="select-type-message-field" [disabled]="isLoading">
-          <option ngValue="Ask">Ask</option>
-          <option ngValue="Edit">Edit</option>
-          <option ngValue="Agent">Agent</option>
+          <option value="Ask">Ask</option>
+          <option value="Edit">Edit</option>
+          <option value="Agent">Agent</option>
         </select>
+        @if (modelSelected !== undefined) {
+        <div class="tools-container">
+          <span>tk: {{ renderTokens() }}</span>
+          <div matTooltip="Vision capability" *ngIf="modelSelected.capabilities.includes('vision')"><ng-icon
+              name="iconoirEye" />
+          </div>
+          <div matTooltip="Thinking capability" *ngIf="modelSelected.capabilities.includes('thinking')"><ng-icon
+              name="iconoirSparks" />
+          </div>
+          <div matTooltip="Completion capability" *ngIf="modelSelected.capabilities.includes('completion')"><ng-icon
+              name="iconoirPlugTypeA" /> </div>
+        </div>
+        }
       </div>
 
       <div class="actions-buttons">
-        <button
-          mat-icon-button
-          class="microphone-button"
-          [class.is-active]="isActiveMicrophone"
-          (click)="activeMicrophone()"
-          [disabled]="isMicDisabled"
-          aria-label="Activate microphone">
-          <ng-icon name="matMicOutline" />
+        <button mat-icon-button class="microphone-button" [class.is-active]="isActiveMicrophone"
+          (click)="activeMicrophone()" [disabled]="isMicDisabled" aria-label="Activate microphone">
+          <ng-icon name="iconoirMicrophone" />
         </button>
 
-        <button
-          mat-icon-button
-          class="send-button"
-          [class.is-active]="!isSendDisabled"
-          (click)="sendMessage()"
-          [disabled]="isSendDisabled"
-          aria-label="Send message">
+        <button mat-icon-button class="send-button" [class.is-active]="!isSendDisabled" (click)="sendMessage()"
+          [disabled]="isSendDisabled" aria-label="Send message">
 
           @if (!isLoading) {
-            <ng-icon name="matSendOutline" />
+          <ng-icon name="iconoirSend" />
           }
           @if (isLoading) {
-            <ng-icon class="loading-icon" name="matHourglassEmptyOutline" />
+          <ng-icon class="loading-icon" name="iconoirHourglass" />
           }
         </button>
       </div>

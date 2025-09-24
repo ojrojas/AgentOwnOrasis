@@ -25,7 +25,8 @@
     color: var(--vscode-editor-foreground);
   }
 
-  select {
+  select,
+  input {
     background-color: #2d2d2d;
     color: var(--vscode-editor-foreground);
     border: 1px solid var(--vscode-editorWidget-border);

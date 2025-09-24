@@ -1,4 +1,4 @@
-.container-input{
+.container-input {
   padding: 5px 5px 5px 5px;
 }
 
@@ -19,19 +19,18 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 2px; /* grosor del borde */
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ff1744,
-    transparent
-  );
+  padding: 2px;
+  /* grosor del borde */
+  background: linear-gradient(90deg,
+      transparent,
+      #ff1744,
+      transparent);
   background-size: 200% 100%;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
-          mask-composite: exclude;
+  mask-composite: exclude;
   animation: border-move 2s ease-in-out infinite alternate;
 }
 
@@ -54,11 +53,11 @@
   color: var(--vscode-editor-foreground);
 }
 
-.select-type-message-field{
+.select-type-message-field {
   background-color: #2d2d2d;
   color: var(--vscode-editor-foreground);
   border-radius: 5px;
-  margin:1px
+  margin: 1px
 }
 
 .select-models-field {
@@ -66,7 +65,7 @@
   color: var(--vscode-editor-foreground);
   border-radius: 5px;
   min-width: 120px;
-  margin:1px
+  margin: 1px
 }
 
 .select-models-field:focus {
@@ -79,12 +78,10 @@ mat-card-actions {
   justify-content: space-between;
 }
 
-
 .send-button.is-active {
   background-color: var(--mat-primary);
   color: azure;
 }
-
 
 .send-button:disabled {
   background-color: var(--mat-primary);
@@ -137,14 +134,16 @@ textarea:focus {
 }
 
 textarea::placeholder {
-  color: var(--vscode-editor-foreground);
+  color: var(--mat-sys-outline);
+  font-size: 12px;
 }
 
 #fileDropdown {
   opacity: 0;
   transform: translateY(-5px);
   transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none; /* Evita clics cuando está oculto */
+  pointer-events: none;
+  /* Evita clics cuando está oculto */
 }
 
 #fileDropdown.show {
@@ -172,15 +171,18 @@ textarea::placeholder {
   margin: 0;
   z-index: 1000;
 }
+
 .dropdown li {
-    padding: 5px 10px;
-    cursor: pointer;
+  padding: 5px 10px;
+  cursor: pointer;
 }
+
 .dropdown li:hover {
-    background: #eee;
+  background: #eee;
 }
+
 .hidden {
-    display: none;
+  display: none;
 }
 
 .actions-container {
@@ -202,4 +204,15 @@ textarea::placeholder {
 .microphone-button.is-active {
   background-color: var(--mat-primary);
   color: white;
+}
+
+.tools-container {
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  margin: 5px;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  border-top: 1px solid var(--vscode-panel-border);
 }

@@ -24,7 +24,7 @@ export class VscodeService {
     }
   };
 
-  public request<T>(type: string, payload?: T): Promise<T> {
+  public request<T>(type: string, payload?: any): Promise<T> {
     const requestId = uuidv4();
     const messageType = `${type}:request`;
 
@@ -35,7 +35,8 @@ export class VscodeService {
   }
 
   sendMessage(type: string, payload?: any): void {
-    this.vscode.postMessage({ type: `${type}:request`, payload });
+    const requestId = uuidv4();
+    this.vscode.postMessage({ type: `${type}:request`, requestId, payload });
   }
 
   onMessage<T>(type: string, handler: (payload: T) => void) {
@@ -47,7 +48,8 @@ export class VscodeService {
   }
 
   public send(type: string, payload?: any) {
-    this.vscode.postMessage({ type, payload });
+    const requestId = uuidv4();
+    this.vscode.postMessage({ type, requestId, payload });
   }
 
   public save(key: string, value: any) {

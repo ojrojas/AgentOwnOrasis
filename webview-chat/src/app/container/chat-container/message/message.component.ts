@@ -1,38 +1,71 @@
-import { Component, Input, OnInit, SecurityContext } from '@angular/core';
-
+import { Component, Input, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
 import json from 'highlight.js/lib/languages/json';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IMessage } from '../../../core/types/message.type';
+import { CommonModule } from '@angular/common';
 
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('json', json);
 
+interface IMessageBlock {
+  type: 'thinking' | 'content';
+  html: string;
+}
+
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [MatCardModule],
+  imports: [MatCardModule, MatExpansionModule, CommonModule],
   templateUrl: `message.component.html`,
   styleUrl: `message.component.scss`
 })
 export class MessageComponent implements OnInit {
   @Input() message!: IMessage;
-  processedContent: SafeHtml = '';
-
-  constructor(private sanitizer: DomSanitizer) {}
+  blocks: IMessageBlock[] = [];
 
   ngOnInit() {
-    this.processedContent = this.processMessageContent(this.message.content);
+    this.blocks = this.splitIntoBlocks(this.message.content);
   }
 
-  private processMessageContent(content: string): SafeHtml {
+  private splitIntoBlocks(content: string): IMessageBlock[] {
+    const blocks: IMessageBlock[] = [];
+    const regex = /<think>([\s\S]*?)<\/think>/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        blocks.push({
+          type: 'content',
+          html: this.formatText(content.slice(lastIndex, match.index))
+        });
+      }
+      blocks.push({
+        type: 'thinking',
+        html: this.formatText(match[1])
+      });
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < content.length) {
+      blocks.push({
+        type: 'content',
+        html: this.formatText(content.slice(lastIndex))
+      });
+    }
+
+    return blocks;
+  }
+
+  private formatText(text: string): string {
     const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g;
 
-    let processedContent = content.replace(codeBlockRegex, (match, language, code) => {
+    let processed = text.replace(codeBlockRegex, (match, language, code) => {
       let highlighted = code.trim();
 
       if (language && hljs.getLanguage(language)) {
@@ -44,17 +77,16 @@ export class MessageComponent implements OnInit {
       return `<pre class="hljs"><code class="language-${language}">${highlighted}</code></pre>`;
     });
 
-    processedContent = processedContent.replace(/`([^`]+)`/g, `<code class="inline-code">$1</code>`);
+    processed = processed.replace(/`([^`]+)`/g, `<code class="inline-code">$1</code>`);
+    processed = processed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-    processedContent = processedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-    const paragraphs = processedContent.split('\n\n');
+    const paragraphs = processed.split('\n\n');
     if (paragraphs.length > 1) {
-      processedContent = paragraphs.map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
+      processed = paragraphs.map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
     } else {
-      processedContent = processedContent.replace(/\n/g, '<br>');
+      processed = processed.replace(/\n/g, '<br>');
     }
 
-    return this.sanitizer.sanitize(SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(processedContent)) || '';
+    return processed;
   }
 }

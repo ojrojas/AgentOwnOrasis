@@ -9,30 +9,31 @@ import { IMessage } from '../../core/types/message.type';
 import { IChat } from '../../core/types/chat.type';
 import { VscodeService } from '../../core/services/vscode-service';
 import { ChatSettingsComponent } from "./chat-settings/chat-settings.component";
+import { SettingsStore } from '../../store/settings/settings.store';
 
 @Component({
   selector: 'app-chat-container',
   standalone: true,
   imports: [
-    // ChatHeaderComponent,
     MessageListComponent,
     MessageInputComponent,
     ChatListComponent,
     CommonModule,
     ChatSettingsComponent
-],
+  ],
   templateUrl: 'chat-container.component.html',
   styleUrl: 'chat-container.component.scss'
 })
 export class ChatContainerComponent {
   readonly chatStore = inject(ChatStore);
   readonly vscode = inject(VscodeService);
+  readonly settingsStore = inject(SettingsStore);
 
   constructor() {
     effect(() => {
+      this.settingsStore.getConfiguration();
       this.chatStore.loadModels();
       this.chatStore.loadMessages();
-      this.chatStore.getPreferredModel();
       this.chatStore.loadWorkSpaceFolders();
     });
 
@@ -46,10 +47,9 @@ export class ChatContainerComponent {
         this.chatStore.backToChatList();
         break;
       case 'settings':
-        console.log("Settings");
+        this.settingsStore.setConfigVisible(!this.settingsStore.isConfigureVisible());
         break;
     }
-
   }
 
   onChatSelected(chatId: string) {
@@ -62,17 +62,19 @@ export class ChatContainerComponent {
 
   private ensureChatAndSend(message: IMessage): void {
     let chatId = this.chatStore.selectedChatId();
-
+    message.type = message.type !== 'Agent' ? 'generated' : 'chat';
     if (!chatId) {
-      const newChat: IChat = { id: uuidv4(), messages: [] };
+      const newChat: IChat = { id: uuidv4(), messages: [message] };
       this.chatStore.createChat(newChat);
       this.chatStore.selectChat(newChat.id);
       chatId = newChat.id;
     }
+    else {
+      message.chatId = chatId;
+      this.chatStore.addMessages(message);
+    }
 
-    message.chatId = chatId;
-    const messageToSend = this.chatStore.postMessage(message);
-    this.chatStore.sendChat(messageToSend);
+    this.chatStore.sendChat(message);
   }
 
   currentMessages = computed(() => {

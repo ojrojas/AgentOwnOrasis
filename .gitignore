@@ -8,6 +8,9 @@ package-lock.json
 oroasis/package-lock.json
 media
 DS_Store
+.DS_Store
 oroasis/tsconfig.tsbuildinfo
 package-lock.json
 pnpm-lock.yaml
+oroasis/pnpm-lock.yaml
+webview-chat/pnpm-lock.yaml

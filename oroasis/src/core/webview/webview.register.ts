@@ -1,5 +1,5 @@
 import { window } from "vscode";
-import { WebviewProvider } from "../../providers/webview/webview.provider";
+import { WebviewProvider } from "../../providers/webview/WebviewProvider";
 
 
 export const registerWebView = (webViewProvider: WebviewProvider) => {

@@ -1,11 +1,18 @@
-import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef, signal, computed } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { matSendOutline, matHourglassEmptyOutline, matMicOutline } from '@ng-icons/material-icons/outline';
+import {
+  iconoirSend,
+  iconoirHourglass,
+  iconoirMicrophone,
+  iconoirEye,
+  iconoirSparks,
+  iconoirPlugTypeA
+} from '@ng-icons/iconoir';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from '@angular/material/select';
@@ -13,6 +20,11 @@ import { CommonModule } from '@angular/common';
 import { ChatStore } from '../../../store/chat/chat.store';
 import { IMessage } from '../../../core/types/message.type';
 import { v4 as uuidv4 } from 'uuid';
+import { IModelInfo } from '../../../core/types/models.types';
+import { SettingsStore } from '../../../store/settings/settings.store';
+import { ToHumanReadable } from '../../../core/utils/context.utils';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 @Component({
   selector: 'app-message-input',
@@ -27,29 +39,43 @@ import { v4 as uuidv4 } from 'uuid';
     MatIconModule,
     MatCardModule,
     MatSelectModule,
+    MatTooltipModule
   ],
   templateUrl: `message-input.component.html`,
   styleUrl: `message-input.component.scss`,
-  viewProviders: [provideIcons({ matSendOutline, matHourglassEmptyOutline, matMicOutline })]
+  viewProviders: [
+    provideIcons({
+      iconoirSend,
+      iconoirHourglass,
+      iconoirMicrophone,
+      iconoirEye,
+      iconoirSparks,
+      iconoirPlugTypeA
+    })]
 })
 export class MessageInputComponent {
 
   readonly chatStore = inject(ChatStore);
+  readonly settingsStore = inject(SettingsStore);
+
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
 
   @Output() messageSent = new EventEmitter<IMessage>();
+
   modelText: string = '';
   typeMessage: string = 'Ask';
   messageText: string = '';
+  modelSelected?: IModelInfo;
 
   constructor() {
-    effect(() => {
-      const list = this.chatStore.models()?.models ?? [];
-      if (list.length) {
-        this.chatStore.getPreferredModel().then(pref => {
-          this.modelText = this.chatStore.preferredModel() ?? '';
-        });
+    effect(async () => {
+      const providers = this.settingsStore.providers();
+      const selected = providers?.find(p => p.isSelected);
+
+      if (selected) {
+        this.modelText = selected.refactorModel ?? '';
+        this.modelSelected = await this.chatStore.getInfoModel(this.modelText);
       }
     });
   }
@@ -90,7 +116,8 @@ export class MessageInputComponent {
         timestamp: new Date(),
         model: this.modelText,
         type: this.typeMessage,
-        files: filesToSend
+        files: filesToSend,
+        done: true
       });
       this.messageText = '';
     }
@@ -100,36 +127,42 @@ export class MessageInputComponent {
     if (event.key !== '@') {
       return;
     }
+    else {
+      console.log("KeyPress:", event.key);
+      event.preventDefault();
 
-    console.log("KeyPress:", event.key);
-    event.preventDefault();
+      const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
+      if (!dropdown) { return; }
 
-    const dropdown = document.getElementById('fileDropdown') as HTMLDivElement | null;
-    if (!dropdown) { return; }
+      dropdown.innerHTML = '';
 
-    dropdown.innerHTML = '';
+      this.chatStore.files().forEach(filePath => {
+        const fileName = filePath.split(/[/\\]/).pop() || '';
 
-    this.chatStore.files().forEach(filePath => {
-      const fileName = filePath.split(/[/\\]/).pop() || '';
+        const ul = document.createElement('ul');
+        ul.classList.add("list-append-file");
+        const li = document.createElement('li');
+        li.textContent = fileName;
+        li.tabIndex = 0;
 
-      const ul = document.createElement('ul');
-      ul.classList.add("list-append-file");
-      const li = document.createElement('li');
-      li.textContent = fileName;
-      li.tabIndex = 0;
+        li.addEventListener('click', () => {
+          this.messageText += `@${fileName} `;
+          dropdown.classList.remove('show');
+        });
 
-      li.addEventListener('click', () => {
-        this.messageText += `@${fileName} `;
-        dropdown.classList.remove('show');
+        ul.appendChild(li);
+
+        dropdown.appendChild(ul);
       });
 
-      ul.appendChild(li);
-
-      dropdown.appendChild(ul);
-    });
-
-    if (this.chatStore.files().length > 0) {
-      dropdown.classList.add('show');
+      if (this.chatStore.files().length > 0) {
+        dropdown.classList.add('show');
+      }
     }
+  }
+
+  renderTokens() {
+    if (this.modelSelected?.model_info.ctx_number) { return ToHumanReadable(this.modelSelected?.model_info.ctx_number); }
+    else { return ''; }
   }
 }
