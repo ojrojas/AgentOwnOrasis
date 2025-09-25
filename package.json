@@ -99,11 +99,11 @@
       },
       {
         "command": "oroasis.cleanChats",
-        "title": "Cleaning chats"
+        "title": "Oroasis: Cleaning chats"
       },
       {
         "command": "oroasis.cleanConfig",
-        "title": "Cleaning configuration"
+        "title": "Oroasis: Cleaning configuration"
       },
       {
         "command": "oroasis.addNewChatButton",
