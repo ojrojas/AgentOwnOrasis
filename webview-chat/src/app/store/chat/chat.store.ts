@@ -129,7 +129,7 @@ export const ChatStore = signalStore(
     async loadWorkSpaceFolders() {
       patchState(store, setPending());
       const response = await vscodeService.request<string[]>("listFiles");
-      console.log("ModelInfo => ", response);
+      console.log("Files workspace => ", response);
       patchState(store, { files: response }, setFulfilled());
     },
 

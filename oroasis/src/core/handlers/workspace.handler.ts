@@ -19,8 +19,13 @@ export function createWorkSpaceHandler(
             }
         },
 
-        'writeFileWithPreview:request': async (payload: any) => {
-            await workspaceController.previewAndSave(payload.path, payload.content);
+        'writeFileWithPreview:request': async (requestId: string, payload: any) => {
+            try {
+                await workspaceController.previewAndSave(payload.path, payload.content);
+                sendToWebview(panel, 'writeFileWithPreview:response', requestId, { message: '' });
+            } catch (error) {
+                handleError(error, outputChannel, 'Error write file with preview');
+            }
         },
 
         'writeFilesBatchWithPreview:request': async (payload: any) => {

@@ -75,8 +75,9 @@ export class OllamaAdapter implements IProviderApiService {
   }
 
   async *chatStream(req: IChatRequest): AsyncGenerator<IMessage> {
-    const url = buildProviderUrl(this.config, 'chat');
-    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, stream: true }) });
+    const url = buildProviderUrl(this.config, '/api/chat');
+    const bodyRequest = JSON.stringify({ ...req, stream: true });
+    const res = await fetch(url, { method: 'POST', body: bodyRequest, headers: { 'Content-Type': 'application/json' } });
     if (!res.body) {
       return;
     }

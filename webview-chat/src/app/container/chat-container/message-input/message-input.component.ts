@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, effect, ViewChild, ElementRef, signal, computed } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, effect } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';

@@ -7,10 +7,10 @@ export interface IMessage {
   timestamp: Date;
   model: string;
   done?: boolean;
-  context?:number[];
+  context?: number[];
   type?: string;
   files?: string[];
-  chatId?: string; 
+  chatId?: string;
 }
 
 export interface IToolCall {

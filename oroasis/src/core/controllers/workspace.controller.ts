@@ -3,6 +3,7 @@ import { IPreviewDiffService } from '../interfaces/preview-diff.interface.servic
 import { PreviewDiffService } from '../services/preview-diff.service';
 import { IFileChange } from '../types/file-change.type';
 import { IWorkspaceFilesRepositoryService } from '../interfaces/workspace-repository-files.interface.service';
+import * as path from 'path';
 
 export class WorkspaceController {
   readonly previewDiffService: IPreviewDiffService = new PreviewDiffService();
@@ -53,5 +54,16 @@ export class WorkspaceController {
   async deleteFile(filePath: string) {
     await this.workspaceService.deleteFile(filePath);
     vscode.window.showInformationMessage(`Deleted file success: ${filePath}`);
+  }
+
+
+  resolveWorkspacePath(relativePath: string): string {
+    const folders = vscode.workspace.workspaceFolders;
+    if (!folders || folders.length === 0) {
+      throw new Error("No workspace open");
+    }
+
+    const rootPath = folders[0].uri.fsPath; // 👈 primer workspace abierto
+    return path.join(rootPath, relativePath);
   }
 }

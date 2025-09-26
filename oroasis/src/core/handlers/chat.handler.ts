@@ -6,6 +6,12 @@ import { sendToWebview } from '../../shared/utils/chat.utils';
 import { IProviderFactory } from '../services/provider.factory.service';
 import { asAsyncGenerator } from '../../shared/generics/asasyncgenerator';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
+import { WorkspaceController } from '../controllers/workspace.controller';
+import { IFileChange } from '../types/file-change.type';
+import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
+import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
+import { ACTION_KEYWORDS } from '../../assets/actions.collection';
+import { PromptsChats } from '../../assets/prompts-chat.collection';
 
 export function createChatHandlers(
     panel: vscode.WebviewPanel,
@@ -14,10 +20,30 @@ export function createChatHandlers(
     chatRepository: IWorkspaceStateRepository<IChatMessage>,
     outputChannel: vscode.OutputChannel
 ) {
+    const workspaceService = new WorkspaceFilesRepositoryService();
+    const workspaceController = new WorkspaceController(workspaceService);
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
     const temperature = parseFloat(settings.get<string>('modelTemperature') ?? '0.1');
     const promptDefault = settings.get<string>('templatePromptGenerate');
     const rolAgent = settings.get<string>('roleAgentDefault');
+
+    async function findFilesContentAsync(files?: string[]): Promise<IFileChange[] | null> {
+        if (!files || files.length === 0) {
+            return null;
+        }
+
+        return Promise.all(
+            files.map(async (file) => ({
+                path: file,
+                newContent: await workspaceController.readFile(file),
+            }))
+        );
+    }
+
+    function shouldAllowFileEdit(userInput: string): boolean {
+        const lower = userInput.toLowerCase();
+        return ACTION_KEYWORDS.some(keyword => lower.includes(keyword));
+    }
 
     return {
         "emitStatusAppChat:request": async (requestId: string) => {
@@ -56,6 +82,12 @@ export function createChatHandlers(
                 return;
             }
 
+            const allowFileEdit = shouldAllowFileEdit(payload.content);
+            let systemPrompt = allowFileEdit ? PromptsChats.find(p => p.type === "editFiles")?.prompt : promptDefault;
+            if (!allowFileEdit) {
+                outputChannel.appendLine("File edit actions blocked (no edit intent detected).");
+            }
+
             let chat = chatRepository.findById(payload.chatId);
             try {
 
@@ -92,16 +124,39 @@ export function createChatHandlers(
                 outputChannel.appendLine(`Warning: Failed to update chat repository at start: ${repoError}`);
             }
 
+
+            const existsFiles = await findFilesContentAsync(payload.files);
+            if (existsFiles) {
+                const sb = new StringBuilder(payload.content);
+                for (const file of existsFiles) {
+                    sb.appendLine(`${file.path}: ${file.newContent}`);
+                }
+                payload.content = sb.toValueString();
+            }
+
             try {
                 const messageId = uuidv4();
                 const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
                 let accumulated = '';
                 let contextAccumulated: number[] | undefined;
 
+                const messagesAllowEdit = [];
+                if (allowFileEdit) {
+                    messagesAllowEdit.push({
+                        role: "system", content: systemPrompt ?? ""
+                    });
+                    messagesAllowEdit.push(payload.messages ?? { role: 'user', content: payload.content });
+                    if (payload.messages) {
+                        payload.type = 'chat';
+                    }
+                }
+
                 if (payload.type === 'chat') {
                     let chatStream = adapter.chatStream?.({
                         model: payload.model,
-                        messages: payload.messages,
+                        format: allowFileEdit ? 'json' : null,
+                        think: payload.think ?? null,
+                        messages: messagesAllowEdit.length === 0 ? payload.messages : messagesAllowEdit,
                         options: { temperature },
                     } as IChatRequest);
 
@@ -133,7 +188,9 @@ export function createChatHandlers(
                     let generateStream = adapter.generateStream?.({
                         model: payload.model,
                         prompt: payload.content,
-                        system: promptDefault,
+                        system: systemPrompt,
+                        format: allowFileEdit ? 'json' : null,
+                        think: payload.think ?? null,
                         context: payload.context,
                         options: { temperature: 0.3 },
                     } as IGenerateRequest);
@@ -160,6 +217,24 @@ export function createChatHandlers(
                             }
                         } catch (chunkError) {
                             outputChannel.appendLine(`Chunk processing error: ${chunkError}`);
+                        }
+                    }
+                }
+
+                if (allowFileEdit) {
+                    const parsed = JSON.parse(accumulated);
+                    if (parsed.action === "editFiles" && allowFileEdit) {
+                        const confirm = await vscode.window.showWarningMessage(
+                            `The model wants to edit ${parsed.changes.length} file(s). Do you want to continue?`,
+                            "Yes", "No"
+                        );
+
+                        if (confirm === "Yes") {
+                            for (let change of parsed.changes) {
+                                await workspaceController.previewAndSave(change.path, change.newContent);
+                            }
+                        } else {
+                            vscode.window.showInformationMessage("Changes discarded.");
                         }
                     }
                 }
