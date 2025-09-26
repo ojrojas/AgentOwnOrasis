@@ -154,8 +154,8 @@ export function createChatHandlers(
                 if (payload.type === 'chat') {
                     let chatStream = adapter.chatStream?.({
                         model: payload.model,
-                        format: 'json',
-                        think: false,
+                        format: allowFileEdit ? 'json' : null,
+                        think: payload.think ?? null,
                         messages: messagesAllowEdit.length === 0 ? payload.messages : messagesAllowEdit,
                         options: { temperature },
                     } as IChatRequest);
@@ -189,8 +189,8 @@ export function createChatHandlers(
                         model: payload.model,
                         prompt: payload.content,
                         system: systemPrompt,
-                        format: 'json',
-                        think: false,
+                        format: allowFileEdit ? 'json' : null,
+                        think: payload.think ?? null,
                         context: payload.context,
                         options: { temperature: 0.3 },
                     } as IGenerateRequest);
@@ -230,7 +230,9 @@ export function createChatHandlers(
                         );
 
                         if (confirm === "Yes") {
-                            await workspaceController.previewAndSaveBatch(parsed.changes);
+                            for (let change of parsed.changes) {
+                                await workspaceController.previewAndSave(change.path, change.newContent);
+                            }
                         } else {
                             vscode.window.showInformationMessage("Changes discarded.");
                         }
