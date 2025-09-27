@@ -13,31 +13,48 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "enabledApiProposals": [
+    "contribSecondarySidebar"
+  ],
   "main": "./oroasis/out/extension.js",
   "contributes": {
+    "views": {
+      "orasis-aii": [
+        {
+          "id": "oroasis.primary-sidebar-provider",
+          "name": "Oroasis chat",
+          "icon": "resources/oroasisBotDark.png",
+          "type": "webview"
+        }
+      ],
+      "oroasis-context": [
+        {
+          "id": "oroasis.secondary-sidebar-provider",
+          "name": "Oroasis context inspector",
+          "icon": "resources/oroasisBotDark.png"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
           "id": "orasis-aii",
           "title": "Orasis IA",
           "icon": "resources/oroasisBotDark.png"
+        },
+        {
+          "id": "oroasis-context",
+          "title": "Oroasis context inspector",
+          "name": "Oroasis context inspector",
+          "icon": "resources/oroasisBotDark.png"
         }
       ],
       "secondarySidebar": [
         {
-          "id": "oroasis-aii",
-          "title": "Orasis IA",
+          "id": "oroasis-context",
+          "title": "Oroasis context inspector",
+          "name": "Oroasis context inspector",
           "icon": "resources/oroasisBotDark.png"
-        }
-      ]
-    },
-    "views": {
-      "orasis-aii": [
-        {
-          "id": "oroasis.primary-sidebar-provider",
-          "name": "",
-          "icon": "resources/oroasisBotDark.png",
-          "type": "webview"
         }
       ]
     },

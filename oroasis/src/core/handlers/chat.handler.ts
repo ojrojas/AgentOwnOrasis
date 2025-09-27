@@ -1,16 +1,25 @@
 import * as vscode from 'vscode';
-import { IChatMessage, IGenerateRequest, IChatRequest } from '../types/chat-message.type';
+import { IChatMessage } from '../types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
 import { handleError } from '../../shared/generics/errors';
-import { sendToWebview } from '../../shared/utils/chat.utils';
+import {
+    buildAssistantMessage,
+    ensureChatExists,
+    getSystemPrompt,
+    handleChatStream,
+    handleFileEdit,
+    handleGenerateStream,
+    isValidPayload,
+    safeUpdateChat,
+    sendSafe,
+    sendToWebview
+} from '../../shared/utils/chat.utils';
 import { IProviderFactory } from '../services/provider.factory.service';
-import { asAsyncGenerator } from '../../shared/generics/asasyncgenerator';
 import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
 import { WorkspaceController } from '../controllers/workspace.controller';
 import { IFileChange } from '../types/file-change.type';
 import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
-import { ACTION_KEYWORDS } from '../../assets/actions.collection';
 import { PromptsChats } from '../../assets/prompts-chat.collection';
 
 export function createChatHandlers(
@@ -24,7 +33,7 @@ export function createChatHandlers(
     const workspaceController = new WorkspaceController(workspaceService);
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
     const temperature = parseFloat(settings.get<string>('modelTemperature') ?? '0.1');
-    const promptDefault = settings.get<string>('templatePromptGenerate');
+    const promptDefault = settings.get<string>('templatePromptGenerate') as string;
     const rolAgent = settings.get<string>('roleAgentDefault');
 
     async function findFilesContentAsync(files?: string[]): Promise<IFileChange[] | null> {
@@ -40,9 +49,18 @@ export function createChatHandlers(
         );
     }
 
-    function shouldAllowFileEdit(userInput: string): boolean {
-        const lower = userInput.toLowerCase();
-        return ACTION_KEYWORDS.some(keyword => lower.includes(keyword));
+    async function enrichContentWithFiles(payload: any): Promise<string> {
+
+        const existsFiles = await findFilesContentAsync();
+        if (!existsFiles) {
+            return payload.content;
+        }
+
+        const sb = new StringBuilder(payload.content);
+        for (const file of existsFiles) {
+            sb.appendLine(`${file.path}: ${file.newContent}`);
+        }
+        return sb.toValueString();
     }
 
     return {
@@ -77,204 +95,61 @@ export function createChatHandlers(
         },
 
         "sendChat:request": async (requestId: string, payload: any) => {
-            if (!payload || !payload.model || !payload.content) {
+            if (!isValidPayload(payload)) {
                 outputChannel.appendLine("sendChat:request aborted: payload incomplete");
                 return;
             }
 
-            const allowFileEdit = shouldAllowFileEdit(payload.content);
-            let systemPrompt = allowFileEdit ? PromptsChats.find(p => p.type === "editFiles")?.prompt : promptDefault;
-            if (!allowFileEdit) {
-                outputChannel.appendLine("File edit actions blocked (no edit intent detected).");
+            const systemPrompt = getSystemPrompt(payload.type);
+
+            if (systemPrompt) {
+                payload.messages = [systemPrompt, { role: payload.role, content: payload.content }];
             }
 
-            let chat = chatRepository.findById(payload.chatId);
-            try {
+            let chat = await ensureChatExists(payload, chatRepository, outputChannel);
 
-                if (chat === undefined) {
-                    chat = {
-                        id: payload.chatId,
-                        messages: [{
-                            content: payload.content,
-                            id: uuidv4(),
-                            model: payload.model,
-                            role: payload.role,
-                            timestamp: new Date(),
-                            chatId: payload.chatId,
-                            done: true,
-                        }],
-                        context: payload.context ?? [],
-                        done: true
-                    };
-                    await chatRepository.insert(chat);
-                } else {
-                    chat.messages.push({
-                        id: uuidv4(),
-                        content: payload.content,
-                        model: payload.model,
-                        role: payload.role,
-                        timestamp: payload.timestamp,
-                        context: payload.context,
-                        done: true,
-                        chatId: payload.id
-                    });
-                    await chatRepository.updateById(payload.chatId, chat);
-                }
-            } catch (repoError) {
-                outputChannel.appendLine(`Warning: Failed to update chat repository at start: ${repoError}`);
-            }
+            payload.content = await enrichContentWithFiles(payload);
+            payload.options = { temperature: temperature };
 
+            const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
+            const messageId = uuidv4();
 
-            const existsFiles = await findFilesContentAsync(payload.files);
-            if (existsFiles) {
-                const sb = new StringBuilder(payload.content);
-                for (const file of existsFiles) {
-                    sb.appendLine(`${file.path}: ${file.newContent}`);
-                }
-                payload.content = sb.toValueString();
-            }
+            let accumulated = '';
+            let contextAccumulated: number[] | undefined;
 
             try {
-                const messageId = uuidv4();
-                const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
-                let accumulated = '';
-                let contextAccumulated: number[] | undefined;
-
-                const messagesAllowEdit = [];
-                if (allowFileEdit) {
-                    messagesAllowEdit.push({
-                        role: "system", content: systemPrompt ?? ""
-                    });
-                    messagesAllowEdit.push(payload.messages ?? { role: 'user', content: payload.content });
-                    if (payload.messages) {
-                        payload.type = 'chat';
-                    }
-                }
-
                 if (payload.type === 'chat') {
-                    let chatStream = adapter.chatStream?.({
-                        model: payload.model,
-                        format: allowFileEdit ? 'json' : null,
-                        think: payload.think ?? null,
-                        messages: messagesAllowEdit.length === 0 ? payload.messages : messagesAllowEdit,
-                        options: { temperature },
-                    } as IChatRequest);
-
-                    if (chatStream) {
-                        chatStream = asAsyncGenerator(chatStream);
-                        for await (const chunk of chatStream) {
-                            try {
-                                accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context;
-                                try {
-                                    sendToWebview(panel, "sendChat:response", requestId, {
-                                        content: accumulated,
-                                        role: "assistant",
-                                        done: chunk.done,
-                                        id: messageId,
-                                        context: contextAccumulated,
-                                        timestamp: new Date(),
-                                        model: payload.model
-                                    });
-                                } catch (webviewError) {
-                                    outputChannel.appendLine(`Webview send error: ${webviewError}`);
-                                }
-                            } catch (chunkError) {
-                                outputChannel.appendLine(`Chunk processing error: ${chunkError}`);
-                            }
-                        }
-                    }
+                    accumulated = await handleChatStream(
+                        adapter,
+                        payload,
+                        requestId,
+                        panel,
+                        messageId,
+                        outputChannel
+                    );
                 } else {
-                    let generateStream = adapter.generateStream?.({
-                        model: payload.model,
-                        prompt: payload.content,
-                        system: systemPrompt,
-                        format: allowFileEdit ? 'json' : null,
-                        think: payload.think ?? null,
-                        context: payload.context,
-                        options: { temperature: 0.3 },
-                    } as IGenerateRequest);
-
-                    if (generateStream) {
-                        generateStream = asAsyncGenerator(generateStream);
-                        try {
-                            for await (const chunk of generateStream) {
-                                accumulated += chunk.content ?? '';
-                                contextAccumulated = chunk.context;
-                                try {
-                                    sendToWebview(panel, "sendChat:response", requestId, {
-                                        content: accumulated,
-                                        role: "assistant",
-                                        done: chunk.done,
-                                        id: messageId,
-                                        context: contextAccumulated,
-                                        timestamp: new Date(),
-                                        model: payload.model,
-                                    });
-                                } catch (webviewError) {
-                                    outputChannel.appendLine(`Webview send error: ${webviewError}`);
-                                }
-                            }
-                        } catch (chunkError) {
-                            outputChannel.appendLine(`Chunk processing error: ${chunkError}`);
-                        }
-                    }
+                    accumulated = await handleGenerateStream(
+                        adapter,
+                        payload,
+                        requestId,
+                        panel,
+                        PromptsChats,
+                        messageId,
+                        outputChannel
+                    );
                 }
 
-                if (allowFileEdit) {
-                    const parsed = JSON.parse(accumulated);
-                    if (parsed.action === "editFiles" && allowFileEdit) {
-                        const confirm = await vscode.window.showWarningMessage(
-                            `The model wants to edit ${parsed.changes.length} file(s). Do you want to continue?`,
-                            "Yes", "No"
-                        );
-
-                        if (confirm === "Yes") {
-                            for (let change of parsed.changes) {
-                                await workspaceController.previewAndSave(change.path, change.newContent);
-                            }
-                        } else {
-                            vscode.window.showInformationMessage("Changes discarded.");
-                        }
-                    }
+                if (accumulated.includes('editFiles')) {
+                    await handleFileEdit(accumulated, workspaceController);
                 }
 
-                chat!.messages.push({
-                    content: accumulated,
-                    role: "assistant",
-                    done: true,
-                    id: messageId,
-                    context: contextAccumulated,
-                    timestamp: new Date(),
-                    model: payload.model
-                });
+                chat.messages.push(buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));
+                await safeUpdateChat(chatRepository, payload.chatId, chat, outputChannel);
 
-                try {
-                    await chatRepository.updateById(payload.chatId, chat!);
-                } catch (repoError) {
-                    outputChannel.appendLine(`Warning: Failed to update chat repository at end: ${repoError}`);
-                }
-
-                try {
-                    sendToWebview(panel, "sendChat:response:done", requestId, {
-                        content: accumulated,
-                        role: "assistant",
-                        done: true,
-                        id: messageId,
-                        context: contextAccumulated,
-                        timestamp: new Date()
-                    });
-                } catch (webviewError) {
-                    outputChannel.appendLine(`Webview final done error: ${webviewError}`);
-                }
-
+                sendSafe(panel, "sendChat:response:done", outputChannel, requestId, buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));
             } catch (error) {
                 handleError(error, outputChannel, "Error: request provider service");
-                try {
-                    sendToWebview(panel, "sendChat:response:done");
-                } catch (webviewError) {
-                    outputChannel.appendLine(`Webview done error after catch: ${webviewError}`);
-                }
+                sendSafe(panel, "sendChat:response:done", outputChannel, requestId);
             }
         }
     };
