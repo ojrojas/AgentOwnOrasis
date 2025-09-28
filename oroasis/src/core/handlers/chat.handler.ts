@@ -21,6 +21,7 @@ import { IFileChange } from '../types/file-change.type';
 import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
 import { PromptsChats } from '../../assets/prompts-chat.collection';
+import { basicPrompts } from '../../assets/basic-prompts.collection';
 
 export function createChatHandlers(
     panel: vscode.WebviewPanel,
@@ -133,7 +134,7 @@ export function createChatHandlers(
                         payload,
                         requestId,
                         panel,
-                        PromptsChats,
+                        basicPrompts,
                         messageId,
                         outputChannel
                     );

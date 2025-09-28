@@ -6,6 +6,7 @@ import { asAsyncGenerator } from '../generics/asasyncgenerator';
 import { StringBuilder } from './stringbuilder.utils';
 import { IProviderApiService } from '../../core/interfaces/provider.interface.service';
 import { IWorkspaceStateRepository } from '../../core/interfaces/workspace-repository-state.interface.service';
+import { basicPrompts } from '../../assets/basic-prompts.collection';
 
 
 export function sendToWebview(
@@ -33,7 +34,7 @@ export function getSystemPrompt(typeMessage: string): IMessage | undefined {
     if (typeMessage === 'chat') {
         return {
             role: 'system',
-            content: PromptsChats
+            content: basicPrompts
 
         } as IMessage;
     }
