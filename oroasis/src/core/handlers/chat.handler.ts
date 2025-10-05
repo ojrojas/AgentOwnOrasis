@@ -22,6 +22,7 @@ import { WorkspaceFilesRepositoryService } from '../services/workspace-repositor
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
 import { PromptsChats } from '../../assets/prompts-chat.collection';
 import { basicPrompts } from '../../assets/basic-prompts.collection';
+import { parseToolCall } from '../../shared/utils/tool.utils';
 
 export function createChatHandlers(
     panel: vscode.WebviewPanel,
@@ -52,7 +53,7 @@ export function createChatHandlers(
 
     async function enrichContentWithFiles(payload: any): Promise<string> {
 
-        const existsFiles = await findFilesContentAsync();
+        const existsFiles = await findFilesContentAsync(payload.files);
         if (!existsFiles) {
             return payload.content;
         }
@@ -140,7 +141,10 @@ export function createChatHandlers(
                     );
                 }
 
-                if (accumulated.includes('editFiles')) {
+
+                const toolCall = parseToolCall(accumulated);
+
+                if (toolCall) {
                     await handleFileEdit(accumulated, workspaceController);
                 }
 

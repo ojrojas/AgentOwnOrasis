@@ -98,7 +98,7 @@ export class OllamaAdapter implements IProviderApiService {
           continue;
         }
         const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.content || '', timestamp: new Date(), model: data.model, tool_calls: data.tool_calls, images: data.images, done: data.done };
+        yield { id: data.id || crypto.randomUUID(), role: data.message.role || 'assistant', content: data.message.content || '', timestamp: new Date(), model: data.model, tool_calls: data.tool_calls, images: data.images, done: data.done };
       }
     }
     if (buffer.trim()) {

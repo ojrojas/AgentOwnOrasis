@@ -1,13 +1,10 @@
 import * as vscode from 'vscode';
 import { IChatMessage, IChatRequest, IGenerateMessage, IGenerateRequest, IMessage } from '../../core/types/chat-message.type';
-import { PromptsChats } from '../../assets/prompts-chat.collection';
 import { v4 as uuidv4 } from 'uuid';
 import { asAsyncGenerator } from '../generics/asasyncgenerator';
-import { StringBuilder } from './stringbuilder.utils';
 import { IProviderApiService } from '../../core/interfaces/provider.interface.service';
 import { IWorkspaceStateRepository } from '../../core/interfaces/workspace-repository-state.interface.service';
 import { basicPrompts } from '../../assets/basic-prompts.collection';
-
 
 export function sendToWebview(
     panel: vscode.WebviewPanel,
@@ -97,7 +94,6 @@ export async function handleChatStream(
     temperature?: number) {
     let accumulated = '';
 
-
     let chatStream = adapter.chatStream?.({
         model: payload.model,
         think: payload.think ?? null,
@@ -131,7 +127,7 @@ export async function handleGenerateStream(
         system: systemPrompt,
         think: payload.think ?? null,
         context: payload.context,
-        options: { temperature: 0.3 },
+        options: { temperature: 0.2 },
     } as IGenerateRequest);
 
     if (!generateStream) {
