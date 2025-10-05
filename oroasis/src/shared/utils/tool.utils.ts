@@ -1,4 +1,4 @@
-export function parseToolCall(text: string): ToolCall | null {
+export function parseToolCall(text: string): any | null {
     const tagMatch = text.match(/<([a-z_]+)[\s\S]*?>/i);
     if (!tagMatch) {
         return null;

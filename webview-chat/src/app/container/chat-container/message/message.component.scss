@@ -1,6 +1,6 @@
 .message-container {
   display: flex;
-  text-justify: distribute-all-lines;
+  text-justify: distribute-all-lines !important;
 }
 
 .user-message {
@@ -34,4 +34,3 @@
   overflow-x: auto;
   border: 1px solid #404040;
 }
-

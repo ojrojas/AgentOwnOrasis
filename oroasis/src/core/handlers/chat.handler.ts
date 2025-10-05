@@ -141,11 +141,17 @@ export function createChatHandlers(
                     );
                 }
 
+                let toolCall: any;
+                try {
+                    toolCall = JSON.parse(accumulated);
+                } catch (error) {
+                    outputChannel.appendLine("Failed to parse tool call: " + (error as Error).message);
+                }
 
-                const toolCall = parseToolCall(accumulated);
-
-                if (toolCall) {
-                    await handleFileEdit(accumulated, workspaceController);
+                if (toolCall?.action === "use_tool") {
+                    const { tool, parameters } = toolCall;
+                    outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
+                    // Invoca la herramienta aquí
                 }
 
                 chat.messages.push(buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));
