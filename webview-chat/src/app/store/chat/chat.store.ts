@@ -1,4 +1,12 @@
-import { getState, patchState, signalState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
+import {
+  getState,
+  patchState,
+  signalState,
+  signalStore,
+  withComputed,
+  withMethods,
+  withState
+} from "@ngrx/signals";
 import { computed, inject } from "@angular/core";
 import { ChatState, initialStateStore } from "./chat.state";
 import { VscodeService } from "../../core/services/vscode-service";
@@ -112,12 +120,6 @@ export const ChatStore = signalStore(
       const response = await vscodeService.request<IListModelsResponse>("getModels");
       patchState(store, { models: response }, setFulfilled());
     },
-
-    // async getPreferredModel() {
-    //   patchState(store, setPending());
-    //   const response = await vscodeService.request<string>("getPreferredModel");
-    //   patchState(store, { preferredModel: response }, setFulfilled());
-    // },
 
     async getInfoModel(modelName: string) {
       patchState(store, setPending());

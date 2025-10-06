@@ -1,6 +1,8 @@
+import { Rol } from "../enums/rol.enum";
+
 export interface IMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: Rol.user | Rol.assistant | Rol.system;
   content: string;
   images?: Uint8Array<ArrayBufferLike>[] | string[];
   tool_calls?: IToolCall[];

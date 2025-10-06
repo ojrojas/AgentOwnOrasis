@@ -1,7 +1,7 @@
 export function ToHumanReadable(ctx_number: number): string {
   switch (true) {
-    // case ctx_number >= 1_000_000_000:
-    //   return (ctx_number / 1_000_000_000).toFixed(ctx_number % 1_000_000_000 === 0 ? 0 : 1) + "B";
+    case ctx_number >= 1_000_000_000:
+      return (ctx_number / 1_000_000_000).toFixed(ctx_number % 1_000_000_000 === 0 ? 0 : 1) + "B";
 
     case ctx_number >= 1_000_000:
       return (ctx_number / 1_000_000).toFixed(ctx_number % 1_000_000 === 0 ? 0 : 1) + "M";

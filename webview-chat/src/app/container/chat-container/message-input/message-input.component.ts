@@ -1,5 +1,4 @@
 import { Component, Output, EventEmitter, Input, inject, effect } from '@angular/core';
-
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +23,8 @@ import { IModelInfo } from '../../../core/types/models.types';
 import { SettingsStore } from '../../../store/settings/settings.store';
 import { ToHumanReadable } from '../../../core/utils/context.utils';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import { Rol } from '../../../core/enums/rol.enum';
+import { MessageType } from '../../../core/enums/type-message.enum';
 
 @Component({
   selector: 'app-message-input',
@@ -57,15 +57,16 @@ export class MessageInputComponent {
 
   readonly chatStore = inject(ChatStore);
   readonly settingsStore = inject(SettingsStore);
+  readonly emptyString = '';
 
   @Input() isLoading: boolean = false;
   @Input() isActiveMicrophone = false;
 
   @Output() messageSent = new EventEmitter<IMessage>();
 
-  modelText: string = '';
-  typeMessage: string = 'Ask';
-  messageText: string = '';
+  modelText: string = this.emptyString;
+  typeMessage: string = MessageType.Ask;
+  messageText: string = this.emptyString;
   modelSelected?: IModelInfo;
 
   constructor() {
@@ -74,7 +75,7 @@ export class MessageInputComponent {
       const selected = providers?.find(p => p.isSelected);
 
       if (selected) {
-        this.modelText = selected.refactorModel ?? '';
+        this.modelText = selected.refactorModel ?? this.emptyString;
         this.modelSelected = await this.chatStore.getInfoModel(this.modelText);
       }
     });
@@ -82,7 +83,7 @@ export class MessageInputComponent {
 
   get placeholder(): string {
     return this.isLoading
-      ? ''
+      ? this.emptyString
       : '@ to mention, ⌘L to add a selection. Enter instructions...';
   }
 
@@ -111,7 +112,7 @@ export class MessageInputComponent {
       const filesToSend = this.chatStore.resolveMentions(this.messageText);
       this.messageSent.emit({
         content: this.messageText,
-        role: 'user',
+        role: Rol.user,
         id: uuidv4(),
         timestamp: new Date(),
         model: this.modelText,
@@ -119,7 +120,7 @@ export class MessageInputComponent {
         files: filesToSend,
         done: true
       });
-      this.messageText = '';
+      this.messageText = this.emptyString;
     }
   }
 
@@ -137,7 +138,7 @@ export class MessageInputComponent {
       dropdown.innerHTML = '';
 
       this.chatStore.files().forEach(filePath => {
-        const fileName = filePath.split(/[/\\]/).pop() || '';
+        const fileName = filePath.split(/[/\\]/).pop() || this.emptyString;
 
         const ul = document.createElement('ul');
         ul.classList.add("list-append-file");
@@ -163,6 +164,6 @@ export class MessageInputComponent {
 
   renderTokens() {
     if (this.modelSelected?.model_info.ctx_number) { return ToHumanReadable(this.modelSelected?.model_info.ctx_number); }
-    else { return ''; }
+    else { return this.emptyString; }
   }
 }

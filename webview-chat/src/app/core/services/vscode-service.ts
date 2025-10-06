@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
