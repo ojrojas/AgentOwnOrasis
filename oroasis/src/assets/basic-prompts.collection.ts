@@ -134,4 +134,10 @@ At each step:
   <diff>- var\\n+ let</diff>
 </replace_in_file>
 \`\`\`
+
+--- 
+## Multiple response options
+
+When the llm offers response options and these are numbered, for example 1, 2, 3..., the number sent by the user as the only response is the selection of that option so that the llm returns a response based on that selected option.
+
 `;
