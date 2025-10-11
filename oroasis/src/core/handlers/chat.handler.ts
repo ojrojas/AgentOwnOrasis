@@ -102,7 +102,7 @@ export function createChatHandlers(
                 return;
             }
 
-            const systemPrompt = getSystemPrompt(payload.type);
+            const systemPrompt = getSystemPrompt();
 
             if (systemPrompt) {
                 payload.messages = [systemPrompt, { role: payload.role, content: payload.content }];
@@ -119,27 +119,20 @@ export function createChatHandlers(
             let accumulated = '';
             let contextAccumulated: number[] | undefined;
 
+            if (payload.type !== 'Ask') {
+                payload.think = true;
+                outputChannel.appendLine(`Thinking mode activated: ${payload.think}`);
+            }
+
             try {
-                if (payload.type === 'chat') {
-                    accumulated = await handleChatStream(
-                        adapter,
-                        payload,
-                        requestId,
-                        panel,
-                        messageId,
-                        outputChannel
-                    );
-                } else {
-                    accumulated = await handleGenerateStream(
-                        adapter,
-                        payload,
-                        requestId,
-                        panel,
-                        basicPrompts,
-                        messageId,
-                        outputChannel
-                    );
-                }
+                accumulated = await handleChatStream(
+                    adapter,
+                    payload,
+                    requestId,
+                    panel,
+                    messageId,
+                    outputChannel
+                );
 
                 let toolCall: any;
                 try {
@@ -151,7 +144,8 @@ export function createChatHandlers(
                 if (toolCall?.action === "use_tool") {
                     const { tool, parameters } = toolCall;
                     outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
-                    // Invoca la herramienta aquí
+                    // Invoke the tool and get the result
+                    const toolResult = `Result of ${tool} with parameters ${JSON.stringify(parameters)}`;
                 }
 
                 chat.messages.push(buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));

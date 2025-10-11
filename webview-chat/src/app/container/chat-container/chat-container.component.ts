@@ -62,7 +62,6 @@ export class ChatContainerComponent {
 
   private ensureChatAndSend(message: IMessage): void {
     let chatId = this.chatStore.selectedChatId();
-    message.type = message.type !== 'Agent' ? 'generated' : 'chat';
     if (!chatId) {
       const newChat: IChat = { id: uuidv4(), messages: [message] };
       this.chatStore.createChat(newChat);

@@ -27,15 +27,11 @@ export function isValidPayload(payload: any): boolean {
     return !!(payload && payload.model && payload.content);
 }
 
-export function getSystemPrompt(typeMessage: string): IMessage | undefined {
-    if (typeMessage === 'chat') {
-        return {
-            role: 'system',
-            content: basicPrompts
-
-        } as IMessage;
-    }
-    return undefined;
+export function getSystemPrompt(): IMessage | undefined {
+    return {
+        role: 'system',
+        content: basicPrompts
+    } as IMessage;
 }
 
 export async function ensureChatExists(payload: any, repo: any, logger: any) {
