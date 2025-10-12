@@ -7,8 +7,6 @@ import {
     ensureChatExists,
     getSystemPrompt,
     handleChatStream,
-    handleFileEdit,
-    handleGenerateStream,
     isValidPayload,
     safeUpdateChat,
     sendSafe,
@@ -20,9 +18,6 @@ import { WorkspaceController } from '../controllers/workspace.controller';
 import { IFileChange } from '../types/file-change.type';
 import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
-import { PromptsChats } from '../../assets/prompts-chat.collection';
-import { basicPrompts } from '../../assets/basic-prompts.collection';
-import { parseToolCall } from '../../shared/utils/tool.utils';
 
 export function createChatHandlers(
     panel: vscode.WebviewPanel,

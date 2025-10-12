@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { asAsyncGenerator } from '../generics/asasyncgenerator';
 import { IProviderApiService } from '../../core/interfaces/provider.interface.service';
 import { IWorkspaceStateRepository } from '../../core/interfaces/workspace-repository-state.interface.service';
-import { basicPrompts } from '../../assets/basic-prompts.collection';
+import { basicPromptsV1_1 } from '../../assets/basic-prompts1_1.collection';
 
 export function sendToWebview(
     panel: vscode.WebviewPanel,
@@ -30,7 +30,7 @@ export function isValidPayload(payload: any): boolean {
 export function getSystemPrompt(): IMessage | undefined {
     return {
         role: 'system',
-        content: basicPrompts
+        content: basicPromptsV1_1
     } as IMessage;
 }
 
