@@ -3,10 +3,8 @@ import { IWorkspaceStateRepository } from './core/interfaces/workspace-repositor
 import { IChatMessage } from './core/types/chat-message.type';
 import { CompletionProvider } from './providers/completions/completion.provider';
 import { RefactorProvider } from './providers/codeactions/refactor.provider';
-import { WebviewProvider } from "./providers/webview/WebviewProvider";
 import { createCommentController } from './core/controllers/comment.controller';
 import { CommentComponent } from './providers/comments/comment.provider';
-import { registerWebView } from './core/webview/webview.register';
 import {
 	cancelSaveCommentCommand,
 	createCommentCommand,
@@ -42,7 +40,6 @@ function addSubscriber(item: vscode.Disposable) {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-
 	const repositoryFactory = new RepositoryFactory(context);
 	const chatMessageRepository: IWorkspaceStateRepository<IChatMessage> = repositoryFactory.createWorkspaceRepository('oroasis-chats-repository');
 	const providerRepository: IGlobalStateRepository<IProviderConfig> = repositoryFactory.createGlobalRepository('oroasis-provider-repository');
@@ -61,14 +58,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const completionsProvider = new CompletionProvider(providers);
 	const refactorProvider = new RefactorProvider(providers, outputChannel);
-	const sideBarWebView = new WebviewProvider(
-		{
-			context,
-			outputChannel,
-			providersMap: providers,
-			chatRepository: chatMessageRepository,
-			providerRepository,
-		});
 
 	registerProvidersAndControllers(
 		[
@@ -79,10 +68,17 @@ export async function activate(context: vscode.ExtensionContext) {
 				refactorProvider,
 				{ providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }
 			),
-			registerWebView(sideBarWebView),
 			createCommentController(),
 		],
 		addSubscriber
+	);
+
+	// Create a WebviewPanel instance for the primary sidebar
+	const webviewPanel = vscode.window.createWebviewPanel(
+		'oroasisWebview',
+		'Oroasis Webview',
+		vscode.ViewColumn.One,
+		{}
 	);
 
 	// Commands
@@ -99,7 +95,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			{ id: 'oroasis.deleteComment', handler: (c: CommentComponent) => deleteCommentCommand(c) },
 			{ id: 'oroasis.deleteAllComments', handler: (t: vscode.CommentThread) => deleteAllCommentsCommand(t) },
 
-
 			// Agents
 			{
 				id: 'oroasis.openChatAgent',
@@ -109,8 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					providersMap: providers,
 					chatRepository: chatMessageRepository,
 					providerRepository,
-				}
-				),
+				}),
 			},
 			{
 				id: 'oroasis.askAgent',
@@ -138,26 +132,22 @@ export async function activate(context: vscode.ExtensionContext) {
 					providerName
 				),
 			},
+			{
+				id: 'oroasis.newHeaderButton',
+				handler: () => newHeaderButtonCommand(webviewPanel),
+			},
+			{
+				id: 'oroasis.historyHeaderButton',
+				handler: () => historyHeaderButtonCommand(webviewPanel),
+			},
+			{
+				id: 'oroasis.settingsHeaderButton',
+				handler: () => settingsHeaderButtonCommand(webviewPanel),
+			},
 
 			// Chats
 			{ id: 'oroasis.cleanChats', handler: () => chatMessageRepository.clear() },
-
-			// Chats
 			{ id: 'oroasis.cleanConfig', handler: () => providerRepository.clear() },
-
-			// Header buttons
-			{
-				id: 'oroasis.addNewChatButton',
-				handler: () => newHeaderButtonCommand(sideBarWebView.view as vscode.WebviewPanel),
-			},
-			{
-				id: 'oroasis.historyChatsButton',
-				handler: () => historyHeaderButtonCommand(sideBarWebView.view as vscode.WebviewPanel),
-			},
-			{
-				id: 'oroasis.settingsChatsButton',
-				handler: () => settingsHeaderButtonCommand(sideBarWebView.view as vscode.WebviewPanel),
-			},
 		],
 		addSubscriber
 	);

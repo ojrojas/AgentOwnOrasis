@@ -13,24 +13,14 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "enabledApiProposals": [
-    "contribSecondarySidebar"
-  ],
+  "enabledApiProposals": [],
   "main": "./oroasis/out/extension.js",
   "contributes": {
     "views": {
-      "orasis-aii": [
+      "orasis-ai-chat": [
         {
           "id": "oroasis.primary-sidebar-provider",
           "name": "Oroasis chat",
-          "icon": "resources/oroasisBotDark.png",
-          "type": "webview"
-        }
-      ],
-      "oroasis-context": [
-        {
-          "id": "oroasis.secondary-sidebar-provider",
-          "name": "Oroasis context inspector",
           "icon": "resources/oroasisBotDark.png"
         }
       ]
@@ -38,18 +28,10 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "orasis-aii",
+          "id": "orasis-ai-chat",
           "title": "Orasis IA",
           "icon": "resources/oroasisBotDark.png"
         },
-        {
-          "id": "oroasis-context",
-          "title": "Oroasis context inspector",
-          "name": "Oroasis context inspector",
-          "icon": "resources/oroasisBotDark.png"
-        }
-      ],
-      "secondarySidebar": [
         {
           "id": "oroasis-context",
           "title": "Oroasis context inspector",
@@ -261,27 +243,33 @@
     "build:webview": "cd webview-chat && pnpm run build",
     "compile": "tsc -b ./",
     "watch": "tsc -b --watch ./",
-    "lint": "eslint src",
+    "mocha:test": "mocha 'oroasis/src/**/*.test.ts'",
+    "lint": "eslint oroasis/src webview-chat/src",
     "pretest": "pnpm run compile && pnpm run lint",
-    "test": "vscode-test",
+    "test": "vscode-test --enable-proposed-api",
     "postinstall": "cd oroasis && pnpm install && cd ../webview-chat && pnpm install && cd ..",
-    "clean": "rm -rf node_modules oroasis/out oroasis/node_modules oroasis/tsconfig.tsbuildinfo webview-chat/dist webview-chat/node_modules package-lock.json"
+    "clean": "rm -rf node_modules .vscode-test oroasis/out oroasis/node_modules oroasis/tsconfig.tsbuildinfo webview-chat/dist webview-chat/node_modules package-lock.json",
+    "build:all": "pnpm run compile && cd webview-chat && pnpm run build && cd .."
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/mocha": "^10.0.10",
     "@types/node": "~20.19.19",
+    "@types/sinon": "^17.0.4",
     "@types/vscode": "^1.104.0",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.37.0",
+    "mocha": "^11.7.4",
+    "sinon": "^21.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "diff": "^8.0.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "vscode": "^1.1.37"
   },
   "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa"
 }

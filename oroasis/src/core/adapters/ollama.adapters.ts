@@ -22,8 +22,10 @@ export class OllamaAdapter implements IProviderApiService {
   private http = new HttpService();
   constructor(private config: IProviderConfig) { }
 
+  // Add logging for debugging
   async listModels(): Promise<IModelList> {
     const url = buildProviderUrl(this.config, '/api/tags');
+    console.log(`Fetching models from: ${url}`);
     return await this.http.get<IModelList>(url);
   }
 
@@ -39,38 +41,45 @@ export class OllamaAdapter implements IProviderApiService {
     return { id: data.id || crypto.randomUUID(), messages: (data.messages || []).map((m: any) => ({ id: m.id || crypto.randomUUID(), role: m.role, content: m.content, timestamp: new Date(m.timestamp || Date.now()), model: req.model, tool_calls: m.tool_calls, images: m.images })) };
   }
 
+  // Ensure proper error handling in generateStream
   async *generateStream(req: IGenerateRequest): AsyncGenerator<IGenerateMessage> {
     const url = buildProviderUrl(this.config, '/api/generate');
-    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, stream: true }) });
-    if (!res.body) {
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
+    console.log(`Starting generateStream with URL: ${url}`);
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, stream: true }) });
+      if (!res.body) {
+        console.error('No response body for generateStream');
+        return;
       }
 
-      buffer += decoder.decode(value, { stream: true });
-      let parts = buffer.split('\n');
-      buffer = parts.pop()!;
-      for (const part of parts) {
-        if (!part.trim()) {
-          continue;
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
         }
 
-        const data = JSON.parse(part);
-        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data.done, context: data.context };
-      }
-    }
+        buffer += decoder.decode(value, { stream: true });
+        let parts = buffer.split('\n');
+        buffer = parts.pop()!;
+        for (const part of parts) {
+          if (!part.trim()) {
+            continue;
+          }
 
-    if (buffer.trim()) {
-      const data = JSON.parse(buffer);
-      yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data, context: data.context };
+          const data = JSON.parse(part);
+          yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data.done, context: data.context };
+        }
+      }
+
+      if (buffer.trim()) {
+        const data = JSON.parse(buffer);
+        yield { id: data.id || crypto.randomUUID(), role: data.role || 'assistant', content: data.response || '', timestamp: new Date(), model: data.model, done: data, context: data.context };
+      }
+    } catch (error) {
+      console.error('Error in generateStream:', error);
     }
   }
 

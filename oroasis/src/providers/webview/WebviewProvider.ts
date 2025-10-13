@@ -11,7 +11,7 @@ import { IWebviewConfiguration } from "../../core/types/webview-configuration.ty
 
 export class WebviewProvider implements WebviewViewProvider {
     static readonly PrimarySidebar = "oroasis.primary-sidebar-provider";
-    static readonly SecodarySidebar = "oroasis.secondary-sidebar-provider";
+
     static readonly TabPanel = "oroasis.tabpanel-provider";
 
     static readonly LOCAL_PORT = 4200;

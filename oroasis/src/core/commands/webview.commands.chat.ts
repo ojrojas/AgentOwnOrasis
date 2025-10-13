@@ -19,4 +19,12 @@ export function registerChatCommands(
             await handler(requestId, payload);
         }
     });
+
+    // Add listener for real-time updates
+    vscode.workspace.onDidChangeTextDocument((event) => {
+        panel.webview.postMessage({
+            type: 'realTimeUpdate',
+            content: event.document.getText(),
+        });
+    });
 }

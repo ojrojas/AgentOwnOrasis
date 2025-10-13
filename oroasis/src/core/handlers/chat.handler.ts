@@ -19,6 +19,9 @@ import { IFileChange } from '../types/file-change.type';
 import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
 
+// Import tools collection
+import { ListTools } from '../../assets/tools.collection';
+
 export function createChatHandlers(
     panel: vscode.WebviewPanel,
     providersFactory: IProviderFactory,
@@ -108,6 +111,12 @@ export function createChatHandlers(
             payload.content = await enrichContentWithFiles(payload);
             payload.options = { temperature: temperature };
 
+            // Include tools in the payload
+            payload.tool_calls = ListTools.map(tool => ({
+                name: tool.function.name,
+                parameters: tool.function.parameters
+            }));
+
             const adapter = providersFactory.getAdapter(payload.provider || defaultProvider);
             const messageId = uuidv4();
 
@@ -129,18 +138,24 @@ export function createChatHandlers(
                     outputChannel
                 );
 
-                let toolCall: any;
-                try {
-                    toolCall = JSON.parse(accumulated);
-                } catch (error) {
-                    outputChannel.appendLine("Failed to parse tool call: " + (error as Error).message);
-                }
-
-                if (toolCall?.action === "use_tool") {
-                    const { tool, parameters } = toolCall;
-                    outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
-                    // Invoke the tool and get the result
-                    const toolResult = `Result of ${tool} with parameters ${JSON.stringify(parameters)}`;
+                // Extraer herramientas del texto generado por el modelo
+                const toolRegex = /{.*?"action":\s*?"use_tool".*?}/g;
+                const matches = accumulated.match(toolRegex);
+                if (matches) {
+                    for (const match of matches) {
+                        try {
+                            const toolCall = JSON.parse(match);
+                            if (toolCall?.action === "use_tool") {
+                                const { tool, parameters } = toolCall;
+                                outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
+                                // Aquí puedes invocar la herramienta y manejar el resultado
+                                const toolResult = `Result of ${tool} with parameters ${JSON.stringify(parameters)}`;
+                                outputChannel.appendLine(`Tool result: ${toolResult}`);
+                            }
+                        } catch (error) {
+                            outputChannel.appendLine("Failed to parse tool call: " + (error as Error).message);
+                        }
+                    }
                 }
 
                 chat.messages.push(buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));

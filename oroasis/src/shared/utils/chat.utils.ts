@@ -94,7 +94,8 @@ export async function handleChatStream(
         model: payload.model,
         think: payload.think ?? null,
         messages: payload.messages,
-        options: { temperature }
+        options: payload.options, // Usar payload.options en lugar de {temperature}
+        tool_calls: payload.tool_calls, // Agregar tool_calls al payload
     } as IChatRequest);
 
     if (!chatStream) {
@@ -123,7 +124,7 @@ export async function handleGenerateStream(
         system: systemPrompt,
         think: payload.think ?? null,
         context: payload.context,
-        options: { temperature: 0.2 },
+        options: payload.options, // Usar payload.options en lugar de {temperature}
     } as IGenerateRequest);
 
     if (!generateStream) {

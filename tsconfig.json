@@ -14,9 +14,13 @@
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
+		"types": ["jest", "node"]
 	},
 	"include": [
+		"node_modules/@types/jest",
 		"src",
+		"src/**/*.ts",
+		"webview-chat/src/**/*.ts"
 	],
 	"exclude": [
 		"node_modules",
