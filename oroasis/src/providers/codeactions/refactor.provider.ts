@@ -10,7 +10,9 @@ import {
     window,
     workspace,
     WorkspaceEdit,
-    OutputChannel
+    OutputChannel,
+    Command,
+    ProviderResult
 } from 'vscode';
 import { IGenerateRequest } from '../../core/types/chat-message.type';
 import { ProvidersMap } from '../../core/types/provider.type';
@@ -21,11 +23,11 @@ export class RefactorProvider implements CodeActionProvider {
     constructor(private providersMap: ProvidersMap, private outputChannel: OutputChannel) { }
 
     async provideCodeActions(
-        document: TextDocument,
-        range: Range | Selection,
-        context: CodeActionContext,
+        document: TextDocument, 
+        range: Range | Selection, 
+        context: CodeActionContext, 
         token: CancellationToken
-    ): Promise<(CodeAction)[] | null> {
+    ): Promise<any> {
 
         const settings = workspace.getConfiguration('oroasisSettings');
         const roleAgent = settings.get<string>('templatePromptRefactor');

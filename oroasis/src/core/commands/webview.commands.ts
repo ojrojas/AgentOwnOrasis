@@ -13,15 +13,15 @@ export const openPanelCommand = async (props: IWebviewConfiguration) => {
     }
     const targetCol = hasVisibleEditors ? Math.max(lastCol + 1, 1) : ViewColumn.Two;
 
-    const panel = window.createWebviewPanel(WebviewProvider.SecodarySidebar, "Orasis", targetCol, {
+    const panel = window.createWebviewPanel(WebviewProvider.PrimarySidebar, "Orasis", targetCol, {
         enableScripts: true,
         retainContextWhenHidden: true,
         localResourceRoots: [Uri.file(path.join(props.context.extensionPath, "webview-chat/dist"))],
     });
 
     panel.iconPath = {
-        light: Uri.joinPath(props.context.extensionUri, "resources", "chatbot_icon.png"),
-        dark: Uri.joinPath(props.context.extensionUri, "resources", "chatbot_icon.png"),
+        light: Uri.file(path.join(props.context.extensionUri.fsPath, "resources", "chatbot_icon.png")),
+        dark: Uri.file(path.join(props.context.extensionUri.fsPath, "resources", "chatbot_icon.png")),
     };
 
     tabWebview.resolveWebviewView(panel);
