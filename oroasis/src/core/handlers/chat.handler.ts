@@ -79,10 +79,6 @@ export function createChatHandlers(
             }
         },
 
-        // "getPreferredModel:request": async (requestId: string) => {
-        //     sendToWebview(panel, "getPreferredModel:response", requestId, preferredModel);
-        // },
-
         "getAllMessages:request": async (requestId: string) => {
             const chats = chatRepository.findAllSync();
             sendToWebview(panel, "getAllMessages:response", requestId, chats);
@@ -138,7 +134,6 @@ export function createChatHandlers(
                     outputChannel
                 );
 
-                // Extraer herramientas del texto generado por el modelo
                 const toolRegex = /{.*?"action":\s*?"use_tool".*?}/g;
                 const matches = accumulated.match(toolRegex);
                 if (matches) {
@@ -148,7 +143,6 @@ export function createChatHandlers(
                             if (toolCall?.action === "use_tool") {
                                 const { tool, parameters } = toolCall;
                                 outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
-                                // Aquí puedes invocar la herramienta y manejar el resultado
                                 const toolResult = `Result of ${tool} with parameters ${JSON.stringify(parameters)}`;
                                 outputChannel.appendLine(`Tool result: ${toolResult}`);
                             }

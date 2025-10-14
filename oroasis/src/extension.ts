@@ -31,6 +31,8 @@ import { providers } from './assets/providers.collection';
 import { IProviderConfig } from './core/types/provider.type';
 import { RepositoryFactory } from './core/factories/repository-factory';
 import { IGlobalStateRepository } from './core/interfaces/global-workspace-repository-state.interface.service';
+import { registerWebView } from './core/webview/webview.register';
+import { WebviewProvider } from './providers/webview/WebviewProvider';
 
 const outputChannel = vscode.window.createOutputChannel("Oroasis");
 const disposables: vscode.Disposable[] = [];
@@ -73,13 +75,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		addSubscriber
 	);
 
-	// Create a WebviewPanel instance for the primary sidebar
-	const webviewPanel = vscode.window.createWebviewPanel(
-		'oroasisWebview',
-		'Oroasis Webview',
-		vscode.ViewColumn.One,
-		{}
-	);
+	const propertiesWebViewProvider = {
+		context,
+		outputChannel,
+		providersMap: providers,
+		chatRepository: chatMessageRepository,
+		providerRepository,
+	};
+
+	const webviewProvider = new WebviewProvider(propertiesWebViewProvider);
+
+	registerWebView(webviewProvider);
 
 	// Commands
 	registerCommands(
@@ -98,13 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			// Agents
 			{
 				id: 'oroasis.openChatAgent',
-				handler: () => openPanelCommand({
-					context,
-					outputChannel,
-					providersMap: providers,
-					chatRepository: chatMessageRepository,
-					providerRepository,
-				}),
+				handler: () => openPanelCommand(propertiesWebViewProvider),
 			},
 			{
 				id: 'oroasis.askAgent',
@@ -132,17 +132,18 @@ export async function activate(context: vscode.ExtensionContext) {
 					providerName
 				),
 			},
+			// Buttons Chats
 			{
-				id: 'oroasis.newHeaderButton',
-				handler: () => newHeaderButtonCommand(webviewPanel),
+				id: 'oroasis.addNewChatButton',
+				handler: () => newHeaderButtonCommand(webviewProvider.view as vscode.WebviewPanel),
 			},
 			{
-				id: 'oroasis.historyHeaderButton',
-				handler: () => historyHeaderButtonCommand(webviewPanel),
+				id: 'oroasis.historyChatsButton',
+				handler: () => historyHeaderButtonCommand(webviewProvider.view as vscode.WebviewPanel),
 			},
 			{
-				id: 'oroasis.settingsHeaderButton',
-				handler: () => settingsHeaderButtonCommand(webviewPanel),
+				id: 'oroasis.settingsChatsButton',
+				handler: () => settingsHeaderButtonCommand(webviewProvider.view as vscode.WebviewPanel),
 			},
 
 			// Chats
