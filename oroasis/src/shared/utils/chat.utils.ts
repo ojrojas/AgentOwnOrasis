@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
-import { IChatMessage, IChatRequest, IGenerateMessage, IGenerateRequest, IMessage } from '../../core/types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
-import { asAsyncGenerator } from '../generics/asasyncgenerator';
+import * as vscode from 'vscode';
+import { basicPromptsV1_1 } from '../../assets/basic-prompts1_1.collection';
 import { IProviderApiService } from '../../core/interfaces/provider.interface.service';
 import { IWorkspaceStateRepository } from '../../core/interfaces/workspace-repository-state.interface.service';
-import { basicPromptsV1_1 } from '../../assets/basic-prompts1_1.collection';
+import { IChatMessage, IChatRequest, IGenerateMessage, IGenerateRequest, IMessage } from '../../core/types/chat-message.type';
+import { asAsyncGenerator } from '../generics/asasyncgenerator';
 
 export function sendToWebview(
     panel: vscode.WebviewPanel,
@@ -27,10 +27,18 @@ export function isValidPayload(payload: any): boolean {
     return !!(payload && payload.model && payload.content);
 }
 
-export function getSystemPrompt(): IMessage | undefined {
+export function getSystemPrompt(type?: string): IMessage | undefined {
+    let content = basicPromptsV1_1;
+    
+    if (type === 'Ask') {
+        content = "You are Oroasis, a helpful AI assistant. Answer the user's questions clearly and concisely.";
+    } else if (type === 'Agent') {
+        content = basicPromptsV1_1 + "\n\nYou are currently in AGENT mode. You have full access to the workspace tools. Use them to help the user with their request.";
+    }
+
     return {
         role: 'system',
-        content: basicPromptsV1_1
+        content: content
     } as IMessage;
 }
 

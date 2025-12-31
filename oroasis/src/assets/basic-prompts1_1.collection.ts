@@ -44,7 +44,7 @@ Use **exactly ONE tool per message**.
 | \`read_file\` | Read a file’s contents | <read_file><path>src/app.ts</path></read_file> |
 | \`workspace_files\` | List files | <workspace_files><path>src</path></workspace_files> |
 | \`write_file\` | Create or overwrite files | <write_file><path>src/new.ts</path><content>...</content></write_file> |
-| \`replace_in_file\` | Apply text diffs | <replace_in_file><path>src/main.ts</path><diff>- var\\n+ let</diff></replace_in_file> |
+| \`replace_in_file\` | Replace text in a file | <replace_in_file><path>src/main.ts</path><search>old text</search><replace>new text</replace></replace_in_file> |
 | \`selection_in_file\` | Select a code range | <selection_in_file><range><start_position>0</start_position><end_position>120</end_position></range><path>src</path></selection_in_file> |
 | \`search_files\` | Search text | <search_files><query>class UserService</query><path>src</path></search_files> |
 | \`use_mcp_tool\` | Call an MCP server tool | <use_mcp_tool><server_name>git</server_name><tool_name>commit</tool_name><arguments>{"message":"Refactor login"}</arguments></use_mcp_tool> |
@@ -80,13 +80,14 @@ Below are *canonical examples* of how Oroasis should respond.
 
 ---
 
-### Example 3 — Replacing deprecated syntax
+### Example 3 — Replacing text
 **User:** “Change var to let in src/app.ts”  
 **Oroasis:**
 \`\`\`xml
 <replace_in_file>
   <path>src/app.ts</path>
-  <diff>- var\\n+ let</diff>
+  <search>var x = 10;</search>
+  <replace>let x = 10;</replace>
 </replace_in_file>
 \`\`\`
 

@@ -1,6 +1,5 @@
-import * as vscode from 'vscode';
-import { IChatMessage } from '../types/chat-message.type';
 import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
 import { handleError } from '../../shared/generics/errors';
 import {
     buildAssistantMessage,
@@ -12,12 +11,14 @@ import {
     sendSafe,
     sendToWebview
 } from '../../shared/utils/chat.utils';
-import { IProviderFactory } from '../services/provider.factory.service';
-import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
-import { WorkspaceController } from '../controllers/workspace.controller';
-import { IFileChange } from '../types/file-change.type';
-import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
 import { StringBuilder } from '../../shared/utils/stringbuilder.utils';
+import { WorkspaceController } from '../controllers/workspace.controller';
+import { IWorkspaceStateRepository } from '../interfaces/workspace-repository-state.interface.service';
+import { IProviderFactory } from '../services/provider.factory.service';
+import { ToolExecutorService } from '../services/tool-executor.service';
+import { WorkspaceFilesRepositoryService } from '../services/workspace-repository-files.service';
+import { IChatMessage } from '../types/chat-message.type';
+import { IFileChange } from '../types/file-change.type';
 
 // Import tools collection
 import { ListTools } from '../../assets/tools.collection';
@@ -31,6 +32,7 @@ export function createChatHandlers(
 ) {
     const workspaceService = new WorkspaceFilesRepositoryService();
     const workspaceController = new WorkspaceController(workspaceService);
+    const toolExecutor = new ToolExecutorService(workspaceController, outputChannel);
     const settings = vscode.workspace.getConfiguration('oroasisSettings');
     const temperature = parseFloat(settings.get<string>('modelTemperature') ?? '0.1');
     const promptDefault = settings.get<string>('templatePromptGenerate') as string;
@@ -96,13 +98,18 @@ export function createChatHandlers(
                 return;
             }
 
-            const systemPrompt = getSystemPrompt();
+            const systemPrompt = getSystemPrompt(payload.type);
+            let chat = await ensureChatExists(payload, chatRepository, outputChannel);
 
             if (systemPrompt) {
-                payload.messages = [systemPrompt, { role: payload.role, content: payload.content }];
+                // Include history + new message
+                payload.messages = [
+                    systemPrompt,
+                    ...chat.messages.map((m: { role: any; content: any; }) => ({ role: m.role, content: m.content }))
+                ];
+            } else {
+                payload.messages = chat.messages.map((m: { role: any; content: any; }) => ({ role: m.role, content: m.content }));
             }
-
-            let chat = await ensureChatExists(payload, chatRepository, outputChannel);
 
             payload.content = await enrichContentWithFiles(payload);
             payload.options = { temperature: temperature };
@@ -125,37 +132,51 @@ export function createChatHandlers(
             }
 
             try {
-                accumulated = await handleChatStream(
-                    adapter,
-                    payload,
-                    requestId,
-                    panel,
-                    messageId,
-                    outputChannel
-                );
+                let loopCount = 0;
+                const maxLoops = 5;
+                let finalAccumulated = '';
 
-                const toolRegex = /{.*?"action":\s*?"use_tool".*?}/g;
-                const matches = accumulated.match(toolRegex);
-                if (matches) {
-                    for (const match of matches) {
-                        try {
-                            const toolCall = JSON.parse(match);
-                            if (toolCall?.action === "use_tool") {
-                                const { tool, parameters } = toolCall;
-                                outputChannel.appendLine(`Tool requested: ${tool} with parameters: ${JSON.stringify(parameters)}`);
-                                const toolResult = `Result of ${tool} with parameters ${JSON.stringify(parameters)}`;
-                                outputChannel.appendLine(`Tool result: ${toolResult}`);
-                            }
-                        } catch (error) {
-                            outputChannel.appendLine("Failed to parse tool call: " + (error as Error).message);
-                        }
+                while (loopCount < maxLoops) {
+                    accumulated = await handleChatStream(
+                        adapter,
+                        payload,
+                        requestId,
+                        panel,
+                        messageId,
+                        outputChannel
+                    );
+                    finalAccumulated += accumulated;
+
+                    const toolCalls = toolExecutor.parseToolCalls(accumulated);
+                    if (toolCalls.length === 0) {
+                        break;
                     }
+
+                    outputChannel.appendLine(`Detected ${toolCalls.length} tool calls. Executing...`);
+                    
+                    for (const toolCall of toolCalls) {
+                        // Notify webview about tool execution
+                        sendSafe(panel, "sendChat:response", outputChannel, requestId, {
+                            id: uuidv4(),
+                            role: 'assistant',
+                            content: `\n\n> 🛠️ **Executing Tool:** \`${toolCall.tool}\`...\n`,
+                            done: false
+                        });
+
+                        const result = await toolExecutor.execute(toolCall.tool, toolCall.parameters);
+                        payload.messages.push({ role: 'assistant', content: accumulated });
+                        payload.messages.push({ role: 'user', content: `Tool Result (${toolCall.tool}):\n${result}` });
+                    }
+
+                    loopCount++;
+                    // Reset accumulated for next iteration
+                    accumulated = '';
                 }
 
-                chat.messages.push(buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));
+                chat.messages.push(buildAssistantMessage(finalAccumulated, messageId, payload.model, contextAccumulated));
                 await safeUpdateChat(chatRepository, payload.chatId, chat, outputChannel);
 
-                sendSafe(panel, "sendChat:response:done", outputChannel, requestId, buildAssistantMessage(accumulated, messageId, payload.model, contextAccumulated));
+                sendSafe(panel, "sendChat:response:done", outputChannel, requestId, buildAssistantMessage(finalAccumulated, messageId, payload.model, contextAccumulated));
             } catch (error) {
                 handleError(error, outputChannel, "Error: request provider service");
                 sendSafe(panel, "sendChat:response:done", outputChannel, requestId);
