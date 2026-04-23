@@ -249,22 +249,21 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/mocha": "^10.0.10",
-    "@types/node": "~20.19.19",
+    "@types/node": "~20.19.39",
     "@types/sinon": "^17.0.4",
-    "@types/vscode": "^1.104.0",
-    "@typescript-eslint/eslint-plugin": "^8.45.0",
-    "@typescript-eslint/parser": "^8.45.0",
+    "@types/vscode": "^1.116.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.37.0",
-    "mocha": "^11.7.4",
-    "sinon": "^21.0.0",
+    "eslint": "^9.39.4",
+    "mocha": "^11.7.5",
+    "sinon": "^21.1.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "diff": "^8.0.2",
-    "uuid": "^11.1.0",
-    "vscode": "^1.1.37"
+    "diff": "^8.0.4",
+    "uuid": "^11.1.0"
   },
-  "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa"
+  "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
